@@ -1,0 +1,16 @@
+.bc-event-dates__date-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.bc-event-dates__date-row-date,
+.bc-event-dates__date-row-time {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  label {
+    width: 80px;
+  }
+}

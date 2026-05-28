@@ -1,0 +1,21 @@
+.bc-event-dates__custom-occurence {
+  border: 1px solid var(--bce-container-border-color);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  max-width: 750px;
+
+  & + & {
+    margin-top: 32px;
+  }
+}
+
+.bc-event-dates__custom-occurence-inputs {
+  display: flex;
+  gap: var( --bce-option-row-gap);
+  justify-content: space-between;
+}
+
+.bc-event-dates__custom-occurence-dates {
+  flex-shrink: 0;
+}

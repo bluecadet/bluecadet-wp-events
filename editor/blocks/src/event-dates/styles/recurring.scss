@@ -1,0 +1,8 @@
+.bc-event-recurring__section {
+  border-top: 1px solid var(--bce-section-border-color);
+
+  & > .bc-event__content-section {
+    border-top: 0;
+    padding-top: 8px;
+  }
+}

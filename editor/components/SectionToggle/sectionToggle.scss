@@ -1,0 +1,17 @@
+.bc-events__section-toggle {
+  padding: var(--bce-container-padding);
+}
+
+.bc-events__section-toggle-button {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  svg {
+    display: block;
+    width: 28px;
+    height: auto;
+  }
+}

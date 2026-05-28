@@ -1,0 +1,13 @@
+.bc-events__checkbox-button {
+
+  &[aria-pressed="true"] {
+    border: 1px solid var(--bce-error-color);
+    color: var(--bce-error-color);
+    background: #fff;
+
+    &:hover {
+      color: #fff;
+      background: var(--bce-error-color);
+    }
+  }
+}

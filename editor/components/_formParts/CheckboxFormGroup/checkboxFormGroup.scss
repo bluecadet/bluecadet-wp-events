@@ -1,0 +1,21 @@
+.bc-event-dates__checkbox-form-group {
+  display: flex;
+  gap: 12px;
+}
+
+.bc-event-dates__checkbox-form-group-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.bc-event-dates__checkbox-form-group-option {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  label {
+    text-align: right;
+  }
+}

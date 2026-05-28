@@ -1,0 +1,30 @@
+.bc-event-dates__validation.has-error {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.bce-events-validation-notice {
+  padding: 16px;
+  border-bottom: 1px solid var(--bce-error-color);
+  background: var(--bce-error-color-light);
+  border-radius: 3px;
+  color: var(--bce-error-color);
+  font-size: 13px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+
+  & + & {
+    border-radius: 0;
+  }
+
+  p + p {
+    margin-top: 12px;
+  }
+}
+
+.bce-events-validation-notice__inner {
+  display: flex;
+  gap: var(--bce-option-row-gap);
+  align-items: center;
+}

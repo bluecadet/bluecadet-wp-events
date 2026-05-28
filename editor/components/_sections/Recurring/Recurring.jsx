@@ -1,0 +1,94 @@
+import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { getKey, getStore } from '../../_utils/store.js';
+import Frequency from '../Frequency/Frequency.jsx';
+import CustomOccurences from '../CustomOccurences/CustomOccurences.jsx';
+import OmitDates from '../OmitDates/OmitDates.jsx';
+import SectionToggle from '../../SectionToggle/SectionToggle.jsx';
+import RecurringButton from '../../_formParts/RecurringButton/RecurringButton.jsx';
+
+export default function Recurring() {
+  const { keys, meta, setMeta } = getStore();
+  const { set } = useDispatch(preferencesStore);
+
+  const META_IS_RECURRING = getKey( 'is_recurring', keys );
+  const IS_RECURRING = meta?.[ META_IS_RECURRING ] ?? false;
+ 
+  const isFreqCondensed = useSelect(select =>
+    select(preferencesStore).get('bc-events/frequency-condensed', 'condensed')
+  );
+
+  const isCustomOccurrencesCondensed = useSelect(select =>
+    select(preferencesStore).get('bc-events/custom-occurrences-condensed', 'condensed')
+  );
+
+  const isOmitDatesCondensed = useSelect(select =>
+    select(preferencesStore).get('bc-events/omit-dates-condensed', 'condensed')
+  );
+
+  const toggleCondensed = (key, value) => {
+    set(`bc-events/${key}-condensed`, 'condensed', value);
+  }
+
+  return (
+    <div className="bc-event-recurring">
+      <div className="bc-event__content-section">
+        <RecurringButton
+          id="is-recurring"
+          value={ IS_RECURRING }
+          onChange={ ( val ) => setMeta( { ...meta, [ META_IS_RECURRING ]: val } ) }
+        />
+      </div>
+      {
+        IS_RECURRING && (
+          <>
+            <div className="bc-event-recurring__section">
+              <SectionToggle
+                title={ __( 'Frequency Options', 'basecadet' ) }
+                value={ isFreqCondensed }
+                onChange={ (value) => toggleCondensed('frequency', value) }
+                asTitle={false}
+                titleTag='h3'
+              />
+              { !isFreqCondensed && (
+                <div className="bc-event__content-section">
+                  <Frequency />
+                </div>
+              ) }
+            </div>
+
+            <div className="bc-event-recurring__section">
+              <SectionToggle
+                title={ __( 'Specific Dates', 'basecadet' ) }
+                value={ isCustomOccurrencesCondensed }
+                onChange={ (value) => toggleCondensed('custom-occurrences', value) }
+                asTitle={false}
+              />
+              { !isCustomOccurrencesCondensed && (
+                <div className="bc-event__content-section">
+                  <CustomOccurences />
+                </div>
+              )}
+            </div>
+
+            <div className="bc-event-recurring__section">
+              <SectionToggle
+                title={ __( 'Exclusions', 'basecadet' ) }
+                value={ isOmitDatesCondensed }
+                onChange={ (value) => toggleCondensed('omit-dates', value) }
+                asTitle={false}
+              />
+              { !isOmitDatesCondensed && (
+                <div className="bc-event__content-section">
+                  <OmitDates />
+                </div>
+              )}
+            </div>
+          </>
+        )
+      }
+    </div>
+  )
+}
