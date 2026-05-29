@@ -15,6 +15,12 @@
   border: 1px solid var(--bce-brand-color);
   color: var(--bce-brand-color);
   background: #fff;
+
+  &:hover,
+  &:focus {
+    color: #fff;
+    background: var(--bce-brand-color);
+  }
 }
 
 

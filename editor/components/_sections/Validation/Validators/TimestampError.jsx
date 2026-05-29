@@ -12,9 +12,21 @@ export default function TimestampError({ onError, onSuccess }) {
   const END_TIMESTAMP_VALUE   = meta?.[ getKey( 'end_timestamp', keys ) ] ?? '';
 
   useEffect( () => {
-    console.log( 'Validating timestamps...', { START_TIMESTAMP_VALUE, END_TIMESTAMP_VALUE } );
-    if ( START_TIMESTAMP_VALUE && END_TIMESTAMP_VALUE && START_TIMESTAMP_VALUE > END_TIMESTAMP_VALUE ) {
-      setErrorMessage( 'End date and time cannot be before start date and time.' );
+    if ( START_TIMESTAMP_VALUE && END_TIMESTAMP_VALUE && START_TIMESTAMP_VALUE === END_TIMESTAMP_VALUE ) {
+      setErrorMessage( 'Start and End dates and times cannot be the same.' );
+      onError( 'timestamp_error' );
+    } else if ( START_TIMESTAMP_VALUE && END_TIMESTAMP_VALUE && START_TIMESTAMP_VALUE > END_TIMESTAMP_VALUE ) {
+      setErrorMessage( 'Start Date and Time must be before End Date and Time.' );
+      onError( 'timestamp_error' );
+    } else if ( 
+      (!START_TIMESTAMP_VALUE && !END_TIMESTAMP_VALUE) || 
+      (START_TIMESTAMP_VALUE && !END_TIMESTAMP_VALUE) ||
+      (!START_TIMESTAMP_VALUE && END_TIMESTAMP_VALUE) ||
+      (START_TIMESTAMP_VALUE === 0 && END_TIMESTAMP_VALUE === 0) ||
+      (START_TIMESTAMP_VALUE === 0 && END_TIMESTAMP_VALUE) ||
+      (START_TIMESTAMP_VALUE && END_TIMESTAMP_VALUE === 0)
+    ) {
+      setErrorMessage( 'Start and end dates and times must be valid.' );
       onError( 'timestamp_error' );
     } else {
       setErrorMessage( false );

@@ -33,8 +33,12 @@ class Events {
       return;
     }
 
+    remove_action( 'wp_after_insert_post', [ $this, 'handle_wp_after_insert_post' ], 99 );
+
     $SAVE_ACTIONS = new RecurringEventsSaveHandler($post_id, $post, $update);
     $SAVE_ACTIONS->run_all();
+
+    add_action( 'wp_after_insert_post', [ $this, 'handle_wp_after_insert_post' ], 99, 4 );
   }
 
 

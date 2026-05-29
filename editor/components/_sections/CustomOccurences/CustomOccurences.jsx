@@ -71,9 +71,7 @@ function OccurenceRow( { occurence, index, values, onChange, removeOccurence, id
                 id={`${id}-start-${index}`}
                 value={ occurence.start_date }
                 onChange={ ( e ) => {
-                  const newValues = [ ...values ];
-                  newValues[ index ].start_date = e.target.value;
-                  onChange( newValues );
+                  onChange( values.map( ( item, i ) => i === index ? { ...item, start_date: e.target.value } : item ) );
                 } }
               />
             </div>
@@ -86,9 +84,7 @@ function OccurenceRow( { occurence, index, values, onChange, removeOccurence, id
                 checked={ showCustomize }
                 onChange={ ( val ) => {
                   setShowCustomize( val );
-                  const newValues = [ ...values ];
-                  newValues[ index ].customize = val;
-                  onChange( newValues );
+                  onChange( values.map( ( item, i ) => i === index ? { ...item, customize: val } : item ) );
                 } }
               />
             </div>
@@ -104,9 +100,7 @@ function OccurenceRow( { occurence, index, values, onChange, removeOccurence, id
                     id={`${id}-start-time-${index}`}
                     value={ occurence.start_time }
                     onChange={ ( e ) => {
-                      const newValues = [ ...values ];
-                      newValues[ index ].start_time = e.target.value;
-                      onChange( newValues );
+                      onChange( values.map( ( item, i ) => i === index ? { ...item, start_time: e.target.value } : item ) );
                     } }
                   />
                 </div>
@@ -119,9 +113,7 @@ function OccurenceRow( { occurence, index, values, onChange, removeOccurence, id
                     id={`${id}-end-${index}`}
                     value={ occurence.end_date }
                     onChange={ ( e ) => {
-                      const newValues = [ ...values ];
-                      newValues[ index ].end_date = e.target.value;
-                      onChange( newValues );
+                      onChange( values.map( ( item, i ) => i === index ? { ...item, end_date: e.target.value } : item ) );
                     } }
                   />
                 </div>
@@ -134,9 +126,7 @@ function OccurenceRow( { occurence, index, values, onChange, removeOccurence, id
                     id={`${id}-end-time-${index}`}
                     value={ occurence.end_time }
                     onChange={ ( e ) => {
-                      const newValues = [ ...values ];
-                      newValues[ index ].end_time = e.target.value;
-                      onChange( newValues );
+                      onChange( values.map( ( item, i ) => i === index ? { ...item, end_time: e.target.value } : item ) );
                     } }
                   />
                 </div>

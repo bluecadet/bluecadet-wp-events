@@ -8,13 +8,18 @@ import CustomOccurences from '../CustomOccurences/CustomOccurences.jsx';
 import OmitDates from '../OmitDates/OmitDates.jsx';
 import SectionToggle from '../../SectionToggle/SectionToggle.jsx';
 import RecurringButton from '../../_formParts/RecurringButton/RecurringButton.jsx';
+import RemoveRecurring from '../RemoveRecurring/RemoveRecurring.jsx';
+import RecurringAltered from './RecurringAltered.jsx';
 
 export default function Recurring() {
   const { keys, meta, setMeta } = getStore();
   const { set } = useDispatch(preferencesStore);
 
   const META_IS_RECURRING = getKey( 'is_recurring', keys );
+  const META_IS_RECURRING_WAS = getKey( 'is_recurring_was', keys );
+
   const IS_RECURRING = meta?.[ META_IS_RECURRING ] ?? false;
+  const IS_RECURRING_WAS = meta?.[ META_IS_RECURRING_WAS ] ?? IS_RECURRING;
  
   const isFreqCondensed = useSelect(select =>
     select(preferencesStore).get('bc-events/frequency-condensed', 'condensed')
@@ -43,7 +48,8 @@ export default function Recurring() {
       </div>
       {
         IS_RECURRING && (
-          <>
+          <div className="bc-event-recurring__inner">
+            <RecurringAltered />
             <div className="bc-event-recurring__section">
               <SectionToggle
                 title={ __( 'Frequency Options', 'basecadet' ) }
@@ -86,7 +92,13 @@ export default function Recurring() {
                 </div>
               )}
             </div>
-          </>
+          </div>
+        )
+      }
+
+      {
+        !IS_RECURRING && IS_RECURRING_WAS && (
+          <RemoveRecurring />
         )
       }
     </div>

@@ -15,7 +15,7 @@ export default function SectionToggle({ title, value, onChange, className = null
 
   
   return (
-    <div className="bc-events__section-toggle">
+    <div className={`bc-events__section-toggle${ isCondensed ? ' closed' : ' open' }`}>
       {
         titleTag && titleTag === 'h2' ? (
           <h2 className="bce-sr-only">

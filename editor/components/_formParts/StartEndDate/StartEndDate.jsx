@@ -37,7 +37,7 @@ export default function StartEndDate({
       const data = await apiFetch( { path: url } );
       return data.timestamp;
     } catch ( error ) {
-        console.error( error );
+      console.error( error );
     }
   };
 
@@ -45,17 +45,9 @@ export default function StartEndDate({
   const handleBlur = async () => {
     const updates = {};
 
-    if ( startDate !== '' && endDate === '' ) {
-      updates[ endDateKey ] = startDate;
-    }
-
-    if ( startTime !== '' && endTime === '' ) {
-      updates[ endTimeKey ] = startTime;
-    }
-
     const [ startTs, endTs ] = await Promise.all( [
-      startDate && startTime ? getTimestamp( startDate, startTime ) : null,
-      endDate   && endTime   ? getTimestamp( endDate,   endTime   ) : null,
+      startDate  && startTime  ? getTimestamp( startDate, startTime ) : null,
+      endDate && endTime ? getTimestamp( endDate, endTime ) : null,
     ] );
 
     if ( startTs != null ) updates[ startTimestampKey ] = startTs;

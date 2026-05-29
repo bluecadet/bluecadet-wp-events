@@ -353,6 +353,9 @@ class AdminEventsViews {
     if ($d) {
       foreach($d as $dv) {
         $v = $dv->meta_value;
+        if ( $v == '' ) {
+          continue;
+        }
         $d_opts[$v] = $v;
       }
 

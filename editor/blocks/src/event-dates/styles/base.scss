@@ -13,11 +13,16 @@
 }
 
 .bc-event-dates {
+  --bce-text-color: #000;
+  --bce-block-background: #f0f0f0;
   --bce-container-border-color: #8c8f94;
   --bce-section-border-color: #ebeef3;
   --bce-input-border-color: #8c8f94;
   --bce-error-color: #ff0f0f;
   --bce-error-color-light: #fff1f1;
+  --bce-warn-color: #E5CD73;
+  --bce-warn-text-on-light: #6e623a;
+  --bce-warn-light: #F1E3B2;
   --bce-brand-color: #0049DB;
   --bce-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   --bce-container-radius: 4px;
@@ -31,9 +36,10 @@
   border-bottom: 1px solid #ccc;
   padding: 32px;
   font-family: var(--bce-font-family);
-  background: #f0f0f0;
+  background: var(--bce-block-background);
   width: 100%;
   max-width: none;
+  color: var(--bce-text-color);
 
   &.block-editor-block-list__block {
     margin: 0 !important;
@@ -45,18 +51,6 @@
       display: none !important;
     }
   }
-}
-
-.bc-events-title-h1 {
-  font-size: 16px;
-  font-weight: 600;
-  font-family: var(--bce-font-family);
-}
-
-.bc-events-title-h2 {
-  font-size: 14px;
-  font-weight: 600;
-  font-family: var(--bce-font-family);
 }
 
 .bc-event-dates__container {
@@ -83,13 +77,28 @@
   margin: 32px 0;
 }
 
+// TYPE
+.bc-events-title-h1 {
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--bce-font-family);
+  text-box-trim: trim-both cap alphabetic;
+}
+
+.bc-events-title-h2 {
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--bce-font-family);
+  text-box-trim: trim-both cap alphabetic;
+}
 
 .bc-event-dates__description {
   font-size: 13px;
   max-width: 750px;
   margin-bottom: 24px;
-  line-height: 1.3;
+  line-height: 1.5;
   opacity: 0.9;
+  text-box-trim: trim-both cap alphabetic;
 }
 
 
@@ -119,97 +128,47 @@
   height: 44px;
 }
 
-// .bc-event-dates__notices {
-//   margin-bottom: 24px;
-// }
+.bce-loader {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-// .bc-event-dates__inner {
-//   margin: 32px auto 16px;
-//   display: flex;
-//   flex-direction: column;
-//   gap: 20px;
-//   position: relative;
+.bce-loader__icon {
+  color: var(--bce-brand-color);
+  position: relative;
 
-//   &--condensed {
-//     display: none;
-//     min-height: 40px;
-//   }
+  &:before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    height: 50%;
+    border-radius: 50%;
+    animation: pulse-animation 2s infinite;
+  }
 
-//   .req {
-//     color: var(--bce-error-color);
-//   }
-// }
-
-
-
-
-// .bc-event-dates__group {
-//   display: flex;
-//   gap: 20px;
-// }
-
-// .bc-event-dates__row {
-//   display: flex;
-//   gap: 12px;
-//   align-items: center;
-// }
+  svg {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 44px;
+    height: auto;
+  }
+}
 
 
-
-// // .bc-event-dates__row--date {
-// //   label {
-// //     width: 70px;
-// //   }
-// // }
-
-// // .bc-event-dates__row--time {
-// //   label {
-// //     width: 75px;
-// //   }
-// // }
-
-// // .bc-event-dates__section {
-// //   margin-top: 12px;
-// //   border-top: 1px solid #eee;
-// //   padding-top: 32px;
-// // }
-
-// .bc-event-dates__options,
-// .bc-event-dates__option-row--virtual {
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--bce-option-row-gap);
-// }
-
-// .bc-event-dates__option-row--virtual {
-
-//   input[type="text"] {
-//     width: 300px;
-//   }
-// }
-
-// .bc-event-dates__option-checkbox,
-// .bc-event-dates__option-text {
-//   display: flex;
-//   align-items: center;
-//   gap: 8px;
-// }
-
-// .bc-event-dates__option-text {
-//   label {
-//     width: 150px;
-//   }
-// }
-
-// .bc-event-dates__checkbox {
-//   display: block;
-//   width: 14px;
-//   height: 14px;
-//   border: 1px solid var(--bce-input-border-color);
-//   border-radius: 2px;
-// }
-
-
-
+@keyframes pulse-animation {
+  0% {
+    box-shadow: 0 0 0 0px rgba(0, 73, 219, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 24px rgba(0, 73, 219, 0);
+  }
+}
 
 

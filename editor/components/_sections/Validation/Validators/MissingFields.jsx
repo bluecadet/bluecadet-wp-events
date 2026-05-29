@@ -7,14 +7,6 @@ export default function MissingFields({ onError, onSuccess }) {
   const { keys, meta } = getStore();
   const [ missingFields, setMissingFields ] = useState( [] );
 
-  const START_DATE_VALUE = meta?.[ getKey( 'start_date', keys ) ] ?? '';
-  const START_TIME_VALUE = meta?.[ getKey( 'start_time', keys ) ] ?? '';
-  const START_TIMESTAMP_VALUE = meta?.[ getKey( 'start_timestamp', keys ) ] ?? '';
-
-  const END_DATE_VALUE   = meta?.[ getKey( 'end_date', keys ) ] ?? '';
-  const END_TIME_VALUE   = meta?.[ getKey( 'end_time', keys ) ] ?? '';
-  const END_TIMESTAMP_VALUE   = meta?.[ getKey( 'end_timestamp', keys ) ] ?? '';
-
   const IS_RECURRING = meta?.[ getKey( 'is_recurring', keys ) ];
   const USE_FREQ = meta?.[ getKey( 'use_frequency', keys ) ];
   const FREQ = meta?.[ getKey( 'freq', keys ) ] ?? 'daily';
@@ -30,25 +22,7 @@ export default function MissingFields({ onError, onSuccess }) {
 
   useEffect( () => {
 
-    const validationChecks = {
-      start_date: {
-        test: START_DATE_VALUE !== '',
-        label: __( 'Start Date', 'basecadet' ),
-      },
-      start_time: {
-        test: START_TIME_VALUE !== '',
-        label: __( 'Start Time', 'basecadet' ),
-      },
-      end_date: {
-        test: END_DATE_VALUE !== '',
-        label: __( 'End Date', 'basecadet' ),
-      },
-      end_time: {
-        test: END_TIME_VALUE !== '',
-        label: __( 'End Time', 'basecadet' ),
-      },
-    }
-
+    const validationChecks = {}
 
     if ( IS_RECURRING ) {
       if ( USE_FREQ && FREQ ) {
@@ -111,10 +85,6 @@ export default function MissingFields({ onError, onSuccess }) {
     }
   
   }, [ 
-    START_DATE_VALUE, 
-    START_TIME_VALUE, 
-    END_DATE_VALUE, 
-    END_TIME_VALUE,
     IS_RECURRING,
     USE_FREQ,
     FREQ,

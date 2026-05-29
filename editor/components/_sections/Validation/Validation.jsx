@@ -18,26 +18,34 @@ export default function Validation() {
   const [ hasError, setHasError ] = useState( false );
 
   const handleLockPost = (key) => {
-    setLockedBy( (prev) => [ ...prev, key ] );
-    setHasError( true );
-    lockPostSaving( LOCK_KEY );
+    setLockedBy( (prev) => prev.includes( key ) ? prev : [ ...prev, key ] );
   }
 
   const handleUnlockPost = (key) => {
     setLockedBy( (prev) => prev.filter( (k) => k !== key ) );
-    if ( lockedBy.length === 1 ) {
+  }
+
+  useEffect( () => {
+    if ( lockedBy.length > 0 ) {
+      setHasError( true );
+      lockPostSaving( LOCK_KEY );
+    } else {
       setHasError( false );
       unlockPostSaving( LOCK_KEY );
     }
-  }
+  }, [ lockedBy ] );
+
+  useEffect( () => {
+    return () => unlockPostSaving( LOCK_KEY );
+  }, [] );
 
   return (
     <div className={`bc-event-dates__validation ${ hasError ? 'has-error' : '' }`}>
-      <MissingFields 
+      <TimestampError
         onError={ handleLockPost }
         onSuccess={ handleUnlockPost }
       />
-      <TimestampError
+      <MissingFields 
         onError={ handleLockPost }
         onSuccess={ handleUnlockPost }
       />

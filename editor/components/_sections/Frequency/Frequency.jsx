@@ -20,6 +20,8 @@ export default function Frequency() {
   const META_END_DATE = getKey( 'freq_end_date', keys );
   const META_END_AFTER_X = getKey( 'freq_end_after_x', keys );
   const META_START_DATE = getKey('start_date', keys );
+  const META_FREQ_IS = getKey( 'freq_is', keys );
+  const META_FREQ_WAS = getKey( 'freq_was', keys );
 
   const END_TYPE_VALUE = meta?.[ META_END_TYPE ] ?? 'on_date';
   const END_DATE_VALUE = meta?.[ META_END_DATE ] ?? '';
@@ -33,8 +35,11 @@ export default function Frequency() {
   const MONTHLY_DATE = meta?.[ META_MONTHLY_DATE ] ?? '';
   const START_DATE_VALUE = meta?.[ META_START_DATE ];
 
+  
+
   return (
     <div className="bc-event-dates__frequency">
+    
       <p className='bc-event-dates__description'>{__('If your event recurs on a specific schedule, you can set the frequency here.', 'bluecadet-events')}</p>
       
       {
@@ -159,6 +164,8 @@ export default function Frequency() {
           </div>
         )
       }
+
+      
 
       <div className="bc-event-dates__frequency-row bc-event-dates__frequency-toggle">
         <CheckboxButton

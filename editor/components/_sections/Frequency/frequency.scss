@@ -1,3 +1,7 @@
+.bc-event-dates__frequency {
+  position: relative;
+}
+
 .bc-event-dates__frequency-row {
 
   .bc-event-dates__label {
@@ -25,4 +29,11 @@
   .bc-events__flex-fieldset + .bc-event-dates__frequency-toggle {
     margin-top: 24px;
   }
+
+  .bc-events__checkbox-button {
+    min-width: var(--bce-recurring-label-width);
+  }
 }
+
+
+

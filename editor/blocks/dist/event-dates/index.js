@@ -40,7 +40,7 @@ function SectionToggle({
     });
   };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
-    className: "bc-events__section-toggle",
+    className: `bc-events__section-toggle${isCondensed ? ' closed' : ' open'}`,
     children: [titleTag && titleTag === 'h2' ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h2", {
       className: "bce-sr-only",
       children: title
@@ -305,12 +305,6 @@ function StartEndDate({
   };
   const handleBlur = async () => {
     const updates = {};
-    if (startDate !== '' && endDate === '') {
-      updates[endDateKey] = startDate;
-    }
-    if (startTime !== '' && endTime === '') {
-      updates[endTimeKey] = startTime;
-    }
     const [startTs, endTs] = await Promise.all([startDate && startTime ? getTimestamp(startDate, startTime) : null, endDate && endTime ? getTimestamp(endDate, endTime) : null]);
     if (startTs != null) updates[startTimestampKey] = startTs;
     if (endTs != null) updates[endTimestampKey] = endTs;
@@ -483,9 +477,10 @@ function OccurenceRow({
               id: `${id}-start-${index}`,
               value: occurence.start_date,
               onChange: e => {
-                const newValues = [...values];
-                newValues[index].start_date = e.target.value;
-                onChange(newValues);
+                onChange(values.map((item, i) => i === index ? {
+                  ...item,
+                  start_date: e.target.value
+                } : item));
               }
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
@@ -496,9 +491,10 @@ function OccurenceRow({
               checked: showCustomize,
               onChange: val => {
                 setShowCustomize(val);
-                const newValues = [...values];
-                newValues[index].customize = val;
-                onChange(newValues);
+                onChange(values.map((item, i) => i === index ? {
+                  ...item,
+                  customize: val
+                } : item));
               }
             })
           }), showCustomize && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
@@ -514,9 +510,10 @@ function OccurenceRow({
                 id: `${id}-start-time-${index}`,
                 value: occurence.start_time,
                 onChange: e => {
-                  const newValues = [...values];
-                  newValues[index].start_time = e.target.value;
-                  onChange(newValues);
+                  onChange(values.map((item, i) => i === index ? {
+                    ...item,
+                    start_time: e.target.value
+                  } : item));
                 }
               })]
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
@@ -531,9 +528,10 @@ function OccurenceRow({
                 id: `${id}-end-${index}`,
                 value: occurence.end_date,
                 onChange: e => {
-                  const newValues = [...values];
-                  newValues[index].end_date = e.target.value;
-                  onChange(newValues);
+                  onChange(values.map((item, i) => i === index ? {
+                    ...item,
+                    end_date: e.target.value
+                  } : item));
                 }
               })]
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
@@ -548,9 +546,10 @@ function OccurenceRow({
                 id: `${id}-end-time-${index}`,
                 value: occurence.end_time,
                 onChange: e => {
-                  const newValues = [...values];
-                  newValues[index].end_time = e.target.value;
-                  onChange(newValues);
+                  onChange(values.map((item, i) => i === index ? {
+                    ...item,
+                    end_time: e.target.value
+                  } : item));
                 }
               })]
             })]
@@ -697,6 +696,8 @@ function Frequency() {
   const META_END_DATE = (0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_end_date', keys);
   const META_END_AFTER_X = (0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_end_after_x', keys);
   const META_START_DATE = (0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_date', keys);
+  const META_FREQ_IS = (0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_is', keys);
+  const META_FREQ_WAS = (0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_was', keys);
   const END_TYPE_VALUE = meta?.[META_END_TYPE] ?? 'on_date';
   const END_DATE_VALUE = meta?.[META_END_DATE] ?? '';
   const END_AFTER_X_VALUE = meta?.[META_END_AFTER_X] ?? 2;
@@ -979,8 +980,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _OmitDates_OmitDates_jsx__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../OmitDates/OmitDates.jsx */ "./editor/components/_sections/OmitDates/OmitDates.jsx");
 /* harmony import */ var _SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../SectionToggle/SectionToggle.jsx */ "./editor/components/SectionToggle/SectionToggle.jsx");
 /* harmony import */ var _formParts_RecurringButton_RecurringButton_jsx__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../_formParts/RecurringButton/RecurringButton.jsx */ "./editor/components/_formParts/RecurringButton/RecurringButton.jsx");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var _RemoveRecurring_RemoveRecurring_jsx__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../RemoveRecurring/RemoveRecurring.jsx */ "./editor/components/_sections/RemoveRecurring/RemoveRecurring.jsx");
+/* harmony import */ var _RecurringAltered_jsx__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./RecurringAltered.jsx */ "./editor/components/_sections/Recurring/RecurringAltered.jsx");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__);
+
+
 
 
 
@@ -1002,18 +1007,20 @@ function Recurring() {
     set
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useDispatch)(_wordpress_preferences__WEBPACK_IMPORTED_MODULE_3__.store);
   const META_IS_RECURRING = (0,_utils_store_js__WEBPACK_IMPORTED_MODULE_4__.getKey)('is_recurring', keys);
+  const META_IS_RECURRING_WAS = (0,_utils_store_js__WEBPACK_IMPORTED_MODULE_4__.getKey)('is_recurring_was', keys);
   const IS_RECURRING = meta?.[META_IS_RECURRING] ?? false;
+  const IS_RECURRING_WAS = meta?.[META_IS_RECURRING_WAS] ?? IS_RECURRING;
   const isFreqCondensed = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useSelect)(select => select(_wordpress_preferences__WEBPACK_IMPORTED_MODULE_3__.store).get('bc-events/frequency-condensed', 'condensed'));
   const isCustomOccurrencesCondensed = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useSelect)(select => select(_wordpress_preferences__WEBPACK_IMPORTED_MODULE_3__.store).get('bc-events/custom-occurrences-condensed', 'condensed'));
   const isOmitDatesCondensed = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useSelect)(select => select(_wordpress_preferences__WEBPACK_IMPORTED_MODULE_3__.store).get('bc-events/omit-dates-condensed', 'condensed'));
   const toggleCondensed = (key, value) => {
     set(`bc-events/${key}-condensed`, 'condensed', value);
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)("div", {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("div", {
     className: "bc-event-recurring",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("div", {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
       className: "bc-event__content-section",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_formParts_RecurringButton_RecurringButton_jsx__WEBPACK_IMPORTED_MODULE_9__["default"], {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_formParts_RecurringButton_RecurringButton_jsx__WEBPACK_IMPORTED_MODULE_9__["default"], {
         id: "is-recurring",
         value: IS_RECURRING,
         onChange: val => setMeta({
@@ -1021,43 +1028,214 @@ function Recurring() {
           [META_IS_RECURRING]: val
         })
       })
-    }), IS_RECURRING && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.Fragment, {
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)("div", {
+    }), IS_RECURRING && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("div", {
+      className: "bc-event-recurring__inner",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_RecurringAltered_jsx__WEBPACK_IMPORTED_MODULE_11__["default"], {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("div", {
         className: "bc-event-recurring__section",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_8__["default"], {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_8__["default"], {
           title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Frequency Options', 'basecadet'),
           value: isFreqCondensed,
           onChange: value => toggleCondensed('frequency', value),
           asTitle: false,
           titleTag: "h3"
-        }), !isFreqCondensed && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("div", {
+        }), !isFreqCondensed && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
           className: "bc-event__content-section",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_Frequency_Frequency_jsx__WEBPACK_IMPORTED_MODULE_5__["default"], {})
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_Frequency_Frequency_jsx__WEBPACK_IMPORTED_MODULE_5__["default"], {})
         })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)("div", {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("div", {
         className: "bc-event-recurring__section",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_8__["default"], {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_8__["default"], {
           title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Specific Dates', 'basecadet'),
           value: isCustomOccurrencesCondensed,
           onChange: value => toggleCondensed('custom-occurrences', value),
           asTitle: false
-        }), !isCustomOccurrencesCondensed && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("div", {
+        }), !isCustomOccurrencesCondensed && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
           className: "bc-event__content-section",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_CustomOccurences_CustomOccurences_jsx__WEBPACK_IMPORTED_MODULE_6__["default"], {})
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_CustomOccurences_CustomOccurences_jsx__WEBPACK_IMPORTED_MODULE_6__["default"], {})
         })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)("div", {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("div", {
         className: "bc-event-recurring__section",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_8__["default"], {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_8__["default"], {
           title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Exclusions', 'basecadet'),
           value: isOmitDatesCondensed,
           onChange: value => toggleCondensed('omit-dates', value),
           asTitle: false
-        }), !isOmitDatesCondensed && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("div", {
+        }), !isOmitDatesCondensed && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
           className: "bc-event__content-section",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_OmitDates_OmitDates_jsx__WEBPACK_IMPORTED_MODULE_7__["default"], {})
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_OmitDates_OmitDates_jsx__WEBPACK_IMPORTED_MODULE_7__["default"], {})
         })]
       })]
-    })]
+    }), !IS_RECURRING && IS_RECURRING_WAS && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_RemoveRecurring_RemoveRecurring_jsx__WEBPACK_IMPORTED_MODULE_10__["default"], {})]
+  });
+}
+
+/***/ },
+
+/***/ "./editor/components/_sections/Recurring/RecurringAltered.jsx"
+/*!********************************************************************!*\
+  !*** ./editor/components/_sections/Recurring/RecurringAltered.jsx ***!
+  \********************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ RecurringAltered)
+/* harmony export */ });
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _utils_store_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../_utils/store.js */ "./editor/components/_utils/store.js");
+/* harmony import */ var _blocks_src_event_dates_data_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../blocks/src/event-dates/data.js */ "./editor/blocks/src/event-dates/data.js");
+/* harmony import */ var _formParts_BasicSelect_BasicSelect_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../_formParts/BasicSelect/BasicSelect.js */ "./editor/components/_formParts/BasicSelect/BasicSelect.js");
+/* harmony import */ var _formParts_CheckboxButton_CheckboxButton_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../_formParts/CheckboxButton/CheckboxButton.jsx */ "./editor/components/_formParts/CheckboxButton/CheckboxButton.jsx");
+/* harmony import */ var _formParts_CheckboxFormGroup_CheckboxFormGroup_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../_formParts/CheckboxFormGroup/CheckboxFormGroup.js */ "./editor/components/_formParts/CheckboxFormGroup/CheckboxFormGroup.js");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__);
+
+
+
+
+
+
+
+
+
+function RecurringAltered() {
+  const {
+    keys,
+    meta,
+    setMeta
+  } = (0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getStore)();
+  const [hasRecurDiff, setHasRecurDiff] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_6__.useState)(false);
+  const USE_FREQUENCY = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('use_frequency', keys)] ?? false;
+  const FREQUENCY_VALUE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq', keys)] ?? '';
+  const WEEKLY_DAYS = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_days', keys)] ?? [];
+  const MONTHLY_SCHED = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_mo_schedule', keys)] ?? '';
+  const MONTHLY_DAY = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_mo_day', keys)] ?? '';
+  const MONTHLY_DATE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_mo_date', keys)] ?? '';
+  const END_TYPE_VALUE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_end_type', keys)] ?? '';
+  const END_DATE_VALUE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_end_date', keys)] ?? '';
+  const END_AFTER_X_VALUE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_end_after_x', keys)] ?? '';
+  const START_TIMESTAMP = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_timestamp', keys)] ?? '';
+  const OCCURENCES = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('custom_occurrences', keys)] ?? [];
+  const OMISSIONS = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('omissions', keys)] ?? [];
+  const RECUR_WAS = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('recur_strategy_was', keys)] ?? [];
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_6__.useEffect)(() => {
+    const currentRecur = {
+      use_frequency: USE_FREQUENCY,
+      frequency: FREQUENCY_VALUE,
+      weekly_days: WEEKLY_DAYS,
+      month_schedule: MONTHLY_SCHED,
+      month_day: MONTHLY_DAY,
+      month_date: MONTHLY_DATE,
+      end_type: END_TYPE_VALUE,
+      end_date: END_DATE_VALUE,
+      end_after_x: END_AFTER_X_VALUE,
+      start_date_timestamp: `${START_TIMESTAMP}`,
+      occurences: OCCURENCES,
+      omissions: OMISSIONS
+    };
+    setHasRecurDiff(!(0,lodash__WEBPACK_IMPORTED_MODULE_7__.isEqual)(currentRecur, RECUR_WAS));
+  }, [USE_FREQUENCY, FREQUENCY_VALUE, WEEKLY_DAYS, MONTHLY_SCHED, MONTHLY_DAY, MONTHLY_DATE, END_TYPE_VALUE, END_DATE_VALUE, END_AFTER_X_VALUE, START_TIMESTAMP, RECUR_WAS, OCCURENCES, OMISSIONS]);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
+    children: hasRecurDiff && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
+      className: "bc-events__recurring-notice",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
+        className: "bc-events__recurring-notice-inner",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("p", {
+          className: "bc-events__description",
+          children: "Recurring values have changed. This may have an effect on existing child events, including their urls or other related data."
+        })
+      })
+    })
+  });
+}
+
+/***/ },
+
+/***/ "./editor/components/_sections/RemoveRecurring/RemoveRecurring.jsx"
+/*!*************************************************************************!*\
+  !*** ./editor/components/_sections/RemoveRecurring/RemoveRecurring.jsx ***!
+  \*************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ RemoveRecurring)
+/* harmony export */ });
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _utils_store__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../_utils/store */ "./editor/components/_utils/store.js");
+/* harmony import */ var _formParts_BasicSelect_BasicSelect_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../_formParts/BasicSelect/BasicSelect.js */ "./editor/components/_formParts/BasicSelect/BasicSelect.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+function RemoveRecurring() {
+  const {
+    keys,
+    meta,
+    setMeta
+  } = (0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getStore)();
+  const META_REMOVE_RECURRING = (0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('remove_recurring', keys);
+  const REMOVE_RECURRING = meta?.[META_REMOVE_RECURRING] ?? 'delete';
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+    className: "bc-event__content-section",
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+      className: "bc-event__remove-recurring",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+        className: "bc-event__remove-recurring-content bc-event__content-section",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("h2", {
+          className: "bc-events-title-h1",
+          children: "Remove Recurring Events"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", {
+          className: "bc-event-dates__description",
+          children: "It seems like you're trying to remove recurring settings from an event that was previously set as recurring. This action will remove all recurring dates and settings associated with this event."
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", {
+          className: "bc-event-dates__description",
+          children: "Please choose how you would like to handle the existing recurring dates:"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("ul", {
+          className: "bc-event__remove-recurring-list",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
+            children: "This action will not be implemented until after you save the event."
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
+            children: "This action cannot be reversed once implemented."
+          })]
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+        className: "bc-event__remove-recurring-action bc-event__content-section",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_formParts_BasicSelect_BasicSelect_js__WEBPACK_IMPORTED_MODULE_2__["default"], {
+          id: "remove-recurring",
+          label: "Action:",
+          value: REMOVE_RECURRING,
+          onChange: val => setMeta({
+            ...meta,
+            [META_REMOVE_RECURRING]: val
+          }),
+          options: [{
+            value: 'delete',
+            label: 'Delete all recurring dates'
+          }, {
+            value: 'to_posts',
+            label: 'Convert child events to top level events'
+          }]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+          className: "bc-event__remove-recurring-action-helper",
+          children: REMOVE_RECURRING === 'to_posts' ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", {
+            className: "bc-event-dates__description",
+            children: "All recurring events created from the current settings will be converted to their own posts and no longer associated with a recurring relationship."
+          }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", {
+            className: "bc-event-dates__description",
+            children: "All recurring dates will be permanently deleted. This is irreversible."
+          })
+        })]
+      })]
+    })
   });
 }
 
@@ -1109,23 +1287,29 @@ function Validation() {
   const [lockedBy, setLockedBy] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.useState)([]);
   const [hasError, setHasError] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
   const handleLockPost = key => {
-    setLockedBy(prev => [...prev, key]);
-    setHasError(true);
-    lockPostSaving(LOCK_KEY);
+    setLockedBy(prev => prev.includes(key) ? prev : [...prev, key]);
   };
   const handleUnlockPost = key => {
     setLockedBy(prev => prev.filter(k => k !== key));
-    if (lockedBy.length === 1) {
+  };
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
+    if (lockedBy.length > 0) {
+      setHasError(true);
+      lockPostSaving(LOCK_KEY);
+    } else {
       setHasError(false);
       unlockPostSaving(LOCK_KEY);
     }
-  };
+  }, [lockedBy]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
+    return () => unlockPostSaving(LOCK_KEY);
+  }, []);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
     className: `bc-event-dates__validation ${hasError ? 'has-error' : ''}`,
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_Validators_MissingFields_jsx__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_Validators_TimestampError_jsx__WEBPACK_IMPORTED_MODULE_6__["default"], {
       onError: handleLockPost,
       onSuccess: handleUnlockPost
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_Validators_TimestampError_jsx__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_Validators_MissingFields_jsx__WEBPACK_IMPORTED_MODULE_5__["default"], {
       onError: handleLockPost,
       onSuccess: handleUnlockPost
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_Validators_MissingRecurringStrategy_jsx__WEBPACK_IMPORTED_MODULE_7__["default"], {
@@ -1220,12 +1404,6 @@ function MissingFields({
     meta
   } = (0,_utils_store__WEBPACK_IMPORTED_MODULE_2__.getStore)();
   const [missingFields, setMissingFields] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.useState)([]);
-  const START_DATE_VALUE = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_2__.getKey)('start_date', keys)] ?? '';
-  const START_TIME_VALUE = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_2__.getKey)('start_time', keys)] ?? '';
-  const START_TIMESTAMP_VALUE = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_2__.getKey)('start_timestamp', keys)] ?? '';
-  const END_DATE_VALUE = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_2__.getKey)('end_date', keys)] ?? '';
-  const END_TIME_VALUE = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_2__.getKey)('end_time', keys)] ?? '';
-  const END_TIMESTAMP_VALUE = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_2__.getKey)('end_timestamp', keys)] ?? '';
   const IS_RECURRING = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_2__.getKey)('is_recurring', keys)];
   const USE_FREQ = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_2__.getKey)('use_frequency', keys)];
   const FREQ = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_2__.getKey)('freq', keys)] ?? 'daily';
@@ -1239,24 +1417,7 @@ function MissingFields({
   const OCCURENCES = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_2__.getKey)('custom_occurrences', keys)];
   const OMISSIONS = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_2__.getKey)('omissions', keys)];
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
-    const validationChecks = {
-      start_date: {
-        test: START_DATE_VALUE !== '',
-        label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Start Date', 'basecadet')
-      },
-      start_time: {
-        test: START_TIME_VALUE !== '',
-        label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Start Time', 'basecadet')
-      },
-      end_date: {
-        test: END_DATE_VALUE !== '',
-        label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('End Date', 'basecadet')
-      },
-      end_time: {
-        test: END_TIME_VALUE !== '',
-        label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('End Time', 'basecadet')
-      }
-    };
+    const validationChecks = {};
     if (IS_RECURRING) {
       if (USE_FREQ && FREQ) {
         if (FREQ === 'weekly') {
@@ -1306,7 +1467,7 @@ function MissingFields({
     } else {
       onSuccess('missing_fields');
     }
-  }, [START_DATE_VALUE, START_TIME_VALUE, END_DATE_VALUE, END_TIME_VALUE, IS_RECURRING, USE_FREQ, FREQ, WEEKLY_DAYS, MONTHLY_SCHED, MONTHLY_DAY, MONTHLY_DATE, FREQ_END_TYPE, FREQ_END_DATE, FREQ_END_AFTER_X, OCCURENCES, OMISSIONS]);
+  }, [IS_RECURRING, USE_FREQ, FREQ, WEEKLY_DAYS, MONTHLY_SCHED, MONTHLY_DAY, MONTHLY_DATE, FREQ_END_TYPE, FREQ_END_DATE, FREQ_END_AFTER_X, OCCURENCES, OMISSIONS]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
     children: missingFields && missingFields.length > 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_ValidationNotice_jsx__WEBPACK_IMPORTED_MODULE_3__["default"], {
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("p", {
@@ -1417,12 +1578,14 @@ function TimestampError({
   const START_TIMESTAMP_VALUE = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_timestamp', keys)] ?? '';
   const END_TIMESTAMP_VALUE = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('end_timestamp', keys)] ?? '';
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    console.log('Validating timestamps...', {
-      START_TIMESTAMP_VALUE,
-      END_TIMESTAMP_VALUE
-    });
-    if (START_TIMESTAMP_VALUE && END_TIMESTAMP_VALUE && START_TIMESTAMP_VALUE > END_TIMESTAMP_VALUE) {
-      setErrorMessage('End date and time cannot be before start date and time.');
+    if (START_TIMESTAMP_VALUE && END_TIMESTAMP_VALUE && START_TIMESTAMP_VALUE === END_TIMESTAMP_VALUE) {
+      setErrorMessage('Start and End dates and times cannot be the same.');
+      onError('timestamp_error');
+    } else if (START_TIMESTAMP_VALUE && END_TIMESTAMP_VALUE && START_TIMESTAMP_VALUE > END_TIMESTAMP_VALUE) {
+      setErrorMessage('Start Date and Time must be before End Date and Time.');
+      onError('timestamp_error');
+    } else if (!START_TIMESTAMP_VALUE && !END_TIMESTAMP_VALUE || START_TIMESTAMP_VALUE && !END_TIMESTAMP_VALUE || !START_TIMESTAMP_VALUE && END_TIMESTAMP_VALUE || START_TIMESTAMP_VALUE === 0 && END_TIMESTAMP_VALUE === 0 || START_TIMESTAMP_VALUE === 0 && END_TIMESTAMP_VALUE || START_TIMESTAMP_VALUE && END_TIMESTAMP_VALUE === 0) {
+      setErrorMessage('Start and end dates and times must be valid.');
       onError('timestamp_error');
     } else {
       setErrorMessage(false);
@@ -1452,16 +1615,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__);
 
 function CaretIcon() {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("svg", {
-    width: "44",
-    height: "44",
-    viewBox: "0 0 44 44",
-    fill: "none",
-    xmlns: "http://www.w3.org/2000/svg",
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("path", {
-      d: "M22.0014 15C22.1787 14.9998 22.3543 15.0338 22.5182 15.1001C22.682 15.1664 22.8308 15.2637 22.956 15.3863L35.6059 27.7465C35.8585 27.994 36.0002 28.3294 36 28.6789C35.9998 29.0284 35.8576 29.3636 35.6046 29.6108C35.3517 29.858 35.0087 29.997 34.651 29.9973C34.2932 29.9975 33.95 29.8591 33.6967 29.6123L22.0014 18.1849L10.3061 29.6123C10.1808 29.7351 10.032 29.8325 9.86807 29.8991C9.70418 29.9656 9.52848 29.9999 9.35101 30C9.17354 30.0001 8.99779 29.966 8.83381 29.8997C8.66983 29.8334 8.52084 29.7362 8.39536 29.6135C8.26989 29.4909 8.17038 29.3453 8.10254 29.1851C8.0347 29.0248 7.99985 28.8531 8 28.6797C8.00015 28.5063 8.03528 28.3346 8.10339 28.1745C8.1715 28.0144 8.27125 27.8689 8.39693 27.7465L21.0468 15.3863C21.172 15.2637 21.3208 15.1664 21.4846 15.1001C21.6485 15.0338 21.8241 14.9998 22.0014 15Z",
-      fill: "currentColor"
-    })
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
+    className: "bce-caret-icon"
   });
 }
 
@@ -1496,6 +1651,16 @@ module.exports = window["React"];
 (module) {
 
 module.exports = window["ReactJSXRuntime"];
+
+/***/ },
+
+/***/ "lodash"
+/*!*************************!*\
+  !*** external "lodash" ***!
+  \*************************/
+(module) {
+
+module.exports = window["lodash"];
 
 /***/ },
 
@@ -1755,8 +1920,35 @@ function Edit() {
   }, []);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("div", {
     ...blockProps,
-    children: isLoading ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("p", {
-      children: "Loading"
+    children: isLoading ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)("div", {
+      className: "bce-loader",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("div", {
+        className: "bce-sr-only",
+        children: "Loading..."
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("div", {
+        className: "bce-loader__icon",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)("svg", {
+          width: "16",
+          height: "16",
+          viewBox: "0 0 16 16",
+          fill: "none",
+          xmlns: "http://www.w3.org/2000/svg",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("path", {
+            d: "M8.93626 0.37875L15.6063 7.04875C16.1213 7.56475 16.1213 8.41275 15.6063 8.92875L8.93626 15.5988C8.42026 16.1138 7.57226 16.1138 7.05626 15.5988L0.386251 8.92875C-0.12875 8.41275 -0.12875 7.56475 0.386251 7.04875L7.05626 0.37875C7.57626 -0.12625 8.41626 -0.12625 8.93626 0.37875Z",
+            fill: "#F0F0F0"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("path", {
+            "fill-rule": "evenodd",
+            "clip-rule": "evenodd",
+            d: "M15.6063 7.04875L8.93626 0.37875C8.41626 -0.12625 7.57626 -0.12625 7.05626 0.37875L0.386251 7.04875C-0.12875 7.56475 -0.12875 8.41275 0.386251 8.92875L7.05626 15.5988C7.57226 16.1138 8.42026 16.1138 8.93626 15.5988L15.6063 8.92875C16.1213 8.41275 16.1213 7.56475 15.6063 7.04875ZM15.2763 8.59875L8.60626 15.2688C8.44526 15.4308 8.22526 15.5228 7.99626 15.5228C7.76726 15.5228 7.54726 15.4308 7.38626 15.2688L0.716251 8.59875C0.554251 8.43775 0.462251 8.21775 0.462251 7.98875C0.462251 7.75975 0.554251 7.53975 0.716251 7.37875L7.38626 0.70875C7.54626 0.54375 7.76626 0.45075 7.99626 0.45075C8.22626 0.45075 8.44626 0.54375 8.60626 0.70875L15.2763 7.37875C15.4383 7.53975 15.5303 7.75975 15.5303 7.98875C15.5303 8.21775 15.4383 8.43775 15.2763 8.59875Z",
+            fill: "#0049DB"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("path", {
+            "fill-rule": "evenodd",
+            "clip-rule": "evenodd",
+            d: "M9.99622 4.25873C9.67722 4.01073 9.30322 3.84273 8.90622 3.76873C8.70522 3.72773 8.50122 3.70473 8.29622 3.69873H6.84622C6.33021 3.69873 5.90621 4.12273 5.90621 4.63873V5.43873C4.78521 5.77173 4.01221 6.80973 4.01221 7.97873C4.01221 9.14773 4.78521 10.1858 5.90621 10.5188V11.3188C5.90621 11.8348 6.33021 12.2588 6.84622 12.2588H8.24622C8.45022 12.2508 8.65422 12.2308 8.85622 12.1988C9.27122 12.1228 9.66222 11.9478 9.99622 11.6888C10.6313 11.1778 11.0003 10.4038 10.9963 9.58873C10.9823 9.00973 10.7783 8.45073 10.4163 7.99873C10.7923 7.53073 10.9973 6.94873 10.9963 6.34873C11.0003 5.53673 10.6313 4.76573 9.99622 4.25873ZM9.99622 8.12873C10.3573 8.52973 10.5563 9.04973 10.5563 9.58873C10.5733 10.6238 9.83422 11.5298 8.81622 11.7188C8.63822 11.7518 8.45722 11.7718 8.27622 11.7788H6.84622C6.58822 11.7788 6.37621 11.5668 6.37621 11.3088V10.6088C6.48322 10.6138 6.58921 10.6138 6.69622 10.6088H8.54622C8.71222 10.5848 8.86822 10.5158 8.99622 10.4088C9.25322 10.2158 9.40222 9.91073 9.39622 9.58873C9.39522 9.26873 9.24722 8.96673 8.99622 8.76873C8.87222 8.67673 8.72822 8.61573 8.57622 8.58873H6.84622C6.33021 8.58873 5.90621 9.01273 5.90621 9.52873V9.99873C5.05421 9.67873 4.48621 8.85873 4.48621 7.94873C4.48621 7.03873 5.05421 6.21873 5.90621 5.89873V6.43873C5.90621 6.95473 6.33021 7.37873 6.84622 7.37873H7.91622C8.12622 7.39673 8.33622 7.39673 8.54622 7.37873C8.71222 7.35073 8.86822 7.27773 8.99622 7.16873C9.26422 6.98173 9.42422 6.67573 9.42422 6.34873C9.42422 6.02173 9.26422 5.71573 8.99622 5.52873C8.87022 5.43773 8.72722 5.37273 8.57622 5.33873C8.45322 5.33173 8.32922 5.33173 8.20622 5.33873H6.69622C6.58921 5.33373 6.48322 5.33373 6.37621 5.33873V4.63873C6.37321 4.51573 6.42022 4.39673 6.50622 4.30873C6.59622 4.21873 6.71922 4.16873 6.84622 4.16873H8.22622C8.40622 4.15673 8.58622 4.15673 8.76622 4.16873C9.09422 4.23173 9.40322 4.37273 9.66622 4.57873C10.1963 4.99173 10.5063 5.62673 10.5063 6.29873C10.5303 6.85073 10.3483 7.39273 9.99622 7.81873L9.79622 7.99873L9.99622 8.12873ZM6.74622 10.1288C6.64022 10.1388 6.53222 10.1388 6.42621 10.1288V9.47873C6.41921 9.23473 6.60422 9.02473 6.84622 8.99873H8.15622C8.25622 8.98673 8.35622 8.98673 8.45622 8.99873C8.53722 9.00573 8.61322 9.03673 8.67622 9.08873C8.81422 9.19773 8.89522 9.36373 8.89622 9.53873C8.89922 9.71473 8.81722 9.88273 8.67622 9.98873C8.61222 10.0398 8.53622 10.0738 8.45622 10.0888C8.35622 10.0968 8.25622 10.0968 8.15622 10.0888H6.69622L6.74622 10.1288ZM6.37621 5.79873C6.48222 5.78873 6.59021 5.78873 6.69622 5.79873H8.45622C8.53622 5.81373 8.61222 5.84773 8.67622 5.89873C8.81622 6.00573 8.89822 6.17273 8.89622 6.34873C8.89922 6.52473 8.81722 6.69273 8.67622 6.79873C8.61222 6.84973 8.53622 6.88373 8.45622 6.89873C8.28022 6.91373 8.10222 6.91373 7.92622 6.89873H6.84622C6.58822 6.89873 6.37621 6.68673 6.37621 6.42873V5.79873Z",
+            fill: "#0049DB"
+          })]
+        })
+      })]
     }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)("div", {
       className: "bc-event-dates__container",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_sections_Validation_Validation_jsx__WEBPACK_IMPORTED_MODULE_12__["default"], {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_8__["default"], {

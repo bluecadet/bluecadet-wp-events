@@ -60,6 +60,12 @@ class RegisterMeta {
       'auth_callback' => $auth,
     ];
 
+    $object_args = [
+      'type'          => 'object',
+      'single'        => true,
+      'auth_callback' => $auth,
+    ];
+
 		register_post_meta( $meta_type, $this->keys['start_date'], array_merge( $string_args, [
 			'description' => __( 'Event start date (YYYY-MM-DD)', 'basecadet' ),
 		] ) );
@@ -210,6 +216,15 @@ class RegisterMeta {
       },
 		] ) );
 
+
+    $occurence_props = [
+      'start_date' => [ 'type' => 'string' ],
+      'customize' => ['type' => 'boolean', 'default' => false],
+      'end_date' => [ 'type' => 'string'],
+      'start_time' => [ 'type' => 'string' ],
+      'end_time' => [ 'type' => 'string' ],
+    ];
+
     // Recurring Custom Occurrences
     register_post_meta( $meta_type, $this->keys['custom_occurrences'], array_merge( $array_args, [
       'description'   => __( 'Custom event recurrence occurrences (array of timestamps)', 'basecadet' ),
@@ -218,13 +233,7 @@ class RegisterMeta {
           'type'  => 'array',
           'items' => [
             'type' => 'object',
-            'properties' => [
-              'start_date' => [ 'type' => 'string' ],
-              'customize' => ['type' => 'boolean', 'default' => false],
-              'end_date' => [ 'type' => 'string'],
-              'start_time' => [ 'type' => 'string' ],
-              'end_time' => [ 'type' => 'string' ],
-            ],
+            'properties' => $occurence_props,
           ],
         ],
       ],
@@ -241,6 +250,54 @@ class RegisterMeta {
         return array_filter( $value, fn( $item ) => preg_match( '/^\d{4}-\d{2}-\d{2}$/', $item ) );
       },
     ] ) );
+
+
+    // Removing Recurring Events
+    register_post_meta( $meta_type, $this->keys['remove_recurring'], array_merge( $string_args, [
+			'description' => __( 'How to remove recurring events', 'basecadet' ),
+      'default' => 'delete',
+      'sanitize_callback' => function( $value ) {
+        $allowed = ['delete', 'to_posts'];
+        return in_array( $value, $allowed ) ? $value : 'delete';
+      },
+		] ) );
+
+
+    // Removing Recurring Events
+    register_post_meta( $meta_type, $this->keys['recur_strategy_was'], array_merge( $object_args, [
+      'description'   => __( 'Custom event recurrence occurrences (array of timestamps)', 'basecadet' ),
+      'show_in_rest'  => [
+        'schema' => [
+          'type'                 => 'object',
+          'additionalProperties' => true,
+          'properties' => [
+            'use_frequency' => ['type' => 'boolean'],
+            'frequency' => ['type' => 'string'],
+            'weekly_days' => ['type' => 'array', 'items' => ['type' => 'string']],
+            'month_schedule' => ['type' => 'string'],
+            'month_day' => ['type' => 'string'],
+            'month_date' => ['type' => 'string'],
+            'end_type' => ['type' => 'string'],
+            'end_date' => ['type' => 'string'],
+            'end_after_x' => ['type' => 'string'],
+            'start_date_timestamp' => ['type' => 'string'],
+            'occurences' => ['type' => 'array', 'items' => ['type' => 'object', 'additionalProperties' => true]],
+            'omissions' => ['type' => 'array', 'items' => ['type' => 'string']],
+          ],
+        ]
+      ],
+    ] ) );
+
+
+    // Parent/Child Meta
+    register_post_meta( $meta_type, $this->keys['is_parent'], array_merge( $bool_args, [
+			'description' => __( 'If event is a parent', 'basecadet' ),
+      'default' => false,
+		] ) );
+
+    register_post_meta( $meta_type, $this->keys['parent_id'], array_merge( $int_args, [
+			'description' => __( 'Parent event ID', 'basecadet' )
+		] ) );
 
 
   }

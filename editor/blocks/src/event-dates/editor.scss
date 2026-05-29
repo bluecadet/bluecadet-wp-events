@@ -1,7 +1,7 @@
 @use './styles/base.scss';
 @use './styles/button.scss';
 @use './styles/toggles.scss';
-@use './styles/recurring.scss';
+// @use './styles/recurring.scss';
 
 // Form Parts
 @use '../../../components/_formParts/DateRow/dateRow.scss';
@@ -17,5 +17,7 @@
 @use '../../../components/_sections/OmitDates/omitDates.scss';
 @use '../../../components/_sections/Validation/validation.scss';
 @use '../../../components/_sections/Frequency/frequency.scss';
+@use '../../../components/_sections/Recurring/recurring.scss';
+@use '../../../components/_sections/RemoveRecurring/removeRecurring.scss';
 
 

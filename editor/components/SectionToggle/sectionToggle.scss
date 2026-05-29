@@ -8,10 +8,41 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
+}
 
-  svg {
+.bc-event-dates__toggle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.bce-caret-icon {
+  position: relative;
+
+  &:before,
+  &::after {
+    content: "";
     display: block;
-    width: 28px;
-    height: auto;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 14px;
+    background: var(--bce-text-color);
   }
+
+  &:after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  .bc-events__section-toggle-button.open & {
+
+    &:before {
+      opacity: 0;
+    }
+  }
+
 }

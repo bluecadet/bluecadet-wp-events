@@ -61,6 +61,10 @@ class MetaKeys {
       'freq_end_after_x' => Settings::$events_meta_ns . 'frequency_end_after_x',
       'custom_occurrences' => Settings::$events_meta_ns . 'recurring_custom_occurrences',
       'omissions' => Settings::$events_meta_ns . 'recurring_omissions',
+      'remove_recurring' => Settings::$events_meta_ns . 'remove_recurring',
+      'recur_strategy_was' => Settings::$events_meta_ns . 'recur_strategy_was',
+      'is_parent' => Settings::$events_meta_ns . 'is_parent',
+      'parent_id' => Settings::$events_meta_ns . 'parent_id',
     ];
   }
 
