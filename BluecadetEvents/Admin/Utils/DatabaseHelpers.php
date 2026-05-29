@@ -153,7 +153,7 @@ class DatabaseHelpers {
    * @param int $event_id
    * @return array|false
    */
-  public function is_recurring_parent($event_id) {
+  public function is_recurring_parent($event_id) : bool|array {
     global $wpdb;
     $table = $wpdb->prefix . $this->recurring_table;
 

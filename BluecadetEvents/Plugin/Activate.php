@@ -46,6 +46,8 @@ class Activate {
       event_start int(11) NOT NULL,
       event_end int(11) NOT NULL,
       post_status varchar(20) NOT NULL,
+      update_check boolean DEFAULT false,
+      date_slug varchar(255) NOT NULL,
       UNIQUE KEY id (id),
       KEY parent_child (parent_ID, child_ID)
     ) $charset_collate;";

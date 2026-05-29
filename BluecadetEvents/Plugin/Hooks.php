@@ -51,6 +51,25 @@ class Hooks {
   }
 
 
+
+  /**
+   * hook_filter_exclude_meta_keys
+   *
+   * @hook 'bc_events_exclude_copy_meta_keys'
+   * @hookType filter
+   * @return array
+   */
+  public static function hook_filter_exclude_meta_keys() {
+    return \apply_filters('bc_events_exclude_copy_meta_keys', []);
+  }
+
+
+
+  // +=========================================================================+
+  // MAYBE DELETE?
+  // +=========================================================================+
+
+
   /**
    * hook_filter_exclude_acf_keys
    *
@@ -75,16 +94,7 @@ class Hooks {
   // }
 
 
-  /**
-   * hook_filter_exclude_meta_keys
-   *
-   * @hook 'bc_events_exclude_copy_meta_keys'
-   * @hookType filter
-   * @return array
-   */
-  public static function hook_filter_exclude_meta_keys() {
-    return \apply_filters('bc_events_exclude_copy_meta_keys', []);
-  }
+  
 
 
   /**
