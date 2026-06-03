@@ -1,6 +1,7 @@
 <?php
 
 namespace BluecadetEvents\Admin\Save\Recur;
+use BluecadetEvents\Admin\Utils\Logger;
 
 
 class RRuleBuilder {
@@ -38,7 +39,9 @@ class RRuleBuilder {
    */
   public function get_recurring_date_period() {
     $rrule_conditional_args = [];
-    $begin                  = new \DateTime('@' . $this->args['start_date_timestamp'], $this->timezone);
+    $begin                  = new \DateTime('now', $this->timezone);
+    
+    $begin->setTimestamp($this->args['start_date_timestamp']);
     
     if ( !$begin ) {
       new \WP_Error('bc-events', 'Invalid begin date for RRule');

@@ -271,18 +271,22 @@ class RegisterMeta {
           'type'                 => 'object',
           'additionalProperties' => true,
           'properties' => [
-            'use_frequency' => ['type' => 'boolean'],
-            'frequency' => ['type' => 'string'],
-            'weekly_days' => ['type' => 'array', 'items' => ['type' => 'string']],
-            'month_schedule' => ['type' => 'string'],
-            'month_day' => ['type' => 'string'],
-            'month_date' => ['type' => 'string'],
-            'end_type' => ['type' => 'string'],
-            'end_date' => ['type' => 'string'],
-            'end_after_x' => ['type' => 'string'],
+            'use_frequency'        => ['type' => 'boolean'],
+            'frequency'            => ['type' => 'string'],
+            'weekly_days'          => ['type' => 'array', 'items' => ['type' => 'string']],
+            'month_schedule'       => ['type' => 'string'],
+            'month_day'            => ['type' => 'string'],
+            'month_date'           => ['type' => 'string'],
+            'end_type'             => ['type' => 'string'],
+            'end_date'             => ['type' => 'string'],
+            'end_after_x'          => ['type' => 'string'],
             'start_date_timestamp' => ['type' => 'string'],
-            'occurences' => ['type' => 'array', 'items' => ['type' => 'object', 'additionalProperties' => true]],
-            'omissions' => ['type' => 'array', 'items' => ['type' => 'string']],
+            'occurences'           => ['type' => 'array', 'items' => ['type' => 'object', 'additionalProperties' => true]],
+            'omissions'            => ['type' => 'array', 'items' => ['type' => 'string']],
+            'primary_start_date'   => ['type' => 'string'],
+            'primary_start_time'   => ['type' => 'string'],
+            'primary_end_date'     => ['type' => 'string'],
+            'primary_end_time'     => ['type' => 'string'],
           ],
         ]
       ],
@@ -295,9 +299,29 @@ class RegisterMeta {
       'default' => false,
 		] ) );
 
+    register_post_meta( $meta_type, $this->keys['is_child'], array_merge( $bool_args, [
+			'description' => __( 'If event is a child', 'basecadet' ),
+      'default' => false,
+		] ) );
+
     register_post_meta( $meta_type, $this->keys['parent_id'], array_merge( $int_args, [
 			'description' => __( 'Parent event ID', 'basecadet' )
 		] ) );
+
+    register_post_meta( $meta_type, $this->keys['date_slug'], array_merge( $string_args, [
+			'description' => __( 'Date slug for child events', 'basecadet' )
+		] ) );
+
+
+    register_post_meta( $meta_type, $this->keys['child_deny_override'], array_merge( $bool_args, [
+			'description' => __( 'If parent content should not override child content', 'basecadet' ),
+      'default' => false,
+		] ) );
+
+    // register_post_meta( $meta_type, $this->keys['child_remove_from_recurring'], array_merge( $bool_args, [
+		// 	'description' => __( 'If child event should be removed from recurring set', 'basecadet' ),
+    //   'default' => false,
+		// ] ) );
 
 
   }

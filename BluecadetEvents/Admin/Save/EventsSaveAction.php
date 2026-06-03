@@ -4,9 +4,12 @@ namespace BluecadetEvents\Admin\Save;
 use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
 use BluecadetEvents\Admin\Meta\MetaKeys;
-use BluecadetEvents\Admin\Save\Recur\RecurringDate;
-use BluecadetEvents\Admin\Save\Recur\RecurringDatesArrayBuilder;
+use BluecadetEvents\Admin\Save\Recur\Objects\RecurringEvent;
+use BluecadetEvents\Admin\Save\Recur\EventCloneBuilder;
+use BluecadetEvents\Admin\Save\Recur\Objects\EventClone;
+use BluecadetEvents\Admin\Save\Recur\Objects\RecurringEventsArray;
 use BluecadetEvents\Admin\Utils\Logger;
+use BluecadetEvents\Plugin\BackgroundProcesses;
 
 /**
  * Handle recurring events
@@ -16,53 +19,28 @@ use BluecadetEvents\Admin\Utils\Logger;
  *
  */
 class EventsSaveAction {
-  // private $saved_post_id;
-  // private $saved_post;
-  // private $saved_update;
-  // private $timezone;
-  // private $keys = [];
-  
   private ?DatabaseHelpers $DB_HELPERS;
-  // private bool|array $is_parent;
-
-  // private array $all_meta;
-  // private array $event_meta = [];
-  // private array $recurring_dates = [];
-  // private array $omit_dates = [];
-  // private array $meta_updates = [];
+  private RecurringEvent $RDATE;
+  private RecurringEventsArray $recurring_events_array;
+  private array $meta_updates = [];
   
-  // private array $freq_args;
-  // private array $recur_strategy_was = [];
-
-  // private bool $is_recurring;
-  // private bool $is_recurring_was;
-
-
-
-  private RecurringDate $RDATE;
+  private mixed $background_event_handler;
 
   
 
   public function __construct(int $post_id, int|\WP_Post $post, bool $update, null|\WP_Post $post_before) {
-    $this->RDATE = new RecurringDate($post_id, $post, $update);
-    // $this->saved_post_id = $post_id;
-    // $this->saved_post = $post;
-    // $this->saved_update = $update;
-    // $this->timezone = wp_timezone();
-    // $this->RDATE->keys = MetaKeys::get_keys();
-    // $this->is_recurring = get_post_meta($this->saved_post_id, $this->RDATE->keys['is_recurring'], true);
-    // $this->is_recurring_was = get_post_meta($this->saved_post_id, $this->RDATE->keys['is_recurring_was'], true);
-  
+    // Logger::log('==================================================================================');
+    // Logger::log('=============================== EVENTS SAVE ACTION ===============================');
+    // Logger::log('================================== post_id: ' . $post_id . ' =================================');
+    $this->RDATE = new RecurringEvent($post_id, $post, $update);  
   }
 
   public function run() : bool|\WP_Error {
+    $this->DB_HELPERS = DatabaseHelpers::get_instance();
 
     if ( $this->RDATE->is_recurring || (!$this->RDATE->is_recurring && $this->RDATE->is_recurring_was) ) {
-      $this->DB_HELPERS = DatabaseHelpers::get_instance();
       $this->RDATE->is_parent = !$this->RDATE->parent_update ? false : $this->DB_HELPERS->is_recurring_parent($this->RDATE->parent_post_id);
-
-      $this->compile_event_meta();
-      $this->handle_is_recurring();
+      $this->maybe_handle_recurring_events();
       $this->handle_always();
     }
 
@@ -72,6 +50,39 @@ class EventsSaveAction {
     // TODO - Handle Errors
     return true;
   }
+
+
+  
+
+
+
+  /**
+   * Handle whether this is a recurring event or not and run the appropriate logic
+   *
+   * @return void
+   */
+  private function maybe_handle_recurring_events() : void {
+    
+    if ( $this->RDATE->is_recurring ) {
+
+      // Setup recurring dates array for comparison and building events
+      $this->compile_event_meta();
+      $this->run_recurring_checks();
+
+    } elseif ( 
+      $this->RDATE->is_parent &&
+      (!$this->RDATE->is_recurring && $this->RDATE->is_recurring_was) &&
+      $this->RDATE->recurring_delete === 'delete' 
+    ) {
+      
+      // This is no longer a recurring event, but it was before, so handle child events
+      $this->handle_child_events_delete();
+
+    } else {
+      $this->set_meta_update('is_parent', '0');
+    }
+  }
+
 
 
   /**
@@ -95,44 +106,15 @@ class EventsSaveAction {
 
 
 
-  private function handle_is_recurring() : void {
-
-    // MAKE SURE ANY META ALTERATIONS TO THE CURRENT POST ARE DONE BEFORE SENDING THIS.
-    // BUILDER/UPDATER WILL USE CURRENT $all_meta & $event_meta VALUES TO CLONE POST.
-    
-    if ( $this->RDATE->is_recurring ) {
-
-      $this->handle_recurring_checks();
-
-    } elseif ( $this->RDATE->is_parent && (!$this->RDATE->is_recurring && $this->RDATE->is_recurring_was) ) {
-
-      // This is no longer a recurring event, but was before, so handle child events
-      if ( $this->RDATE->get_meta('remove_recurring') && $this->RDATE->get_meta('remove_recurring' === 'to_posts') ) {
-        $this->handle_child_events_to_posts();
-      } else {
-        $this->handle_child_events_delete();
-      }
-
-      // TODO
-      // REMOVE all existing recurring events
-      $this->set_meta_update('is_parent', false);
-
-    } else {
-      $this->set_meta_update('is_parent', false);
-    }
-  }
-
-
-
   /**
    * Event is recurring, do the recurring thing
    *
    * @return void
    */
-  private function handle_recurring_checks() : void {
+  private function run_recurring_checks() : void {
 
     // Always set the parent
-    $this->set_meta_update('is_parent', true);
+    $this->set_meta_update('is_parent', '1');
 
     // +===============================================================+
     //  Build arrays for RecurringDatesBuilder and `recur_strategy_was`
@@ -154,6 +136,10 @@ class EventsSaveAction {
 
     // Set recur_strategy_was for comparison on next save
     $this->RDATE->recur_strategy_was = [
+      'primary_start_date'    => (string) ($this->RDATE->get_meta('start_date') ?: ''),
+      'primary_start_time'    => (string) ($this->RDATE->get_meta('start_time') ?: ''),
+      'primary_end_date'      => (string) ($this->RDATE->get_meta('end_date') ?: ''),
+      'primary_end_time'      => (string) ($this->RDATE->get_meta('end_time') ?: ''),
       'omissions' => (array) ($this->RDATE->get_meta('omissions') ?: []),
       'occurences' => (array) ($this->RDATE->get_meta('custom_occurrences') ?: []),
       ...$this->RDATE->freq_args,
@@ -161,92 +147,135 @@ class EventsSaveAction {
 
     $this->set_meta_update('recur_strategy_was', $this->RDATE->recur_strategy_was);
 
-    
-
     // +===============================================================+
     //  Update Child Event Content or Build Events
     // +===============================================================+
 
-    $diff = array_map('unserialize', 
-      array_diff(array_map('serialize', $this->RDATE->get_meta('recur_strategy_was')), array_map('serialize', $this->RDATE->recur_strategy_was))
-    );
+    if ( !$this->RDATE->is_parent ) {
+      $this->handle_build_recurring_events(); 
+    } else {
+      $recur_was = $this->RDATE->get_meta('recur_strategy_was') ? $this->RDATE->get_meta('recur_strategy_was') : [];
 
-    // if ( empty($diff) ) {
-    //   $this->handle_update_existing_events_only();
-    // } else {
-      $this->handle_build_recurring_events();
-      
-    // }
+      $diff = array_map('unserialize', 
+        array_diff(array_map('serialize', $recur_was), array_map('serialize', $this->RDATE->recur_strategy_was))
+      );
+
+      if ( empty($diff) ) {
+        $this->update_only();
+      } else {
+        $this->handle_build_recurring_events(); 
+      }
+    }
 
     
   }
 
 
   private function handle_build_recurring_events() {
-    $builder = new RecurringDatesArrayBuilder($this->RDATE);
-    $builder->run();
+    Logger::log('HANDLE BUILD RECURRING');
+
+    $this->recurring_events_array = new RecurringEventsArray($this->RDATE);
+    $this->recurring_events_array->build_array();
+
+    if (!$this->recurring_events_array->has_events()) {
+      return;
+    }
+
+    $clone_builder = new EventCloneBuilder($this->RDATE);
+    $clone_builder->clear_recurring();
+    $clone_builder->set_parent_id_meta();
+
+    $this->background_event_handler = BackgroundProcesses::get_event_handler();
+
+    foreach ( $this->recurring_events_array->events_array as $event ) {
+      $clone_builder->set_dates($event->start_date, $event->end_date, $event->slug);
+      $clone_data = $clone_builder->get_clone();
+      Logger::log('Event: ' . $event->slug);
+      $this->background_event_handler->push_to_queue(clone $clone_data);
+    }
+
+    $this->background_event_handler->set_check_updates($this->RDATE->parent_post_id);
+    $this->background_event_handler->save()->dispatch();
+
+    Logger::log('DISPATCHING NEW BACKGROUND EVENT DISPATCHED');
     
-    Logger::log(['RECUR BUILDER OUTPUT', $this->RDATE->recurring_dates]);
-    // $this->RDATE->recurring_dates = $builder->recurring_dates;
-
-
-    /**
-     * Todo:
-     * Create events
-     * Save update_check, date slug
-     * check against existing slugs, maybe update?
-     * make all posts, clear all without update_check
-     * clear update_check
-     * 
-     */
 
   }
 
 
 
-  private function handle_update_existing_events_only() {
-    /**
-     * 
-     * 
-     * 
-     * TODO: HANDLE UPDATING POST CONTENT ONLY
-     * 
-     * 
-     * 
-     * 
-     */
+  /**
+   * Only update content of child events
+   * 
+   * Frequency hasn't changed, so we don't need to rebuild events, just update 
+   * existing ones with new content.
+   *
+   * @return void
+   */
+  private function update_only() {
+
+    if ( !is_array($this->RDATE->is_parent) || empty($this->RDATE->is_parent) ) {
+      return;
+    }
+
+    // Build clone data for updating child events
+    $clone_builder = new EventCloneBuilder($this->RDATE);
+    $clone_builder->clear_dates_meta();
+    $clone_builder->set_parent_id_meta();
+
+    $this->background_event_handler = BackgroundProcesses::get_event_handler();
+
+    // Loop through child events and push updates to the background handler
+    foreach ($this->RDATE->is_parent as $cid) {
+      $child_id = (int)$cid;
+      $clone_builder->set_child_update_meta($child_id);
+      $clone_data = $clone_builder->get_clone();
+      $clone = clone $clone_data;
+      $this->background_event_handler->push_to_queue(clone $clone_data);
+    }
+
+    // Dispatch the background process to handle updates
+    $this->background_event_handler->save()->dispatch();
   }
 
-
-
-
-
-
-  private function handle_child_events_to_posts() {
-    /**
-     * 
-     * 
-     * 
-     * TODO: HANDLE POSTING CHILD EVENTS AS INDIVIDUAL POSTS
-     * 
-     * 
-     * 
-     * 
-     */
-  }
   
   
   private function handle_child_events_delete() {
-    /**
-     * 
-     * 
-     * 
-     * TODO: HANDLE DELETING CHILD EVENTS
-     * 
-     * 
-     * 
-     * 
-     */
+    if ( !is_array($this->RDATE->is_parent) || empty($this->RDATE->is_parent) ) {
+      return;
+    }
+
+    $delete_handler = BackgroundProcesses::get_event_delete_handler();
+
+    foreach ($this->RDATE->is_parent as $cid) {
+      $child_id = (int)$cid;
+      $delete_handler->push_to_queue($child_id);
+    }
+
+    $delete_handler->save()->dispatch();
+
+    $recur_keys = [
+      'is_recurring',
+      'is_recurring_was',
+      'use_frequency',
+      'freq',
+      'freq_days',
+      'freq_mo_schedule',
+      'freq_mo_day',
+      'freq_mo_date',
+      'freq_end_type',
+      'freq_end_date',
+      'freq_end_after_x',
+      'custom_occurrences',
+      'omissions',
+      'remove_recurring',
+      'recur_strategy_was',
+      'is_parent',
+    ];
+
+    foreach ($recur_keys as $key) {
+      delete_post_meta($this->RDATE->parent_post_id, $this->RDATE->keys[$key]);
+    }
   }
 
 
@@ -269,17 +298,11 @@ class EventsSaveAction {
     $d->setTimestamp($start_timestamp);
     $this->set_meta_update($this->RDATE->keys['start_month_year'], $d->format('F Y'));
 
-
-    /**
-     * 
-     * 
-     * 
-     * TODO: WRITE TO EVENTS TABLE
-     * 
-     * 
-     * 
-     * 
-     */
+    if ( $this->DB_HELPERS->is_recurring_child($this->RDATE->parent_post_id) ) {
+      $this->set_meta_update('is_child', '1');
+    } else {
+      $this->set_meta_update('is_child', '0');
+    }
 
   }
 
@@ -297,7 +320,7 @@ class EventsSaveAction {
    * @param boolean $override
    * @return void
    */
-  private function set_meta_update(string $key, string|array|bool $value, bool $override = true) : void {
+  private function set_meta_update(string $key, int|string|array|bool $value, bool $override = true) : void {
     $meta_key = isset($this->RDATE->keys[$key]) ? $this->RDATE->keys[$key] : $key;
 
     if ( !$override && isset($this->meta_updates[$meta_key]) ) {

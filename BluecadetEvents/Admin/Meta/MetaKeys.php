@@ -5,7 +5,7 @@ use BluecadetEvents\Plugin\Settings;
 
 class MetaKeys {
 	private static $_instance = null;
-  private $keys;
+  private array $keys;
 
 	private function __construct() {
 		Settings::__init();
@@ -29,7 +29,7 @@ class MetaKeys {
 	}
 
 
-  public static function get_keys() {
+  public static function get_keys() : array {
     $instance = self::get_instance();
     return $instance->keys; 
   }
@@ -64,7 +64,11 @@ class MetaKeys {
       'remove_recurring' => Settings::$events_meta_ns . 'remove_recurring',
       'recur_strategy_was' => Settings::$events_meta_ns . 'recur_strategy_was',
       'is_parent' => Settings::$events_meta_ns . 'is_parent',
+      'is_child' => Settings::$events_meta_ns . 'is_child',
       'parent_id' => Settings::$events_meta_ns . 'parent_id',
+      'date_slug' => Settings::$events_meta_ns . 'date_slug',
+      'child_deny_override' => Settings::$events_meta_ns . 'child_deny_override',
+      // 'child_remove_from_recurring' => Settings::$events_meta_ns . 'child_remove_from_recurring',
     ];
   }
 

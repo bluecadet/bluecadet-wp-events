@@ -3,6 +3,10 @@ import { useEffect, useState } from '@wordpress/element';
 export default function RecurringButton({id, value, onChange}) {
   const [isPressed, setIsPressed] = useState(value);
 
+  useEffect( () => {
+    setIsPressed(value);
+  }, [value] );
+
   const togglePressed = () => {
     setIsPressed(!isPressed);
     onChange(!isPressed);

@@ -6,8 +6,8 @@ use BluecadetEvents\Admin;
 class Init {
 
 
-	protected $plugin_root_dir;
-  protected $plugin_root_url;
+	protected string $plugin_root_dir;
+  protected string $plugin_root_url;
 
 
   public function __construct() {
@@ -27,6 +27,8 @@ class Init {
     new Admin\Editor\Gutenberg;
     new Admin\Editor\EditorAssets;
     new Admin\Editor\RestRoutes;
+
+    BackgroundProcesses::__init();
 
     if ( \is_admin() ) {
       new Admin\Views\AdminEventsViews;

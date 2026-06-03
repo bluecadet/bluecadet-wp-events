@@ -1,9 +1,11 @@
 <?php
 
-namespace BluecadetEvents\Admin\Save\Recur;
+namespace BluecadetEvents\Admin\Save\Recur\Objects;
 use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Admin\Save\Recur\Objects\EventClone;
 
-class RecurringDate {
+
+class RecurringEvent {
   
   /**
    * Parent/Saved Post ID
@@ -55,6 +57,13 @@ class RecurringDate {
   public bool $is_recurring_was;
 
   /**
+   * Whether the event was previously recurring
+   *
+   * @var null|string
+   */
+  public null|string $recurring_delete;
+
+  /**
    * Whether the event is a parent event
    *
    * @var boolean|array
@@ -92,7 +101,7 @@ class RecurringDate {
   /**
    * Recurring dates for the event
    *
-   * @var array
+   * @var RecurringEventDate[]
    */
   public array $recurring_dates = [];
 
@@ -103,12 +112,6 @@ class RecurringDate {
    */
   public array $omit_dates = [];
 
-  /**
-   * Data cloner for the event
-   *
-   * @var DataCloner
-   */
-  public DataCloner $clone;
 
   
   /**
@@ -126,7 +129,7 @@ class RecurringDate {
     $this->keys = MetaKeys::get_keys();
     $this->is_recurring = get_post_meta($this->parent_post_id, $this->keys['is_recurring'], true);
     $this->is_recurring_was = get_post_meta($this->parent_post_id, $this->keys['is_recurring_was'], true);
-    
+    $this->recurring_delete = get_post_meta($this->parent_post_id, $this->keys['remove_recurring'], true);
   }
 
 

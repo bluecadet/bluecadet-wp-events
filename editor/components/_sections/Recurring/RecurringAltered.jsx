@@ -17,6 +17,11 @@ export default function RecurringAltered() {
 
   const USE_FREQUENCY = meta?.[ getKey( 'use_frequency', keys ) ] ?? false;
 
+  const START_DATE = meta?.[ getKey( 'start_date', keys ) ] ?? '';
+  const START_TIME = meta?.[ getKey( 'start_time', keys ) ] ?? '';
+  const END_DATE = meta?.[ getKey( 'end_date', keys ) ] ?? '';
+  const END_TIME = meta?.[ getKey( 'end_time', keys ) ] ?? '';
+
   const FREQUENCY_VALUE = meta?.[ getKey( 'freq', keys ) ] ?? '';
   const WEEKLY_DAYS = meta?.[ getKey( 'freq_days', keys ) ] ?? [];
   const MONTHLY_SCHED = meta?.[ getKey( 'freq_mo_schedule', keys ) ] ?? '';
@@ -33,6 +38,9 @@ export default function RecurringAltered() {
 
 
   useEffect( () => {
+    if ( !RECUR_WAS.length ) {
+      setHasRecurDiff(false);
+    } else {
       const currentRecur = {
         use_frequency: USE_FREQUENCY,
         frequency: FREQUENCY_VALUE,
@@ -46,25 +54,36 @@ export default function RecurringAltered() {
         start_date_timestamp: `${START_TIMESTAMP}`,
         occurences: OCCURENCES,
         omissions: OMISSIONS,
+        primary_start_date: START_DATE,
+        primary_start_time: START_TIME,
+        primary_end_date: END_DATE,
+        primary_end_time: END_TIME,
       }
 
       setHasRecurDiff( !isEqual( currentRecur, RECUR_WAS ) );
+    }
 
-    }, [
-      USE_FREQUENCY,
-      FREQUENCY_VALUE,
-      WEEKLY_DAYS,
-      MONTHLY_SCHED,
-      MONTHLY_DAY,
-      MONTHLY_DATE,
-      END_TYPE_VALUE,
-      END_DATE_VALUE,
-      END_AFTER_X_VALUE,
-      START_TIMESTAMP,
-      RECUR_WAS,
-      OCCURENCES,
-      OMISSIONS,
-    ]);
+      
+
+  }, [
+    USE_FREQUENCY,
+    FREQUENCY_VALUE,
+    WEEKLY_DAYS,
+    MONTHLY_SCHED,
+    MONTHLY_DAY,
+    MONTHLY_DATE,
+    END_TYPE_VALUE,
+    END_DATE_VALUE,
+    END_AFTER_X_VALUE,
+    START_TIMESTAMP,
+    RECUR_WAS,
+    OCCURENCES,
+    OMISSIONS,
+    START_DATE,
+    START_TIME,
+    END_DATE,
+    END_TIME,
+  ]);
 
 
   return (
@@ -73,7 +92,8 @@ export default function RecurringAltered() {
         hasRecurDiff && (
           <div className="bc-events__recurring-notice">
             <div className="bc-events__recurring-notice-inner">
-              <p className="bc-events__description">Recurring values have changed. This may have an effect on existing child events, including their urls or other related data.</p>
+              <p className="bc-event-dates__description"><strong>The recurring event pattern has changed.</strong></p>
+              <p className="bc-event-dates__description">Existing child events with dates that are not in the current recurring pattern will be deleted. This may include customized child events. Proceed with caution.</p>
             </div>
           </div>
         )

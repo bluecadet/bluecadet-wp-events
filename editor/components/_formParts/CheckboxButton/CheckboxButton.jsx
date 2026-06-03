@@ -8,12 +8,17 @@ export default function CheckboxButton(
     onChange, 
     label, 
     pressedLabel = null, 
-    smallOnChecked = false
+    smallOnChecked = false,
+    smallButton = false
   }
 ) {
   const [isPressed, setIsPressed] = useState(value);
+
+  useEffect( () => {
+    setIsPressed(value);
+  }, [value] );
   const pressedLabelText = pressedLabel ? pressedLabel : label;
-  const classes = "bc-events__checkbox-button bc-events__button bc-events__button--secondary";
+  const classes = smallButton ? "bc-events__checkbox-button bc-events__button bc-events__button--secondary bc-events__button--medium" : "bc-events__checkbox-button bc-events__button bc-events__button--secondary";
   const checkedClasses = smallOnChecked ? "bc-events__checkbox-button bc-events__button bc-events__button--secondary bc-events__button--small" : classes;
 
 

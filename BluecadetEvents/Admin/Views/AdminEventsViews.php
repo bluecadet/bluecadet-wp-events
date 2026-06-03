@@ -4,6 +4,8 @@ namespace BluecadetEvents\Admin\Views;
 use BluecadetEvents\Plugin;
 use BluecadetEvents\Admin\Admin_Utils;
 use BluecadetEvents\Plugin\Settings;
+use BluecadetEvents\Admin\Utils\DatabaseHelpers;
+use BluecadetEvents\Admin\Meta\MetaKeys;
 
 /**
  * Create Custom Post Types
@@ -14,29 +16,36 @@ use BluecadetEvents\Plugin\Settings;
  */
 class AdminEventsViews {
 
-  private $query_view;
-  private $event_date_filter_key;
-  private $recur_by_id_key;
+  private string $filter_events_param                 = 'bc_query_view';
+  private string $event_date_filter_param          = 'bc_events_date';
+  private string $recurring_children_of_param      = 'recurring-by-id';
+  private string $filter_events_default_key        = 'default';
+  private string $filter_events_all_events_key     = 'show_all_events';
+  private string $filter_events_parent_only_key    = 'parent_only';
+  private string $filter_events_no_alterations_key = 'no_filters';
+
+  private array $keys;
 
   function __construct() {
 
-    $this->query_view = 'bc_query_view';
-    $this->event_date_filter_key = 'bc_events_date';
-    $this->recur_by_id_key = 'recurring-by-id';
+    $this->keys = MetaKeys::get_keys();
+    
+    // Add post state to admin list
+    add_filter( 'display_post_states', [$this, 'post_states'], 10, 2 );
 
     // Order events by start date by default, and add sorting for start date column
     add_action( 'pre_get_posts', [$this, 'admin_queries'], 100 );
 
+    // Display Column Data
     add_filter( 'manage_' . Settings::$events_machine_name . '_posts_columns', [$this, 'columns_display'] );
-    add_action( 'manage_' . Settings::$events_machine_name . '_posts_custom_column',   [$this, 'columns_content'], 10, 2);
+    add_action( 'manage_' . Settings::$events_machine_name . '_posts_custom_column', [$this, 'columns_content'], 10, 2);
     add_filter( 'manage_edit-' . Settings::$events_machine_name . '_sortable_columns', [$this, 'sortable_columns']);
 
+    // Add filters
     add_action( 'restrict_manage_posts', [$this, 'table_filtering'], 10, 1 );
 
+    // Remove default WP date filter on events post type
     add_action( 'admin_head', [$this, 'remove_core_dates_filter'] );
-
-    // add_filter( 'display_post_states',                    [$this, 'post_states'], 10, 2 );
-    // add_filter( 'admin_body_class',                       [$this, 'add_admin_classes'] );
 
   }
 
@@ -46,29 +55,33 @@ class AdminEventsViews {
    * Custom post states for recurring events
    *
    * @param array $post_states
-   * @param object $post
+   * @param \WP_Post $post
    * @return array
    * @since 1.0.0
    */
-  // function post_states( $post_states, $post ) {
+  function post_states( array $post_states, \WP_Post $post ) : array {
 
-  //   if ( $post->post_type !== 'bc-events') {
-  //     return $post_states;
-  //   }
+    if ( $post->post_type !== 'bc-events') {
+      return $post_states;
+    }
 
-  //   $db_helpers           = Admin_Utils\DatabaseHelpers::get_instance();
-  //   $is_recurring_child  = $db_helpers->is_recurring_child($post->ID);
-  //   $is_recurring_parent = $db_helpers->is_recurring_parent($post->ID);
+    $db_helpers           = DatabaseHelpers::get_instance();
+    $is_recurring_child  = $db_helpers->is_recurring_child($post->ID);
+    $is_recurring_parent = $db_helpers->is_recurring_parent($post->ID);
 
-  //   if ( $is_recurring_child ) {
-  //     $post_states['bc_events_recurring_child'] = 'Recurring Child';
-  //   } elseif ( $is_recurring_parent ) {
-  //     $post_states['_bc_events_recurring_parent'] = 'Recurring Parent';
-  //   }
+    if ( $is_recurring_child ) {
+      $post_states['bc_events_recurring_child'] = 'Recurring Child';
+      if ( get_post_meta($post->ID, $this->keys['child_deny_override'], true) ) {
+        $post_states['bc_events_recurring_child_override'] = 'Custom Content';
+      }
 
-  //   return $post_states;
+    } elseif ( $is_recurring_parent ) {
+      $post_states['_bc_events_recurring_parent'] = 'Recurring Parent';
+    }
 
-  // }
+    return $post_states;
+
+  }
 
 
 
@@ -79,13 +92,13 @@ class AdminEventsViews {
    * @return array
    * @since 1.0.0
    */
-  function columns_display( $columns ) {
+  function columns_display( array $columns ) : array {
 
     $new_columns = array(
       'cb'         => $columns['cb'],
       'title'      => __( 'Title' ),
       'event_date' => __( 'Event Date', 'bc_events' ),
-      // 'recurring'  => __( 'Recurring', 'bc_events' ),
+      'recurring'  => __( 'Recurring', 'bc_events' ),
     );
 
     $columns = array_merge($new_columns, $columns);
@@ -98,59 +111,58 @@ class AdminEventsViews {
   /**
    * Provide content to custom columns
    *
-   * @param array $column
+   * @param string $column
    * @param int $post_id
    * @return void
    * @since 1.0.0
    */
-  function columns_content( $column, $post_id ) {
+  function columns_content( string $column, int $post_id ) : void {
 
-    // $db_helpers           = Admin_Utils\DatabaseHelpers::get_instance();
-    // $is_recurring_child  = $db_helpers->is_recurring_child($post_id);
-    // $is_recurring_parent = $db_helpers->is_recurring_parent($post_id);
+    $db_helpers          = DatabaseHelpers::get_instance();
+    $is_recurring_child  = $db_helpers->is_recurring_child($post_id);
+    $is_recurring_parent = $db_helpers->is_recurring_parent($post_id);
 
     if ( 'event_date' === $column ) {
 
       $start_date = \bce__get_start_date($post_id);
       $end_date   = \bce__get_start_date($post_id);
 
-      if ( $start_date === $end_date ) {
+      if ( $is_recurring_parent ) {
+        echo 'Starts: ' . $start_date;
+
+        $last = $db_helpers->get_last_child_event($post_id);
+        if ( $last ) {
+          echo '<br>Ends: ' . \bce__date_from_timestamp($last);
+        }
+        
+      } elseif ( $start_date === $end_date ) {
         echo $start_date;
+        
       } else {
         echo $start_date . ' - ' . $end_date;
       }
 
+    } elseif ( 'recurring' === $column ) {
+
+      $is_trash = isset($_GET['post_status']) && $_GET['post_status'] === 'trash';
+
+      if ( $is_recurring_child ) {
+
+        if ( isset($_GET[$this->recurring_children_of_param]) && !$is_trash) {
+          if (isset($is_recurring_child[0])) {
+            echo '<a href="' . get_edit_post_link($is_recurring_child[0]) . '">Edit Recurring Parent</a>';
+          }
+          echo '<br /><a href="' . admin_url('edit.php?post_type=' . Settings::$events_machine_name) . '">Back to Events</a>';
+        }
+
+      } elseif ( $is_recurring_parent ) {
+        if ( !$is_trash ) {
+          $view_url = 'edit.php?post_type=' . Settings::$events_machine_name . '&recurring-by-id=' . $post_id;
+          echo '<a href="' . admin_url($view_url) . '">' . 'View Recurring Events' . '</a>';
+        }
+      }
+
     }
-    // elseif ( 'recurring' === $column ) {
-    //   $is_trash = isset($_GET['post_status']) && $_GET['post_status'] === 'trash';
-
-    //   if ( $is_recurring_child ) {
-
-    //     if ( !$is_trash && isset($is_recurring_child[0]) ) {
-    //       echo '<a href="' . get_edit_post_link($is_recurring_child[0]) . '">Edit Recurring Parent</a>';
-    //     }
-
-    //     if ( isset($_GET[$this->recur_by_id_key])) {
-    //       if ( $is_trash ) {
-    //         echo '<br /><a href="' . admin_url('edit.php?post_type=bc-events&post_status=trash') . '">Back to Events (in trash)</a>';
-    //       } else {
-    //         echo '<br /><a href="' . admin_url('edit.php?post_type=bc-events') . '">Back to Events</a>';
-    //       }
-    //     }
-
-    //   } elseif ( $is_recurring_parent ) {
-    //     $view_url = 'edit.php?post_type=bc-events&recurring-by-id=' . $post_id;
-    //     $view_title = 'View Recurring Events';
-
-    //     if ( $is_trash ) {
-    //       $view_url = $view_url . '&post_status=' . $_GET['post_status'];
-    //       $view_title = $view_title . ' (in trash)';
-    //     }
-
-    //     echo '<a href="' . admin_url($view_url) . '">' . $view_title . '</a>';
-    //   }
-
-    // }
   }
 
 
@@ -159,10 +171,10 @@ class AdminEventsViews {
    * Add sorting to custom columns
    *
    * @param array $columns
-   * @return void
+   * @return array
    * @since 1.0.0
    */
-  function sortable_columns( $columns ) {
+  function sortable_columns( array $columns ) : array {
     $columns['event_date'] = 'bc_event_date';
     // $columns['last_modified'] = 'bc_last_modified';
     return $columns;
@@ -175,18 +187,23 @@ class AdminEventsViews {
    * - Sort by start date by default
    * - Add sortable column queries
    *
-   * @param object $query
-   * @return object
+   * @param \WP_Query $query
+   * @return \WP_Query
    * @since 1.0.0
    */
-  function admin_queries( $query ) {
+  function admin_queries( \WP_Query $query ) : \WP_Query {
 
     if ( !is_admin() || !$query->is_main_query() || $query->query['post_type'] !== Settings::$events_machine_name ) {
-      return;
+      return $query;
     }
 
     // Do not add any other filters if user doesnt want them
-    if ( isset($_GET[$this->query_view]) && $_GET[$this->query_view] === 'show_all_no_filter' ) {
+    if ( isset($_GET[$this->filter_events_param]) && $_GET[$this->filter_events_param] === $this->filter_events_no_alterations_key ) {
+      return $query;
+    }
+
+    // If is trash view, do not show filters
+    if ( isset($_GET['post_status']) && $_GET['post_status'] === 'trash' ) {
       return $query;
     }
 
@@ -200,46 +217,28 @@ class AdminEventsViews {
 
 
     // Handle showing recurring children for specific post
-    if ( isset($_GET[$this->recur_by_id_key])) {
-      $parent_id = $_GET[$this->recur_by_id_key];
-      $meta_query[] = [
-        [
-          'key' => '_bc_events_recurring_parent',
-          'value' => $parent_id
-        ],
-      ];
-
-      $query->set( 'meta_query', $meta_query);
-
+    if ( isset($_GET[$this->recurring_children_of_param])) {
+      $parent_id = (int)$_GET[$this->recurring_children_of_param];
+      $child_ids = DatabaseHelpers::get_instance()->get_recurring_child_ids($parent_id);
+      $query->set( 'post__in', $child_ids );
       return $query;
     }
-
-    // Storage for meta_query arrays
-
 
 
     // Handle Filter Actions
     if ( isset($_GET['filter_action']) ) {
 
       // Filter Showing/Hiding Recurring Children
-      if ( isset($_GET[$this->query_view] ) ) {
+      if ( isset($_GET[$this->filter_events_param] ) ) {
 
         // Only show parent events
-        if ( $_GET[$this->query_view] === 'parent_only' ) {
+        if ( $_GET[$this->filter_events_param] === $this->filter_events_parent_only_key ) {
 
           $meta_query[] = [
-            'relation' => 'OR',
             [
-              [
-                'key' => '_bc_events_recurring_has_children',
-                'value' => '',
-                'compare' => '!='
-              ],
-              [
-                'key' => 'bc_events_recurring',
-                'value' => 'on',
-                'compare' => '='
-              ]
+              'key' => $this->keys['is_parent'],
+              'value' => '1',
+              'compare' => '='
             ]
           ];
 
@@ -247,20 +246,33 @@ class AdminEventsViews {
 
         }
 
-        if ( $_GET[$this->query_view] === 'show_all' ) {
+        if ( $_GET[$this->filter_events_param] === $this->filter_events_all_events_key ) {
+          $meta_query[] = [
+            'relation' => 'OR',
+            [
+              'key' => $this->keys['is_parent'],
+              'value' => '1',
+              'compare' => '='
+            ],
+            [
+              'key' => $this->keys['is_child'],
+              'value' => '1',
+              'compare' => '='
+            ]
+          ];
           $queries_applied = true;
         }
 
         // Only show Primary events
-        if ( $_GET[$this->query_view] === 'default' ) {
+        if ( $_GET[$this->filter_events_param] === 'default' ) {
           $queries_applied = false;
         }
       }
 
       // Filter Showing by Month/Year
-      if ( isset($_GET[$this->event_date_filter_key]) ) {
+      if ( isset($_GET[$this->event_date_filter_param]) ) {
 
-        $date_val = $_GET[$this->event_date_filter_key];
+        $date_val = $_GET[$this->event_date_filter_param];
 
         if ( $date_val !== 'all' ) {
           $meta_query[] = [
@@ -292,20 +304,22 @@ class AdminEventsViews {
       $meta_query[] = [
         'relation' => 'OR',
         [
-          'key' => '_bc_events_recurring_parent',
+          'key' => $this->keys['is_child'],
           'compare' => 'NOT EXISTS'
         ],
         [
-          'key' => '_bc_events_recurring_parent',
-          'value' => '',
-          'compare' => '=='
-        ],
+          'key' => $this->keys['is_child'],
+          'compare' => '!=',
+          'value' => '1'
+        ]
       ];
     }
 
     if ( !empty($meta_query) ) {
       $query->set( 'meta_query', $meta_query );
     }
+
+    return $query;
 
   }
 
@@ -319,6 +333,11 @@ class AdminEventsViews {
   //  * @return void
   //  */
   function table_filtering($post_type) {
+
+    // If is trash view, do not show filters
+    if ( isset($_GET['post_status']) && $_GET['post_status'] === 'trash' ) {
+      return;
+    }
 
 
     if ( $post_type !== 'bc-events' ) {
@@ -339,7 +358,7 @@ class AdminEventsViews {
   private function filter_month_year() {
     global $wpdb;
 
-    $date_selected = isset($_REQUEST[$this->event_date_filter_key]) ? $_REQUEST[$this->event_date_filter_key] : '';
+    $date_selected = isset($_REQUEST[$this->event_date_filter_param]) ? $_REQUEST[$this->event_date_filter_param] : '';
 
     // Custom Event Date Filter
     $d = $wpdb->get_results( "
@@ -368,7 +387,7 @@ class AdminEventsViews {
 
       $final_opts = array_merge(['all' => 'All event dates'], $d_opts);
 
-      $this->create_select('bc-events-date-opts', $this->event_date_filter_key, $final_opts, $date_selected);
+      $this->create_select('bc-events-date-opts', $this->event_date_filter_param, $final_opts, $date_selected);
     }
   }
 
@@ -381,19 +400,18 @@ class AdminEventsViews {
    */
   private function filter_query_view() {
 
-      $query_view_selected = isset($_REQUEST[$this->query_view]) ? $_REQUEST[$this->query_view] : '';
+      $query_view_selected = isset($_REQUEST[$this->filter_events_param]) ? $_REQUEST[$this->filter_events_param] : '';
 
 
       // Custom Event Recur Filter
       $query_view_opts = [
-        'default'            => 'Event Date',
-        // 'default'            => 'Show All Primary Events',
-        // 'show_all'           => 'Show All Events',
-        // 'parent_only'        => 'Recurring Parent Events Only',
-        'show_all_no_filter' => 'Remove All Events Filters',
+        $this->filter_events_default_key => 'Primary Events',
+        $this->filter_events_all_events_key => 'Primary and Child Events',
+        $this->filter_events_parent_only_key => 'Recurring Parent Events Only',
+        $this->filter_events_no_alterations_key => 'Remove All Events Filters',
       ];
 
-      $this->create_select('bc-query-view', $this->query_view, $query_view_opts, $query_view_selected);
+      $this->create_select('bc-query-view', $this->filter_events_param, $query_view_opts, $query_view_selected);
     }
 
 
@@ -432,37 +450,5 @@ class AdminEventsViews {
       add_filter('months_dropdown_results', '__return_empty_array');
     }
   }
-
-
-
-  /**
-   * Add Admin Classes
-   *
-   * @param string $classes
-   * @return string
-   */
-  // function add_admin_classes( $classes ) {
-  //   global $pagenow;
-  //   global $post;
-
-  //   if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) ) {
-  //     $db_helpers           = Admin_Utils\DatabaseHelpers::get_instance();
-  //     $is_recurring_child  = $db_helpers->is_recurring_child($post->ID);
-  //     $is_recurring_parent = $db_helpers->is_recurring_parent($post->ID);
-
-  //     if ( $is_recurring_child ) {
-  //       $classes .= ' bc-events--is-recurring-child';
-  //     } elseif ( $is_recurring_parent ) {
-  //       $classes .= ' bc-events--is-recurring-parent';
-  //     }
-
-  //     if ( $post->post_type === 'bc-events') {
-  //       $classes .= ' bc-events-edit-screen';
-  //     }
-  //   }
-
-  //   return $classes;
-  // }
-
 
 }

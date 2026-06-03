@@ -2,6 +2,7 @@
 
 namespace BluecadetEvents\Admin\Utils;
 use BluecadetEvents\Plugin\Settings;
+use BluecadetEvents\Admin\Save\Recur\Objects\EventClone;
 
 /**
  * Database helper functions
@@ -46,23 +47,23 @@ class DatabaseHelpers {
    * @param int $end_date unix timestamp
    * @return int|false
    */
-  public function write_or_update_event(int $post_id, int $start_date, int $end_date, false|string $title = false) {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->events_table;
+  // public function write_or_update_event(int $post_id, int $start_date, int $end_date, false|string $title = false) {
+  //   global $wpdb;
+  //   $table = $wpdb->prefix . $this->events_table;
 
-    $results = $wpdb->get_results(
-      $wpdb->prepare(
-        "SELECT * FROM $table WHERE post_id=%d",
-        $post_id
-      )
-    );
+  //   $results = $wpdb->get_results(
+  //     $wpdb->prepare(
+  //       "SELECT * FROM $table WHERE post_id=%d",
+  //       $post_id
+  //     )
+  //   );
 
-    if ( !$results ) {
-      return $this->write_event($post_id, $start_date, $end_date, $title);
-    }
+  //   if ( !$results ) {
+  //     return $this->write_event($post_id, $start_date, $end_date, $title);
+  //   }
 
-    return $this->update_event($post_id, $start_date, $end_date, $title);
-  }
+  //   return $this->update_event($post_id, $start_date, $end_date, $title);
+  // }
 
 
 
@@ -74,25 +75,25 @@ class DatabaseHelpers {
    * @param int $end_date unix timestamp
    * @return int|false
    */
-  public function write_event(int $post_id, int $start_date, int $end_date, false|string $title = false) {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->events_table;
-    $timezone = \wp_timezone();
-    $now = new \DateTime('now', $timezone);
-    $title = $title ? $title : get_the_title($post_id);
+  // public function write_event(int $post_id, int $start_date, int $end_date, false|string $title = false) {
+  //   global $wpdb;
+  //   $table = $wpdb->prefix . $this->events_table;
+  //   $timezone = \wp_timezone();
+  //   $now = new \DateTime('now', $timezone);
+  //   $title = $title ? $title : get_the_title($post_id);
 
-    $data = [
-      'post_id' => $post_id,
-      'event_start_date' => $start_date,
-      'event_end_date' => $end_date,
-      'post_title' => $title,
-      'modified' => $now->format($this->now_format)
-    ];
+  //   $data = [
+  //     'post_id' => $post_id,
+  //     'event_start_date' => $start_date,
+  //     'event_end_date' => $end_date,
+  //     'post_title' => $title,
+  //     'modified' => $now->format($this->now_format)
+  //   ];
 
-    $result = $wpdb->insert($table, $data, ['%d','%d','%d','%s','%s']);
+  //   $result = $wpdb->insert($table, $data, ['%d','%d','%d','%s','%s']);
 
-    return $result;
-  }
+  //   return $result;
+  // }
 
 
   /**
@@ -103,25 +104,25 @@ class DatabaseHelpers {
    * @param int $end_date unix timestamp
    * @return int|false
    */
-  public function update_event(int $post_id, int $start_date, int $end_date, false|string $title = false) {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->events_table;
-    $timezone = \wp_timezone();
-    $now = new \DateTime('now', $timezone);
-    $title = $title ? $title : get_the_title($post_id);
+  // public function update_event(int $post_id, int $start_date, int $end_date, false|string $title = false) {
+  //   global $wpdb;
+  //   $table = $wpdb->prefix . $this->events_table;
+  //   $timezone = \wp_timezone();
+  //   $now = new \DateTime('now', $timezone);
+  //   $title = $title ? $title : get_the_title($post_id);
 
-    $data = [
-      'event_start_date' => $start_date,
-      'event_end_date' => $end_date,
-      'post_title' => $title,
-      'modified' => $now->format($this->now_format),
-    ];
+  //   $data = [
+  //     'event_start_date' => $start_date,
+  //     'event_end_date' => $end_date,
+  //     'post_title' => $title,
+  //     'modified' => $now->format($this->now_format),
+  //   ];
 
-    $where = ['post_id' => $post_id];
+  //   $where = ['post_id' => $post_id];
 
-    $result = $wpdb->update($table, $data, $where, ['%d','%d','%s','%s'], ['%d']);
-    return $result;
-  }
+  //   $result = $wpdb->update($table, $data, $where, ['%d','%d','%s','%s'], ['%d']);
+  //   return $result;
+  // }
 
 
   /**
@@ -130,15 +131,15 @@ class DatabaseHelpers {
    * @param int $post_id
    * @return int|false
    */
-  public function delete_event(int $post_id) {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->events_table;
+  // public function delete_event(int $post_id) {
+  //   global $wpdb;
+  //   $table = $wpdb->prefix . $this->events_table;
 
-    $where = ['post_id' => $post_id];
-    $result = $wpdb->delete($table, $where, ['%d']);
+  //   $where = ['post_id' => $post_id];
+  //   $result = $wpdb->delete($table, $where, ['%d']);
 
-    return $result;
-  }
+  //   return $result;
+  // }
 
 
   // ===================================
@@ -169,7 +170,7 @@ class DatabaseHelpers {
     $eids = [];
 
     foreach ( $results as $r ) {
-      $eids[] = $r->child_ID;
+      $eids[] = (int)$r->child_ID;
     }
 
     if ( !empty($eids) ) {
@@ -203,7 +204,7 @@ class DatabaseHelpers {
     $eids = [];
 
     foreach ( $results as $r ) {
-      $eids[] = $r->parent_ID;
+      $eids[] = (int)$r->parent_ID;
     }
 
     if ( !empty($eids) ) {
@@ -237,7 +238,7 @@ class DatabaseHelpers {
     $cids = [];
 
     foreach ( $results as $r ) {
-      $cids[] = $r->child_ID;
+      $cids[] = (int)$r->child_ID;
     }
 
     if ( !empty($cids) ) { return $cids; }
@@ -253,7 +254,7 @@ class DatabaseHelpers {
    * @param int $child_id
    * @return int|false
    */
-  public function write_recurring_child($parent_id, $child_id) {
+  public function write_recurring_child($parent_id, $child_id, false|string $date_slug = false, $update_check = false) {
     global $wpdb;
     $table = $wpdb->prefix . $this->recurring_table;
     $timezone = \wp_timezone();
@@ -261,6 +262,17 @@ class DatabaseHelpers {
 
     $data = array('parent_ID' => $parent_id, 'child_ID' => $child_id, 'modified' => $now->format($this->now_format));
     $format = array('%d','%d','%s');
+
+    if ( $date_slug ) {
+      $data['date_slug'] = $date_slug;
+      $format[] = '%s';
+    }
+
+    if ( $update_check ) {
+      $data['update_check'] = 1;
+      $format[] = '%d';
+    }
+
     $result = $wpdb->insert($table, $data, $format);
 
     return $result;
@@ -311,220 +323,191 @@ class DatabaseHelpers {
 
 
 
+  // NEW ========================
+
+  public function write_new_recurring_child(EventClone $item, int $child_id) {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->recurring_table;
+    $timezone = \wp_timezone();
+    $now = new \DateTime('now', $timezone);
+
+    $data = array(
+      'modified' => $now->format($this->now_format),
+      'parent_ID' => $item->parent_id,
+      'child_ID' => $child_id,
+      'event_start' => $item->start_date->getTimestamp(),
+      'event_end' => $item->end_date->getTimestamp(),
+      'post_status' => $item->post['post_status'],
+      'update_check' => 1,
+      'date_slug' => $item->event_slug,
+    );
+    $format = array('%s', '%d', '%d', '%d', '%d', '%s', '%d', '%s');
+
+    $result = $wpdb->insert($table, $data, $format);
+
+    return $result;
+  }
+
+
+  public function update_existing_recurring_child(EventClone $item, int $child_id) {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->recurring_table;
+    $timezone = \wp_timezone();
+    $now = new \DateTime('now', $timezone);
+
+    $data = array('modified' => $now->format($this->now_format));
+    $format = array('%s');
+    
+
+    $data = array(
+      'modified' => $now->format($this->now_format),
+      'event_start' => $item->start_date->getTimestamp(),
+      'event_end' => $item->end_date->getTimestamp(),
+      'post_status' => $item->post['post_status'],
+      'update_check' => 1,
+      'date_slug' => $item->event_slug,
+    );
+    $where = array('parent_ID' => $item->parent_id, 'child_ID' => $child_id);
+    $format = array('%s', '%d', '%d', '%s', '%d', '%s');
+
+    $result = $wpdb->update($table, $data, $where, $format);
+
+    return $result;
+  }
+
+
+  public function update_existing_recurring_child_modified(int $child_id) {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->recurring_table;
+    $timezone = \wp_timezone();
+    $now = new \DateTime('now', $timezone);
+
+    $data = array('modified' => $now->format($this->now_format));
+    $where = array('child_ID' => $child_id);
+    $format = array('%s');
+
+    $result = $wpdb->update($table, $data, $where, $format);
+
+    return $result;
+  }
+
+
+  /**
+   * Clear update checks for recurring events
+   *
+   * @param int $parent_id
+   * @return int|false
+   */
+  public function clear_recurring_update_checks(int $parent_id) : bool {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->recurring_table;
+
+    $data = array('update_check' => 0);
+    $where = array('parent_ID' => $parent_id);
+    $format = array('%d');
+    $result = $wpdb->update($table, $data, $where, $format);
+
+    return (bool) $result;
+  }
+
+
+  /**
+   * Get events with matching slug
+   *
+   * @param int $parent_id
+   * @return int|false
+   */
+  public function check_unused_update_checks(int $parent_id) : false|array {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->recurring_table;
+
+    $results = $wpdb->get_results(
+      $wpdb->prepare(
+        "SELECT child_ID FROM $table WHERE parent_ID=%d AND update_check=0",
+        $parent_id
+      )
+    );
+
+    if ( !$results ) { return false; }
+
+    return $results;
+  }
 
 
 
-  // // ===================================
-  // //             Meta Types
-  // // ===================================
+  /**
+   * Get events with matching slug
+   *
+   * @param string $slug
+   * @return int|false
+   */
+  public function check_child_events_for_date_slug(string $slug) : false|array {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->recurring_table;
 
-  // /**
-  //  * Get results of meta/event db rows
-  //  *
-  //  * @param int $meta_id
-  //  * @return array|false
-  //  */
-  // public function get_meta_type_event_ids($meta_id, $meta_type) {
-  //   global $wpdb;
-  //   $table = $wpdb->prefix . $this->meta_table;
+    $results = $wpdb->get_results(
+      $wpdb->prepare(
+        "SELECT child_ID FROM $table WHERE date_slug=%s AND update_check=0",
+        $slug
+      )
+    );
 
-  //   $results = $wpdb->get_results(
-  //     $wpdb->prepare(
-  //       "SELECT eventID FROM $table WHERE metaID=%d AND metaType=%s",
-  //       $meta_id, $meta_type
-  //     )
-  //   );
+    if ( !$results ) { return false; }
 
-  //   if ( !$results ) { return false; }
-
-  //   $eids = [];
-
-  //   foreach ( $results as $r ) {
-  //     $eids[] = $r->eventID;
-  //   }
-
-  //   if ( !empty($eids) ) { return $eids; }
-
-  //   return false;
-
-  // }
-
-  // /**
-  //  * Get results of metas/event db rows
-  //  *
-  //  * @param int $meta_id
-  //  * @return array|false
-  //  */
-  // public function get_event_meta_type_ids(int $event_id, string $meta_type) {
-  //   global $wpdb;
-  //   $table = $wpdb->prefix . $this->meta_table;
-
-  //   $results = $wpdb->get_results(
-  //     $wpdb->prepare(
-  //       "SELECT metaID FROM $table WHERE eventID=%d AND metaType=%s",
-  //       $event_id, $meta_type
-  //     )
-  //   );
-
-  //   if ( !$results ) { return false; }
-
-  //   $eids = [];
-
-  //   foreach ( $results as $r ) {
-  //     $eids[] = $r->metaID;
-  //   }
-
-  //   if ( !empty($eids) ) { return $eids; }
-
-  //   return false;
-
-  // }
+    return $results;
+  }
 
 
-  // /**
-  //  * Get results of metas/event db rows
-  //  *
-  //  * @param int $meta_id
-  //  * @return array|false
-  //  */
-  // public function get_event_meta_type_all_ids(int $event_id) {
-  //   global $wpdb;
-  //   $table = $wpdb->prefix . $this->meta_table;
-
-  //   $results = $wpdb->get_results(
-  //     $wpdb->prepare(
-  //       "SELECT metaID FROM $table WHERE eventID=%d",
-  //       $event_id
-  //     )
-  //   );
-
-  //   if ( !$results ) { return false; }
-
-  //   $eids = [];
-
-  //   foreach ( $results as $r ) {
-  //     $eids[] = $r->metaID;
-  //   }
-
-  //   if ( !empty($eids) ) { return $eids; }
-
-  //   return false;
-
-  // }
 
 
-  // /**
-  //  * Create DB row with metas/child ids
-  //  *
-  //  * @param int $meta_id
-  //  * @param int $child_id
-  //  * @return int|false
-  //  */
-  // public function write_meta_type_event(int $meta_id, string $meta_type, int $event_id) {
-  //   global $wpdb;
-  //   $table = $wpdb->prefix . $this->meta_table;
-  //   $timezone = \wp_timezone();
-  //   $now = new \DateTime('now', $timezone);
+  /**
+   * Delete DB row with parent/child ids
+   *
+   * @param int $post_id
+   * @return int|false
+   * 
+   * delete_recurring_event
+   */
+  public function delete_recurring_event(int $post_id) {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->recurring_table;
 
-  //   $data = array(
-  //     'metaID' => $meta_id,
-  //     'eventID' => $event_id,
-  //     'modified' => $now->format($this->now_format),
-  //     'metaType' => $meta_type,
-  //   );
-  //   $format = array('%d','%d','%s', '%s');
-  //   $result = $wpdb->insert($table, $data, $format);
+    $where = array('child_ID' => $post_id);
+    $format = array('%d');
+    $result = $wpdb->delete($table, $where, $format);
 
-  //   return $result;
-  // }
+    return $result;
+  }
 
 
-  // /**
-  //  * Create DB row with metas/child ids
-  //  *
-  //  * @param int $meta_id
-  //  * @param int $child_id
-  //  * @return int|false
-  //  */
-  // public function write_meta_type_event_from_array(array $meta_ids, string $meta_type, int $event_id) {
-  //   if ( !empty($meta_ids) ) {
-  //     foreach ($meta_ids as $meta_id) {
-  //       $this->write_meta_type_event($meta_id, $meta_type, $event_id);
-  //     }
-  //   }
-  // }
+
+  /**
+   * Get last child event
+   *
+   * @param int $parent_id
+   * @return int|false
+   */
+  public function get_last_child_event(int $parent_id) : false|int {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->recurring_table;
+
+    $results = $wpdb->get_results(
+      $wpdb->prepare(
+        "SELECT MAX(event_start) AS last_event_start FROM $table WHERE parent_ID=%d",
+        $parent_id
+      )
+    );
+
+    if ( !$results ) { return false; }
+
+    if ( isset($results[0]->last_event_start) ) {
+      return $results[0]->last_event_start;
+    }
+
+    return false;
+  }
 
 
-  // /**
-  //  * Update DB row with metas/event ids
-  //  *
-  //  * @param int $meta_id
-  //  * @param int $event_id
-  //  * @return int|false
-  //  */
-  // public function update_meta_type_event($meta_id, $event_id) {
-  //   global $wpdb;
-  //   $table = $wpdb->prefix . $this->meta_table;
-  //   $timezone = \wp_timezone();
-  //   $now = new \DateTime('now', $timezone);
 
-  //   $data = array('modified' => $now->format($this->now_format));
-  //   $where = array('metaID' => $meta_id, 'eventID' => $event_id);
-  //   $format = array('%s');
-  //   $result = $wpdb->update($table, $data, $where, $format, $format);
-
-  //   return $result;
-  // }
-
-
-  // /**
-  //  * Create DB row with metas/child ids
-  //  *
-  //  * @param int $meta_id
-  //  * @param int $child_id
-  //  * @return int|false
-  //  */
-  // public function update_meta_type_event_from_array(array $meta_ids, string $meta_type, int $event_id) {
-  //   if ( !empty($meta_ids) ) {
-  //     foreach ($meta_ids as $meta_id) {
-  //       $this->update_meta_event($meta_id, $meta_type, $event_id);
-  //     }
-  //   }
-  // }
-
-
-  // /**
-  //  * Delete DB row with meta/event ids
-  //  *
-  //  * @param int $meta_id
-  //  * @param int $event_id
-  //  * @return int|false
-  //  */
-  // public function delete_meta_type_event($meta_id, $event_id) {
-  //   global $wpdb;
-  //   $table = $wpdb->prefix . $this->meta_table;
-
-  //   $where = array('metaID' => $meta_id, 'eventID' => $event_id);
-  //   $format = array('%d','%d');
-  //   $result = $wpdb->delete($table, $where, $format);
-
-  //   return $result;
-  // }
-
-
-  // /**
-  //  * Create DB row with metas/child ids
-  //  *
-  //  * @param int $meta_id
-  //  * @param int $child_id
-  //  * @return int|false
-  //  */
-  // public function deleta_meta_type_event_from_array(array $meta_ids, int $event_id) {
-  //   if ( !empty($meta_ids) ) {
-  //     foreach ($meta_ids as $meta_id) {
-  //       $this->deleta_meta_event($meta_id, $event_id);
-  //     }
-  //   }
-  // }
-
+  // NEW ========================
 }

@@ -1,25 +1,23 @@
 <?php
 
-namespace BluecadetEvents\Admin\Save\Recur;
-use BluecadetEvents\Admin\Save\Recur\RRuleBuilder;
+namespace BluecadetEvents\Admin\Save\Recur\Objects;
 use BluecadetEvents\Admin\Save\Recur\Objects\RecurringEvent;
 use BluecadetEvents\Admin\Save\Recur\Objects\RecurringEventDate;
-use BluecadetEvents\Admin\Utils\Logger;
+use BluecadetEvents\Admin\Save\Recur\RRuleBuilder;
 
+class RecurringEventsArray {
 
-/**
- * Creates all new events
- * 
- */
-class RecurringDatesArrayBuilder {
   private RecurringEvent $RDATE;
+  public array $events_array = [];
   private \DateTime $parent_start;
   private \DateTime $parent_end;
   private \DateInterval $parent_date_diff;
 
+
+
   public function __construct(RecurringEvent $RDATE) {
     $this->RDATE = $RDATE;
-
+    
     $this->parent_start = new \DateTime('now', $this->RDATE->timezone);
     $this->parent_start->setTimestamp($this->RDATE->event_meta[$this->RDATE->keys['start_timestamp']]);
 
@@ -29,11 +27,8 @@ class RecurringDatesArrayBuilder {
     $this->parent_date_diff = $this->parent_start->diff($this->parent_end);
   }
 
-
-
-  public function run() : void {
-
-    $this->RDATE->recurring_dates = [];
+  public function build_array() {
+    $this->events_array = [];
 
     // Handle frequency-based recurrence
     if ( $this->RDATE->get_meta('use_frequency') ) {
@@ -45,7 +40,6 @@ class RecurringDatesArrayBuilder {
       $this->handle_custom_occurences();
     }
   }
-
 
 
   /**
@@ -96,6 +90,11 @@ class RecurringDatesArrayBuilder {
           continue;
         }
 
+        $start_date->setTime(
+          (int)$this->parent_start->format('H'),
+          (int)$this->parent_start->format('i')
+        );
+
         $end_date = null;
         $is_customized = isset($values['customize']) && $values['customize'];
 
@@ -132,21 +131,6 @@ class RecurringDatesArrayBuilder {
 
 
 
-  private function set_date(\DateTime $start, \DateTime|null $end = null) : void {
-    
-    if ( !$end ) {
-      $end = (clone $start)->add($this->parent_date_diff);
-    }
-
-    $this->RDATE->recurring_dates[] = new RecurringEventDate(
-      $start,
-      $end,
-      $start->format('Y-m-d--H-i') . '-' . $this->RDATE->parent_post_id
-    );
-  }
-
-
-
   /**
    * Check to see if Y-m-d date string is in omission array
    *
@@ -161,4 +145,33 @@ class RecurringDatesArrayBuilder {
     return false;
   }
 
+
+
+  /**
+   * Set Date in array
+   *
+   * @param \DateTime $start
+   * @param \DateTime|null $end
+   * @return void
+   */
+  private function set_date(\DateTime $start, \DateTime|null $end = null) : void {
+    
+    if ( !$end ) {
+      $end = (clone $start)->add($this->parent_date_diff);
+    }
+
+    $this->events_array[] = new RecurringEventDate(
+      $start,
+      $end,
+      $start->format('Y-m-d--H-i')
+    );
+  }
+
+
+
+  public function has_events() : bool {
+    return !empty($this->events_array);
+  }
+
+  
 }

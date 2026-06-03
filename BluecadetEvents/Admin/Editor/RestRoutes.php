@@ -3,6 +3,7 @@
 namespace BluecadetEvents\Admin\Editor;
 use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Admin\Utils\DatabaseHelpers;
 
 /**
  * Handle date formatting
@@ -55,13 +56,33 @@ class RestRoutes {
 				},
 			)
 		);
+
+
+    // Get Meta Keys
+    register_rest_route(
+			$namespace,
+			'/is-child',
+			array(
+				'methods'             => 'GET',
+				'callback'            => [$this, 'is_child'],
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+        'args'                => array(
+          'id' => array(
+            'required'          => true,
+            'sanitize_callback' => 'sanitize_text_field',
+          ),
+        ),
+			)
+		);
   }
 
 
   public function to_timestamp(\WP_REST_Request $request) : \WP_REST_Response | \WP_Error {
     $date = $request->get_param( 'date' );
     $time = $request->get_param( 'time' );
-    $tz = wp_timezone();
+    $tz = \wp_timezone();
 
     if ( ! $date ) {
       return new \WP_Error( 'missing_date', 'Date parameter is required', [ 'status' => 400 ] );
@@ -95,6 +116,32 @@ class RestRoutes {
   public function get_keys() : \WP_REST_Response | \WP_Error {
     $keys = MetaKeys::get_keys();
     return rest_ensure_response( $keys );
+  }
+
+
+
+  public function is_child(\WP_REST_Request $request) : \WP_REST_Response | \WP_Error {
+    $id = $request->get_param( 'id' );
+
+    if ( ! $id ) {
+      return new \WP_Error( 'missing_id', 'ID parameter is required', [ 'status' => 400 ] );
+    }
+
+    $value = false;
+
+    $db_helpers = DatabaseHelpers::get_instance();
+    $is_child = $db_helpers->is_recurring_child($id);
+
+    if ( is_array($is_child) && !empty($is_child) ) {
+      $parent_id = $is_child[0];
+      $value = [
+        'parent_url' => get_edit_post_link($parent_id),
+        'parent_id' => $parent_id,
+        'parent_title' => get_the_title($parent_id),
+      ];
+    }
+
+    return rest_ensure_response( $value );
   }
 
 

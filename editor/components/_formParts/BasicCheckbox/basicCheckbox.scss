@@ -47,3 +47,10 @@
     }
   }
 }
+
+.bc-event-dates__checkbox--toggle,
+.bc-event-dates__checkbox--toggle-label {
+  &:hover {
+    cursor: pointer;
+  }
+}

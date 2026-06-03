@@ -1,7 +1,8 @@
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 import { getKey, getStore } from '../../_utils/store.js';
 import Frequency from '../Frequency/Frequency.jsx';
 import CustomOccurences from '../CustomOccurences/CustomOccurences.jsx';
@@ -37,13 +38,30 @@ export default function Recurring() {
     set(`bc-events/${key}-condensed`, 'condensed', value);
   }
 
+  const updateIsRecurring = ( val ) => {
+    setMeta( { ...meta, [ META_IS_RECURRING ]: val } );
+  }
+
+  const LOCK_KEY = 'event-dates-remove-recurring-warning';
+  const { lockPostSaving, unlockPostSaving } = useDispatch( editorStore );
+  const [ userAllowDelete, setUserAllowDelete ] = useState(false);
+
+  useEffect( () => {
+    console.log( 'Recurring useEffect', { IS_RECURRING, IS_RECURRING_WAS, userAllowDelete } );
+    if ( !IS_RECURRING && ( IS_RECURRING !== IS_RECURRING_WAS ) && !userAllowDelete ) {
+      lockPostSaving( LOCK_KEY );
+    } else {
+      unlockPostSaving( LOCK_KEY );
+    }
+  }, [ IS_RECURRING, IS_RECURRING_WAS, userAllowDelete ] );
+
   return (
     <div className="bc-event-recurring">
       <div className="bc-event__content-section">
         <RecurringButton
           id="is-recurring"
-          value={ IS_RECURRING }
-          onChange={ ( val ) => setMeta( { ...meta, [ META_IS_RECURRING ]: val } ) }
+          value={ meta?.[ META_IS_RECURRING ] ?? false }
+          onChange={ ( val ) => updateIsRecurring(val) }
         />
       </div>
       {
@@ -98,7 +116,11 @@ export default function Recurring() {
 
       {
         !IS_RECURRING && IS_RECURRING_WAS && (
-          <RemoveRecurring />
+          <RemoveRecurring 
+            onRecurringChange={ (val) => updateIsRecurring(val) }
+            onDeleteChange={ (val) => setUserAllowDelete(val) } 
+            userAllowDelete={userAllowDelete}   
+          />
         )
       }
     </div>

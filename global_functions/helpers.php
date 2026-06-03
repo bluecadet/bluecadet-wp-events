@@ -26,7 +26,7 @@ function bce__get_start_date($post = null) {
 
   $settings = bce__get_options();
 
-  if ( $field = get_post_meta($post->ID, 'bc_events_start', true) ) {
+  if ( $field = get_post_meta($post->ID, 'bc_events_start_timestamp', true) ) {
     $timezone = wp_timezone();
     $fDate = new DateTime('', $timezone);
     $fDate->setTimestamp($field);
@@ -50,7 +50,7 @@ function bce__get_end_date($post = null) {
 
   $settings = bce__get_options();
 
-  if ( $field = get_post_meta($post->ID, 'bc_events_end', true) ) {
+  if ( $field = get_post_meta($post->ID, 'bc_events_end_timestamp', true) ) {
     $timezone = wp_timezone();
     $fDate = new DateTime('', $timezone);
     $fDate->setTimestamp($field);
@@ -58,4 +58,15 @@ function bce__get_end_date($post = null) {
   }
 
   return false;
+}
+
+
+
+
+function bce__date_from_timestamp(int $timestamp) {
+  $settings = bce__get_options();
+  $timezone = wp_timezone();
+  $fDate = new DateTime('', $timezone);
+  $fDate->setTimestamp($timestamp);
+  return $fDate->format($settings['date_format']);
 }

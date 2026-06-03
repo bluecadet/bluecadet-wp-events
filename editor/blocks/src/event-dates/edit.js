@@ -12,6 +12,7 @@ import CheckboxButton from '../../../components/_formParts/CheckboxButton/Checkb
 import EventDetails from '../../../components/_sections/EventDetails/EventDetails.jsx';
 import Recurring from '../../../components/_sections/Recurring/Recurring.jsx';
 import Validation from '../../../components/_sections/Validation/Validation.jsx';
+import ChildEventDetails from '../../../components/_sections/ChildEventDetails/ChildEventDetails.jsx';
 
 
 
@@ -21,14 +22,25 @@ export default function Edit() {
   const { meta, setMeta } = getStore();
   const [ isLoading, setIsLoading ] = useState( true );
   const [ isLoadingError, setIsLoadingError ] = useState( false );
+  const [ isChild, setIsChild ] = useState( false );
+  const [ parentInfo, setParentInfo ] = useState({});
+  const postID = useSelect(select => select('core/editor').getCurrentPostId());
 
   const isCondensed = useSelect(select =>
     select(preferencesStore).get('bc-events/details-condensed', 'condensed')
   );
 
+  const isChildCondensed = useSelect(select =>
+    select(preferencesStore).get('bc-events/child-details-condensed', 'condensed')
+  );
+
   const { set } = useDispatch(preferencesStore);
   const handleToggle = (value) => {
     set('bc-events/details-condensed', 'condensed', value);
+  };
+
+  const handleChildToggle = (value) => {
+    set('bc-events/child-details-condensed', 'condensed', value);
   };
   
 
@@ -45,8 +57,22 @@ export default function Edit() {
       }
     };
 
+    const checkIsChild = async () => {
+      if ( postID ) {
+        try {
+          const url = addQueryArgs( `/${REST_NAMESPACE}/is-child`, {id: postID} );
+          const response = await apiFetch( { path: url } );
+          setIsChild( response );
+        } catch ( error ) {
+          console.error( 'Error fetching is_child:', error );
+        }
+      }
+    }
+
     fetchKeys();
-  }, [] );
+    checkIsChild();
+
+  }, [postID] );
   
 
 
@@ -66,21 +92,40 @@ export default function Edit() {
         </div>
       ) : (
         <div className="bc-event-dates__container">
-          <Validation />
-          <SectionToggle
-            title={ __( 'Event Details', 'basecadet' ) }
-            value={ isCondensed }
-            onChange={ (value) => handleToggle(value) }
-            asTitle={true}
-            titleTag="h2"
-          />
+          { 
+            isChild ? (
+              <>
+                <SectionToggle
+                  title={ __( 'Child Event Details', 'basecadet' ) }
+                  value={ isChildCondensed }
+                  onChange={ (value) => handleChildToggle(value) }
+                  asTitle={true}
+                  titleTag="h2"
+                />
+                { !isChildCondensed && <ChildEventDetails parentData={isChild} /> }
+              </>
+            ) : (
+              <>
+                <Validation />
+                <SectionToggle
+                  title={ __( 'Event Details', 'basecadet' ) }
+                  value={ isCondensed }
+                  onChange={ (value) => handleToggle(value) }
+                  asTitle={true}
+                  titleTag="h2"
+                />
+                
+                { !isCondensed && (
+                  <>
+                    <EventDetails />
+                    <Recurring />
+                  </>
+                )}
+              </>
+            )
+          }
+
           
-          { !isCondensed && (
-            <>
-              <EventDetails />
-              <Recurring />
-            </>
-          )}
         </div>
       ) }      
     </div>
