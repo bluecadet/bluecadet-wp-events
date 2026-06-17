@@ -176,7 +176,6 @@ class AdminEventsViews {
    */
   function sortable_columns( array $columns ) : array {
     $columns['event_date'] = 'bc_event_date';
-    // $columns['last_modified'] = 'bc_last_modified';
     return $columns;
   }
 
@@ -401,7 +400,6 @@ class AdminEventsViews {
   private function filter_query_view() {
 
       $query_view_selected = isset($_REQUEST[$this->filter_events_param]) ? $_REQUEST[$this->filter_events_param] : '';
-
 
       // Custom Event Recur Filter
       $query_view_opts = [
