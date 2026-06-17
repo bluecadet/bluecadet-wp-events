@@ -3,10 +3,9 @@
 namespace BluecadetEvents\Admin\Save;
 use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
-use BluecadetEvents\Admin\Meta\MetaKeys;
 use BluecadetEvents\Admin\Save\Recur\Objects\RecurringEvent;
+use BluecadetEvents\Admin\Save\Recur\Objects\EventPost;
 use BluecadetEvents\Admin\Save\Recur\EventCloneBuilder;
-use BluecadetEvents\Admin\Save\Recur\Objects\EventClone;
 use BluecadetEvents\Admin\Save\Recur\Objects\RecurringEventsArray;
 use BluecadetEvents\Admin\Utils\Logger;
 use BluecadetEvents\Plugin\BackgroundProcesses;
@@ -23,15 +22,13 @@ class EventsSaveAction {
   private RecurringEvent $RDATE;
   private RecurringEventsArray $recurring_events_array;
   private array $meta_updates = [];
+  private ?EventPost $event_post = null;
   
   private mixed $background_event_handler;
 
   
 
   public function __construct(int $post_id, int|\WP_Post $post, bool $update, null|\WP_Post $post_before) {
-    // Logger::log('==================================================================================');
-    // Logger::log('=============================== EVENTS SAVE ACTION ===============================');
-    // Logger::log('================================== post_id: ' . $post_id . ' =================================');
     $this->RDATE = new RecurringEvent($post_id, $post, $update);  
   }
 
@@ -39,7 +36,11 @@ class EventsSaveAction {
     $this->DB_HELPERS = DatabaseHelpers::get_instance();
 
     if ( $this->RDATE->is_recurring || (!$this->RDATE->is_recurring && $this->RDATE->is_recurring_was) ) {
-      $this->RDATE->is_parent = !$this->RDATE->parent_update ? false : $this->DB_HELPERS->is_recurring_parent($this->RDATE->parent_post_id);
+      
+      if ( !$this->RDATE->parent_update ) {
+        $this->RDATE->is_parent = false;
+      }
+      
       $this->maybe_handle_recurring_events();
       $this->handle_always();
     }
@@ -172,7 +173,6 @@ class EventsSaveAction {
 
 
   private function handle_build_recurring_events() {
-    Logger::log('HANDLE BUILD RECURRING');
 
     $this->recurring_events_array = new RecurringEventsArray($this->RDATE);
     $this->recurring_events_array->build_array();
@@ -190,15 +190,11 @@ class EventsSaveAction {
     foreach ( $this->recurring_events_array->events_array as $event ) {
       $clone_builder->set_dates($event->start_date, $event->end_date, $event->slug);
       $clone_data = $clone_builder->get_clone();
-      Logger::log('Event: ' . $event->slug);
       $this->background_event_handler->push_to_queue(clone $clone_data);
     }
 
     $this->background_event_handler->set_check_updates($this->RDATE->parent_post_id);
-    $this->background_event_handler->save()->dispatch();
-
-    Logger::log('DISPATCHING NEW BACKGROUND EVENT DISPATCHED');
-    
+    $this->background_event_handler->save()->dispatch();    
 
   }
 
@@ -294,21 +290,30 @@ class EventsSaveAction {
 
     // Set start month year for sorting
     $start_timestamp = get_post_meta($this->RDATE->parent_post_id, $this->RDATE->keys['start_timestamp'], true);
+    $end_timestamp = get_post_meta($this->RDATE->parent_post_id, $this->RDATE->keys['end_timestamp'], true);
     $d = new \DateTime();
     $d->setTimestamp($start_timestamp);
     $this->set_meta_update($this->RDATE->keys['start_month_year'], $d->format('F Y'));
 
-    if ( $this->DB_HELPERS->is_recurring_child($this->RDATE->parent_post_id) ) {
+    if ( $this->RDATE->is_child ) {
       $this->set_meta_update('is_child', '1');
     } else {
       $this->set_meta_update('is_child', '0');
     }
 
+    // Add event to DB
+    $this->event_post = new EventPost(
+      modified: current_time('Y-m-d H:i:s'),
+      post_id: $this->RDATE->parent_post_id,
+      post_slug: $this->RDATE->parent_post->post_name,
+      event_start: (int) $start_timestamp,
+      event_end: (int) $end_timestamp,
+      parent_ID: $this->RDATE->is_child && is_array($this->RDATE->is_child) ? (int) $this->RDATE->is_child[0] : 0,
+    );
+
+    $insert = $this->DB_HELPERS->insert_event($this->event_post);
+
   }
-
-
-
-  
 
 
 
@@ -342,16 +347,4 @@ class EventsSaveAction {
     }
   }
 
-
-  /**
-   * Log if you can
-   *
-   * @param mixed $data
-   * @return void
-   */
-  // private function log(mixed $data) : void {
-  //   if ( $this->allow_log ) {
-  //     error_log(print_r($data, true));
-  //   }
-  // }
 }

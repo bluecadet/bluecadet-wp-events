@@ -47,6 +47,8 @@ class AdminEventsViews {
     // Remove default WP date filter on events post type
     add_action( 'admin_head', [$this, 'remove_core_dates_filter'] );
 
+    add_filter( 'post_row_actions', [$this, 'remove_cpt_trash_action'], 99, 2 );
+
   }
 
 
@@ -72,7 +74,7 @@ class AdminEventsViews {
     if ( $is_recurring_child ) {
       $post_states['bc_events_recurring_child'] = 'Recurring Child';
       if ( get_post_meta($post->ID, $this->keys['child_deny_override'], true) ) {
-        $post_states['bc_events_recurring_child_override'] = 'Custom Content';
+        $post_states['bc_events_recurring_child_override'] = '<span style="color: #ff0f0f; font-style: italic;">Custom Content</span>';
       }
 
     } elseif ( $is_recurring_parent ) {
@@ -447,6 +449,28 @@ class AdminEventsViews {
     if ( Settings::$events_machine_name == $screen->post_type ){
       add_filter('months_dropdown_results', '__return_empty_array');
     }
+  }
+
+
+  public function remove_cpt_trash_action( array $actions, \WP_Post $post ) : array {
+    if ( $post->post_type !== Settings::$events_machine_name ) {
+      return $actions;
+    }
+
+    $db_helpers          = DatabaseHelpers::get_instance();
+    $is_recurring_child  = $db_helpers->is_recurring_child($post->ID);
+
+    if ( $is_recurring_child ) {
+      $new_actions = [
+        'edit' => $actions['edit'],
+        'view' => $actions['view']
+      ];
+    } else {
+      $new_actions = $actions;
+    }
+    
+
+    return $new_actions;
   }
 
 }

@@ -20,14 +20,18 @@ class Activate {
     $bc_events_table = $wpdb->prefix . Settings::$events_table;
 
     $event_table_sql = "CREATE TABLE IF NOT EXISTS {$bc_events_table} (
-      id mediumint(9) NOT NULL AUTO_INCREMENT,
+      id bigint NOT NULL AUTO_INCREMENT,
       modified datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
       post_id bigint NOT NULL,
-      post_title text NOT NULL,
+      post_slug varchar(200) NOT NULL,
       event_start int(11) NOT NULL,
       event_end int(11) NOT NULL,
-      post_status varchar(20) NOT NULL,
-      UNIQUE KEY id (id)
+      parent_ID bigint NOT NULL,
+      UNIQUE KEY id (id),
+      KEY post_id (post_id),
+      KEY event_start (event_start),
+      KEY parent_ID (parent_ID),
+      KEY event_start_parent (event_start, parent_ID)
     ) $charset_collate;";
 
     dbDelta( $event_table_sql );
@@ -39,10 +43,10 @@ class Activate {
     $recur_table_name = $wpdb->prefix . Settings::$recurring_events_table;
 
     $recur_sql = "CREATE TABLE IF NOT EXISTS $recur_table_name (
-      id mediumint(9) NOT NULL AUTO_INCREMENT,
+      id bigint NOT NULL AUTO_INCREMENT,
       modified datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-      parent_ID mediumint(9) NOT NULL,
-      child_ID mediumint(9) NOT NULL,
+      parent_ID bigint NOT NULL,
+      child_ID bigint NOT NULL,
       event_start int(11) NOT NULL,
       event_end int(11) NOT NULL,
       post_status varchar(20) NOT NULL,

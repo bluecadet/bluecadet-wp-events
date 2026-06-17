@@ -47,7 +47,6 @@ export default function Recurring() {
   const [ userAllowDelete, setUserAllowDelete ] = useState(false);
 
   useEffect( () => {
-    console.log( 'Recurring useEffect', { IS_RECURRING, IS_RECURRING_WAS, userAllowDelete } );
     if ( !IS_RECURRING && ( IS_RECURRING !== IS_RECURRING_WAS ) && !userAllowDelete ) {
       lockPostSaving( LOCK_KEY );
     } else {

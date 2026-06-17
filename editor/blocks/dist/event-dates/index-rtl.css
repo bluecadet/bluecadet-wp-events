@@ -21,8 +21,9 @@
   --bce-input-border-color: #8c8f94;
   --bce-error-color: #ff0f0f;
   --bce-error-color-light: #fff1f1;
-  --bce-warn-color: #E5CD73;
-  --bce-warn-text-on-light: #6e623a;
+  --bce-warn-background: rgb(255, 247, 225);
+  --bce-warn-text: rgb(46, 25, 0);
+  --bce-warn-border: rgb(225, 188, 124);
   --bce-warn-light: #F1E3B2;
   --bce-brand-color: #0049DB;
   --bce-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
@@ -516,8 +517,9 @@
 }
 
 .bc-events__recurring-notice-inner {
-  border: 1px solid var(--bce-warn-text-on-light);
-  background: var(--bce-warn-light);
+  border: 1px solid var(--bce-warn-border);
+  color: var(--bce-warn-text);
+  background: var(--bce-warn-background);
   border-radius: 4px;
   font-size: 13px;
   padding: 16px;
@@ -634,9 +636,10 @@
 .bc-event__child-content-notes {
   margin-top: 24px;
   padding: 20px;
-  border: 1px solid var(--bce-warn-text-on-light);
+  border: 1px solid var(--bce-warn-border);
   border-radius: 4px;
-  background-color: var(--bce-warn-light);
+  color: var(--bce-warn-text);
+  background-color: var(--bce-warn-background);
 }
 
 .bc-event__child-content-notes ul {
@@ -652,4 +655,5 @@
 
 .bc-event__child-content-notes .bc-event-dates__description {
   margin-bottom: 0;
+  opacity: 1;
 }

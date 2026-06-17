@@ -3,6 +3,7 @@
 namespace BluecadetEvents\Admin\Utils;
 use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Admin\Save\Recur\Objects\EventClone;
+use BluecadetEvents\Admin\Save\Recur\Objects\EventPost;
 
 /**
  * Database helper functions
@@ -140,6 +141,61 @@ class DatabaseHelpers {
 
   //   return $result;
   // }
+
+
+  public function insert_event(EventPost $event_post) : int|false {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->events_table;
+
+    $data = [
+      'modified' => $event_post->modified,
+      'post_id' => $event_post->post_id,
+      'post_slug' => $event_post->post_slug,
+      'event_start' => $event_post->event_start,
+      'event_end' => $event_post->event_end,
+      'parent_ID' => $event_post->parent_ID,
+    ];
+
+    $format = ['%s','%d','%s','%d','%d','%d'];
+
+    if ( $this->event_row_exists($event_post->post_id) ) {
+      $where = ['post_id' => $event_post->post_id];
+      $result = $wpdb->update($table, $data, $where, $format, ['%d']);
+      return $result;
+    }
+
+    $result = $wpdb->insert($table, $data, $format);
+
+    return $result;
+  }
+
+
+  function event_row_exists(int $post_id) : bool {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->events_table;
+
+    $exists = $wpdb->get_var(
+      $wpdb->prepare(
+        "SELECT 1 FROM $table WHERE post_id=%d LIMIT 1",
+        $post_id
+      )
+    );
+
+    if ( !$exists ) { return false; }
+
+    return true;
+  }
+
+
+  function delete_event_row(int $post_id) : int|false {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->events_table;
+
+    $where = ['post_id' => $post_id];
+    $result = $wpdb->delete($table, $where, ['%d']);
+
+    return $result;
+  }
 
 
   // ===================================
