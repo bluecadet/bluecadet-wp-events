@@ -3,6 +3,7 @@
 namespace BluecadetEvents\Admin\Save\Recur\Objects;
 use BluecadetEvents\Admin\Meta\MetaKeys;
 use BluecadetEvents\Admin\Save\Recur\Objects\EventClone;
+use BluecadetEvents\Admin\Utils\DatabaseHelpers;
 
 
 class RecurringEvent {
@@ -68,14 +69,21 @@ class RecurringEvent {
    *
    * @var boolean|array
    */
-  public bool|array $is_parent;
+  public bool|array $is_parent = false;
+
+  /**
+   * Whether the event is a parent event
+   *
+   * @var boolean|array
+   */
+  public bool|array $is_child = false;
 
   /**
    * Frequency arguments for the event
    *
    * @var array
    */
-  public array $freq_args;
+  public array $freq_args = [];
 
   /**
    * Previous recurrence strategy
@@ -122,6 +130,8 @@ class RecurringEvent {
    * @param boolean $update - Whether this is an update to an existing post or a new post
    */
   public function __construct(int $id, \WP_Post $post, bool $update) {
+    $DB_HELPERS = DatabaseHelpers::get_instance();
+
     $this->parent_post_id = $id;
     $this->parent_post = $post;
     $this->parent_update = $update;
@@ -130,6 +140,8 @@ class RecurringEvent {
     $this->is_recurring = get_post_meta($this->parent_post_id, $this->keys['is_recurring'], true);
     $this->is_recurring_was = get_post_meta($this->parent_post_id, $this->keys['is_recurring_was'], true);
     $this->recurring_delete = get_post_meta($this->parent_post_id, $this->keys['remove_recurring'], true);
+    $this->is_parent = $DB_HELPERS->is_recurring_parent($id);
+    $this->is_child = $DB_HELPERS->is_recurring_child($id);
   }
 
 

@@ -14,31 +14,30 @@ export default function RecurringAltered() {
 
   const [ hasRecurDiff, setHasRecurDiff ] = useState( false );
   
+  const USE_FREQUENCY = meta?.[ getKey( 'use_frequency', keys ) ];
+  const START_DATE = meta?.[ getKey( 'start_date', keys ) ];
+  const START_TIME = meta?.[ getKey( 'start_time', keys ) ];
+  const END_DATE = meta?.[ getKey( 'end_date', keys ) ];
+  const END_TIME = meta?.[ getKey( 'end_time', keys ) ];
+  const FREQUENCY_VALUE = meta?.[ getKey( 'freq', keys ) ];
+  const WEEKLY_DAYS = meta?.[ getKey( 'freq_days', keys ) ];
+  const MONTHLY_SCHED = meta?.[ getKey( 'freq_mo_schedule', keys ) ];
+  const MONTHLY_DAY = meta?.[ getKey( 'freq_mo_day', keys ) ];
+  const MONTHLY_DATE = meta?.[ getKey( 'freq_mo_date', keys ) ];
+  const END_TYPE_VALUE = meta?.[ getKey( 'freq_end_type', keys ) ];
+  const END_DATE_VALUE = meta?.[ getKey( 'freq_end_date', keys ) ];
+  const END_AFTER_X_VALUE = meta?.[ getKey( 'freq_end_after_x', keys ) ];
+  const START_TIMESTAMP = meta?.[ getKey('start_timestamp', keys ) ];
+  const OCCURENCES = meta?.[ getKey('custom_occurrences', keys ) ];
+  const OMISSIONS = meta?.[ getKey('omissions', keys ) ];
 
-  const USE_FREQUENCY = meta?.[ getKey( 'use_frequency', keys ) ] ?? false;
+  const RECUR_WAS = meta?.[ getKey( 'recur_strategy_was', keys ) ];
 
-  const START_DATE = meta?.[ getKey( 'start_date', keys ) ] ?? '';
-  const START_TIME = meta?.[ getKey( 'start_time', keys ) ] ?? '';
-  const END_DATE = meta?.[ getKey( 'end_date', keys ) ] ?? '';
-  const END_TIME = meta?.[ getKey( 'end_time', keys ) ] ?? '';
-
-  const FREQUENCY_VALUE = meta?.[ getKey( 'freq', keys ) ] ?? '';
-  const WEEKLY_DAYS = meta?.[ getKey( 'freq_days', keys ) ] ?? [];
-  const MONTHLY_SCHED = meta?.[ getKey( 'freq_mo_schedule', keys ) ] ?? '';
-  const MONTHLY_DAY = meta?.[ getKey( 'freq_mo_day', keys ) ] ?? '';
-  const MONTHLY_DATE = meta?.[ getKey( 'freq_mo_date', keys ) ] ?? '';
-  const END_TYPE_VALUE = meta?.[ getKey( 'freq_end_type', keys ) ] ?? '';
-  const END_DATE_VALUE = meta?.[ getKey( 'freq_end_date', keys ) ] ?? '';
-  const END_AFTER_X_VALUE = meta?.[ getKey( 'freq_end_after_x', keys ) ] ?? '';
-  const START_TIMESTAMP = meta?.[ getKey('start_timestamp', keys ) ] ?? '';
-  const OCCURENCES = meta?.[ getKey('custom_occurrences', keys ) ] ?? [];
-  const OMISSIONS = meta?.[ getKey('omissions', keys ) ] ?? [];
-
-  const RECUR_WAS = meta?.[ getKey( 'recur_strategy_was', keys ) ] ?? [];
 
 
   useEffect( () => {
-    if ( !RECUR_WAS.length ) {
+
+    if ( !RECUR_WAS ) {
       setHasRecurDiff(false);
     } else {
       const currentRecur = {
@@ -62,8 +61,6 @@ export default function RecurringAltered() {
 
       setHasRecurDiff( !isEqual( currentRecur, RECUR_WAS ) );
     }
-
-      
 
   }, [
     USE_FREQUENCY,

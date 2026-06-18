@@ -11,8 +11,9 @@
 }
 
 .bc-events__recurring-notice-inner {
-  border: 1px solid var(--bce-warn-text-on-light);
-  background: var(--bce-warn-light);
+  border: 1px solid var(--bce-warn-border);
+  color: var(--bce-warn-text);
+  background: var(--bce-warn-background);
   border-radius: 4px;
   font-size: 13px;
   padding: 16px;

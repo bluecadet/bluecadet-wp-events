@@ -141,7 +141,7 @@ class RestRoutes {
       ];
     }
 
-    return rest_ensure_response( $value );
+    return \rest_ensure_response( $value );
   }
 
 

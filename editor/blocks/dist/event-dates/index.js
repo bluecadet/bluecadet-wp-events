@@ -1179,11 +1179,6 @@ function Recurring() {
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useDispatch)(_wordpress_editor__WEBPACK_IMPORTED_MODULE_4__.store);
   const [userAllowDelete, setUserAllowDelete] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
-    console.log('Recurring useEffect', {
-      IS_RECURRING,
-      IS_RECURRING_WAS,
-      userAllowDelete
-    });
     if (!IS_RECURRING && IS_RECURRING !== IS_RECURRING_WAS && !userAllowDelete) {
       lockPostSaving(LOCK_KEY);
     } else {
@@ -1285,25 +1280,25 @@ function RecurringAltered() {
     setMeta
   } = (0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getStore)();
   const [hasRecurDiff, setHasRecurDiff] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_6__.useState)(false);
-  const USE_FREQUENCY = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('use_frequency', keys)] ?? false;
-  const START_DATE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_date', keys)] ?? '';
-  const START_TIME = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_time', keys)] ?? '';
-  const END_DATE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('end_date', keys)] ?? '';
-  const END_TIME = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('end_time', keys)] ?? '';
-  const FREQUENCY_VALUE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq', keys)] ?? '';
-  const WEEKLY_DAYS = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_days', keys)] ?? [];
-  const MONTHLY_SCHED = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_mo_schedule', keys)] ?? '';
-  const MONTHLY_DAY = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_mo_day', keys)] ?? '';
-  const MONTHLY_DATE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_mo_date', keys)] ?? '';
-  const END_TYPE_VALUE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_end_type', keys)] ?? '';
-  const END_DATE_VALUE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_end_date', keys)] ?? '';
-  const END_AFTER_X_VALUE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_end_after_x', keys)] ?? '';
-  const START_TIMESTAMP = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_timestamp', keys)] ?? '';
-  const OCCURENCES = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('custom_occurrences', keys)] ?? [];
-  const OMISSIONS = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('omissions', keys)] ?? [];
-  const RECUR_WAS = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('recur_strategy_was', keys)] ?? [];
+  const USE_FREQUENCY = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('use_frequency', keys)];
+  const START_DATE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_date', keys)];
+  const START_TIME = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_time', keys)];
+  const END_DATE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('end_date', keys)];
+  const END_TIME = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('end_time', keys)];
+  const FREQUENCY_VALUE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq', keys)];
+  const WEEKLY_DAYS = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_days', keys)];
+  const MONTHLY_SCHED = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_mo_schedule', keys)];
+  const MONTHLY_DAY = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_mo_day', keys)];
+  const MONTHLY_DATE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_mo_date', keys)];
+  const END_TYPE_VALUE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_end_type', keys)];
+  const END_DATE_VALUE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_end_date', keys)];
+  const END_AFTER_X_VALUE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_end_after_x', keys)];
+  const START_TIMESTAMP = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_timestamp', keys)];
+  const OCCURENCES = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('custom_occurrences', keys)];
+  const OMISSIONS = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('omissions', keys)];
+  const RECUR_WAS = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('recur_strategy_was', keys)];
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_6__.useEffect)(() => {
-    if (!RECUR_WAS.length) {
+    if (!RECUR_WAS) {
       setHasRecurDiff(false);
     } else {
       const currentRecur = {

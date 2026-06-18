@@ -613,25 +613,30 @@ class Hooks {
       'per_page' => 12,                         // per page count
       'past_parameter' => 'is-past',            // applies to list view only
       'starting_on_parameter' => 'starting-on', // applies to list view only
+      'dedupe_main_query' => false,
     ];
 
     $args  = \apply_filters('bc_events_archive_settings', $args);
 
     // Enforce some things...
-    if ( empty($args['layout']) || !in_array( $args['layout'], ['list', 'week'] ) ) {
+    if ( !isset($args['layout']) || empty($args['layout']) || !in_array( $args['layout'], ['list', 'week'] ) ) {
       $args['layout'] = 'list';
     }
 
-    if ( empty($args['per_page']) ) {
+    if ( !isset($args['per_page']) || empty($args['per_page']) ) {
       $args['per_page'] = 12;
     }
 
-    if ( empty($args['past_parameter']) ) {
+    if ( !isset($args['past_parameter']) || empty($args['past_parameter']) ) {
       $args['past_parameter'] = 'is-past';
     }
 
-    if ( empty($args['starting_on_parameter']) ) {
-      $args['past_parameter'] = 'starting-on';
+    if ( !isset($args['starting_on_parameter']) || empty($args['starting_on_parameter']) ) {
+      $args['starting_on_parameter'] = 'starting-on';
+    }
+
+    if ( !isset($args['dedupe_main_query']) || empty($args['dedupe_main_query']) ) {
+      $args['dedupe_main_query'] = false;
     }
 
     return $args;

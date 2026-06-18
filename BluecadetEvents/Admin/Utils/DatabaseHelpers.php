@@ -3,6 +3,7 @@
 namespace BluecadetEvents\Admin\Utils;
 use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Admin\Save\Recur\Objects\EventClone;
+use BluecadetEvents\Admin\Save\Recur\Objects\EventPost;
 
 /**
  * Database helper functions
@@ -39,112 +40,84 @@ class DatabaseHelpers {
   }
 
 
-  /**
-   * Create DB row with post_id, start & end dates
-   *
-   * @param int $post_id
-   * @param int $start_date unix timestamp
-   * @param int $end_date unix timestamp
-   * @return int|false
-   */
-  // public function write_or_update_event(int $post_id, int $start_date, int $end_date, false|string $title = false) {
-  //   global $wpdb;
-  //   $table = $wpdb->prefix . $this->events_table;
-
-  //   $results = $wpdb->get_results(
-  //     $wpdb->prepare(
-  //       "SELECT * FROM $table WHERE post_id=%d",
-  //       $post_id
-  //     )
-  //   );
-
-  //   if ( !$results ) {
-  //     return $this->write_event($post_id, $start_date, $end_date, $title);
-  //   }
-
-  //   return $this->update_event($post_id, $start_date, $end_date, $title);
-  // }
-
-
 
   /**
-   * Create DB row with post_id, start & end dates
+   * Insert Event row into database. Will insert new or update existing
    *
-   * @param int $post_id
-   * @param int $start_date unix timestamp
-   * @param int $end_date unix timestamp
-   * @return int|false
+   * @param EventPost $event_post
+   * @return integer|false
    */
-  // public function write_event(int $post_id, int $start_date, int $end_date, false|string $title = false) {
-  //   global $wpdb;
-  //   $table = $wpdb->prefix . $this->events_table;
-  //   $timezone = \wp_timezone();
-  //   $now = new \DateTime('now', $timezone);
-  //   $title = $title ? $title : get_the_title($post_id);
+  public function insert_event(EventPost $event_post) : int|false {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->events_table;
 
-  //   $data = [
-  //     'post_id' => $post_id,
-  //     'event_start_date' => $start_date,
-  //     'event_end_date' => $end_date,
-  //     'post_title' => $title,
-  //     'modified' => $now->format($this->now_format)
-  //   ];
+    $data = [
+      'modified' => $event_post->modified,
+      'post_id' => $event_post->post_id,
+      'post_slug' => $event_post->post_slug,
+      'event_start' => $event_post->event_start,
+      'event_end' => $event_post->event_end,
+      'parent_ID' => $event_post->parent_ID,
+    ];
 
-  //   $result = $wpdb->insert($table, $data, ['%d','%d','%d','%s','%s']);
+    $format = ['%s','%d','%s','%d','%d','%d'];
 
-  //   return $result;
-  // }
+    if ( $this->event_row_exists($event_post->post_id) ) {
+      $where = ['post_id' => $event_post->post_id];
+      $result = $wpdb->update($table, $data, $where, $format, ['%d']);
+      return $result;
+    }
+
+    $result = $wpdb->insert($table, $data, $format);
+
+    return $result;
+  }
+
 
 
   /**
-   * Update DB row with post_id, start & end dates
+   * Delete event row from database
    *
-   * @param int $post_id
-   * @param int $start_date unix timestamp
-   * @param int $end_date unix timestamp
-   * @return int|false
+   * @param integer $post_id
+   * @return integer|false
    */
-  // public function update_event(int $post_id, int $start_date, int $end_date, false|string $title = false) {
-  //   global $wpdb;
-  //   $table = $wpdb->prefix . $this->events_table;
-  //   $timezone = \wp_timezone();
-  //   $now = new \DateTime('now', $timezone);
-  //   $title = $title ? $title : get_the_title($post_id);
+  public function delete_event(int $post_id) : int|false {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->events_table;
 
-  //   $data = [
-  //     'event_start_date' => $start_date,
-  //     'event_end_date' => $end_date,
-  //     'post_title' => $title,
-  //     'modified' => $now->format($this->now_format),
-  //   ];
+    $where = ['post_id' => $post_id];
+    $result = $wpdb->delete($table, $where, ['%d']);
 
-  //   $where = ['post_id' => $post_id];
+    return $result;
+  }
 
-  //   $result = $wpdb->update($table, $data, $where, ['%d','%d','%s','%s'], ['%d']);
-  //   return $result;
-  // }
 
 
   /**
-   * Delete DB row with parent/child ids
+   * Check if event row exists in database
    *
-   * @param int $post_id
-   * @return int|false
+   * @param integer $post_id
+   * @return boolean
    */
-  // public function delete_event(int $post_id) {
-  //   global $wpdb;
-  //   $table = $wpdb->prefix . $this->events_table;
+  public function event_row_exists(int $post_id) : bool {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->events_table;
 
-  //   $where = ['post_id' => $post_id];
-  //   $result = $wpdb->delete($table, $where, ['%d']);
+    $exists = $wpdb->get_var(
+      $wpdb->prepare(
+        "SELECT 1 FROM $table WHERE post_id=%d LIMIT 1",
+        $post_id
+      )
+    );
 
-  //   return $result;
-  // }
+    if ( !$exists ) { return false; }
 
+    return true;
+  }
 
-  // ===================================
+  // =======================================
   //             Recurring Events
-  // ===================================
+  // =======================================
 
 
 

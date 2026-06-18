@@ -40,9 +40,10 @@
 .bc-event__child-content-notes {
   margin-top: 24px;
   padding: 20px;
-  border: 1px solid var(--bce-warn-text-on-light);
+  border: 1px solid var(--bce-warn-border);
   border-radius: 4px;
-  background-color: var(--bce-warn-light);
+  color: var(--bce-warn-text);
+  background-color: var(--bce-warn-background);
 
   ul {
     list-style: list;
@@ -57,5 +58,6 @@
 
   .bc-event-dates__description {
     margin-bottom: 0;
+    opacity: 1;
   }
 }
