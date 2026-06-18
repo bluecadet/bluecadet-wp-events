@@ -13,6 +13,8 @@ import EventDetails from '../../../components/_sections/EventDetails/EventDetail
 import Recurring from '../../../components/_sections/Recurring/Recurring.jsx';
 import Validation from '../../../components/_sections/Validation/Validation.jsx';
 import ChildEventDetails from '../../../components/_sections/ChildEventDetails/ChildEventDetails.jsx';
+import EventLocations from '../../../components/_sections/EventLocations/EventLocations.jsx';
+import EventSeries from '../../../components/_sections/EventSeries/EventSeries.jsx';
 
 
 
@@ -23,6 +25,8 @@ export default function Edit() {
   const [ isLoading, setIsLoading ] = useState( true );
   const [ isLoadingError, setIsLoadingError ] = useState( false );
   const [ isChild, setIsChild ] = useState( false );
+  const [ useLocations, setUseLocations ] = useState( false );
+  const [ useSeries, setUseSeries ] = useState( false );
   const [ parentInfo, setParentInfo ] = useState({});
   const postID = useSelect(select => select('core/editor').getCurrentPostId());
 
@@ -69,8 +73,19 @@ export default function Edit() {
       }
     }
 
+    const getSupportSettings = async () => {
+      try {
+        const response = await apiFetch( { path: `/${REST_NAMESPACE}/get-support-settings` } );
+        setUseLocations( response?.use_locations ?? false );
+        setUseSeries( response?.use_series ?? false );
+      } catch ( error ) {
+        console.error( 'Error fetching support settings:', error );
+      }
+    }
+
     fetchKeys();
     checkIsChild();
+    getSupportSettings();
 
   }, [postID] );
   
@@ -118,6 +133,8 @@ export default function Edit() {
                 { !isCondensed && (
                   <>
                     <EventDetails />
+                    { useLocations && <EventLocations /> }
+                    { useSeries && <EventSeries /> }
                     <Recurring />
                   </>
                 )}

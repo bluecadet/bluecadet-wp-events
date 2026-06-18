@@ -1,6 +1,6 @@
-@use './styles/base.scss';
-@use './styles/button.scss';
-@use './styles/toggles.scss';
+@use '../../../styles/base.scss';
+@use '../../../styles/button.scss';
+@use '../../../styles/toggles.scss';
 // @use './styles/recurring.scss';
 
 // Form Parts
@@ -10,6 +10,7 @@
 @use '../../../components/_formParts/CheckboxFormGroup/checkboxFormGroup.scss';
 @use '../../../components/_formParts/RecurringButton/recurringButton.scss';
 @use '../../../components/_formParts/CheckboxButton/checkboxButton.scss';
+@use '../../../components/_formParts/PostPicker/postPicker.scss';
 
 // Sections
 @use '../../../components/SectionToggle/sectionToggle.scss';
@@ -20,5 +21,6 @@
 @use '../../../components/_sections/Recurring/recurring.scss';
 @use '../../../components/_sections/RemoveRecurring/removeRecurring.scss';
 @use '../../../components/_sections/ChildEventDetails/childEventDetails.scss';
+@use '../../../components/_sections/RepeatingPostPicker/repeatingPostPicker.scss';
 
 

@@ -7,14 +7,14 @@
  */
 
 $post_id         = $block->context['postId'] ?? get_the_ID();
-$start_date      = get_post_meta( $post_id, 'event_start_date',            true );
-$start_time      = get_post_meta( $post_id, 'event_start_time',            true );
-$end_date        = get_post_meta( $post_id, 'event_end_date',              true );
-$end_time        = get_post_meta( $post_id, 'event_end_time',              true );
-$hide_time       = (bool) get_post_meta( $post_id, 'event_hide_time_display',     true );
-$hide_end_time   = (bool) get_post_meta( $post_id, 'event_hide_end_time_display', true );
-$is_virtual      = (bool) get_post_meta( $post_id, 'event_virtual_event',         true );
-$virtual_url     = get_post_meta( $post_id, 'event_virtual_url',           true );
+$start_date      = get_post_meta( $post_id, 'bc_events_start_date',            true );
+$start_time      = get_post_meta( $post_id, 'bc_events_start_time',            true );
+$end_date        = get_post_meta( $post_id, 'bc_events_end_date',              true );
+$end_time        = get_post_meta( $post_id, 'bc_events_end_time',              true );
+$hide_time       = (bool) get_post_meta( $post_id, 'bc_events_hide_time_display',     true );
+$hide_end_time   = (bool) get_post_meta( $post_id, 'bc_events_hide_end_time_display', true );
+$is_virtual      = (bool) get_post_meta( $post_id, 'bc_events_virtual_event',         true );
+$virtual_url     = get_post_meta( $post_id, 'bc_events_virtual_url',           true );
 
 if ( ! $start_date && ! $end_date ) {
 	return;
