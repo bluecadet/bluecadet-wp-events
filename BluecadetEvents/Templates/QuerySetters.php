@@ -110,25 +110,13 @@ class QuerySetters {
    */
   private function set_list_view() : void {
     $this->args['posts_per_page'] = $this->settings['per_page'];
-    $this->args['meta_key']       = $this->keys['start_timestamp'];
-    $this->args['orderby']        = 'meta_value_num';
     $this->args['order']          = $this->is_past ? 'DESC' : 'ASC';
-    $compare_operator             = $this->is_past ? '<=' : '>=';
 
     $this->set_view_decorator('list');
     $this->set_view_status_decorator();
 
-
     if ( $this->is_past ) {
-      $this->args['meta_query'] = [
-        'relation' => 'OR',
-        [
-          'key'     => $this->keys['end_timestamp'],
-          'value'   => $this->now_ts,
-          'compare' => '<=',
-          'type'    => 'NUMERIC',
-        ]
-      ];
+      $this->args['bc_events_query'] = 'past';
     } else {
 
       if ( $this->starting_on ) {
@@ -138,11 +126,11 @@ class QuerySetters {
           $ymdDate->setTime(0, 0, 0);
           $this->now_date = $ymdDate;
           $this->now_ts   = $this->now_date->format('U');
-          $this->args['bce_events_honor_timestamp'] = $this->now_ts;
+          $this->args['bc_events_timestamp'] = (int) $this->now_ts;
         }
       }
 
-      $this->args['bce_events_order'] = 'upcoming';
+      $this->args['bc_events_query'] = 'upcoming';
     }
   }
 
@@ -241,7 +229,9 @@ class QuerySetters {
     $prev  = clone $date;
     $prev->modify('-1 month');
 
-    $this->set_between_start_end_meta_query($date->format('U'), $end->format('U'));
+    $this->args['bc_events_query']       = 'range';
+    $this->args['bc_events_range_start'] = (int) $date->format('U');
+    $this->args['bc_events_range_end']   = (int) $end->format('U');
 
     $this->set_view_date_decorators('month-of', $date, $prev, $next, 'Y-m');
 
@@ -296,8 +286,9 @@ class QuerySetters {
     $prev  = clone $date;
     $prev->modify('-1 week');
 
-    // $this->set_start_end_meta_query($date->format('U'), $end->format('U'));
-    $this->set_between_start_end_meta_query($date->format('U'), $end->format('U'));
+    $this->args['bc_events_query']       = 'range';
+    $this->args['bc_events_range_start'] = (int) $date->format('U');
+    $this->args['bc_events_range_end']   = (int) $end->format('U');
     $this->set_view_date_decorators('week-of', $date, $prev, $next);
 
     $now_week_start = clone $this->now_date;
@@ -364,8 +355,9 @@ class QuerySetters {
     $prev->modify('-1 day');
 
 
-    // $this->set_start_end_meta_query($date->format('U'), $end->format('U'));
-    $this->set_between_start_end_meta_query($date->format('U'), $end->format('U'));
+    $this->args['bc_events_query']       = 'range';
+    $this->args['bc_events_range_start'] = (int) $date->format('U');
+    $this->args['bc_events_range_end']   = (int) $end->format('U');
     $this->set_view_date_decorators('day-of', $date, $prev, $next);
 
     $now_day_start = clone $this->now_date;
@@ -459,34 +451,6 @@ class QuerySetters {
   // }
 
 
-  /**
-   * Set between start/end meta query
-   *
-   * @param string $start_timestamp
-   * @param string $end_timestamp
-   * @return void
-   */
-  private function set_between_start_end_meta_query(string $start_timestamp, string $end_timestamp) : void {
-    if ( !isset($this->args['meta_query']) ) {
-      $this->args['meta_query'] = [];
-    }
-
-    $this->args['meta_query'][] = [
-      'key' => $this->keys['start_timestamp'],
-      'value' => $end_timestamp,
-      'compare' => '<=',
-      'type' => 'NUMERIC'
-    ];
-
-    $this->args['meta_query'][] = [
-      'key' => $this->keys['end_timestamp'],
-      'value' => $start_timestamp,
-      'compare' => '>=',
-      'type' => 'NUMERIC'
-    ];
-
-  }
-
 
 
   /**
@@ -529,10 +493,8 @@ class QuerySetters {
    * @return void
    */
   private function set_unlimited_query_defaults() : void {
-    $this->args['post_per_page'] = 100;
-    $this->args['meta_key']      = $this->keys['start_timestamp'];
-    $this->args['orderby']       = 'meta_value_num';
-    $this->args['order']         = 'ASC';
+    $this->args['posts_per_page'] = 100;
+    $this->args['order']          = 'ASC';
   }
 
 

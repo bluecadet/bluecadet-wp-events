@@ -613,6 +613,7 @@ class Hooks {
       'per_page' => 12,                         // per page count
       'past_parameter' => 'is-past',            // applies to list view only
       'starting_on_parameter' => 'starting-on', // applies to list view only
+      'dedupe_main_query' => false,
     ];
 
     $args  = \apply_filters('bc_events_archive_settings', $args);
@@ -632,6 +633,10 @@ class Hooks {
 
     if ( !isset($args['starting_on_parameter']) || empty($args['starting_on_parameter']) ) {
       $args['starting_on_parameter'] = 'starting-on';
+    }
+
+    if ( !isset($args['dedupe_main_query']) || empty($args['dedupe_main_query']) ) {
+      $args['dedupe_main_query'] = false;
     }
 
     return $args;

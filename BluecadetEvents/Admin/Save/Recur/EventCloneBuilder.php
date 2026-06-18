@@ -191,7 +191,16 @@ class EventCloneBuilder {
     $this->clone_data->start_date = $start;
     $this->clone_data->end_date = $end;
     $this->clone_data->event_slug = $date_slug;
-    $this->clone_data->post['post_name'] = $this->RDATE->parent_post->post_name . '--' . $date_slug;
+
+    // trim slug base so that, when slug suffix is added, it is always less than 200 chars
+    $slug_suffix = $date_slug ? '--' . $date_slug : '';
+    $slug_base = $this->RDATE->parent_post->post_name;
+
+    if ( strlen($slug_base) + strlen($slug_suffix) > 200 ) {
+      $slug_base = substr($slug_base, 0, 200 - strlen($slug_suffix));
+    }
+
+    $this->clone_data->post['post_name'] = $slug_base . $slug_suffix;
   }
 
 

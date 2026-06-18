@@ -122,14 +122,14 @@ class Events {
     $this->set_vars( $post_id );
 
     // Delete Event from DB
-    $this->DB_HELPERS->delete_event_row( $post_id );
+    $this->DB_HELPERS->delete_event( $post_id );
 
     if ( $this->child_events ) {
       // Permanently Delete Child Events when Parent Event is Permanently Deleted
       foreach ( $this->child_events as &$child_event ) {
         $child_id = (int) $child_event;
         wp_delete_post( $child_id, true );
-        $this->DB_HELPERS->delete_event_row( $child_id );
+        $this->DB_HELPERS->delete_event( $child_id );
       }
     }
     

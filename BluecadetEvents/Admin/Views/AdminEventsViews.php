@@ -6,6 +6,7 @@ use BluecadetEvents\Admin\Admin_Utils;
 use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
 use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Helpers\TemplateHelpers;
 
 /**
  * Create Custom Post Types
@@ -126,15 +127,17 @@ class AdminEventsViews {
 
     if ( 'event_date' === $column ) {
 
-      $start_date = \bce__get_start_date($post_id);
-      $end_date   = \bce__get_start_date($post_id);
+      $formatter  = TemplateHelpers::getInstance();
+
+      $start_date = $formatter->get_formatted_start_date($post_id);
+      $end_date   = $formatter->get_formatted_end_date($post_id);
 
       if ( $is_recurring_parent ) {
         echo 'Starts: ' . $start_date;
 
         $last = $db_helpers->get_last_child_event($post_id);
         if ( $last ) {
-          echo '<br>Ends: ' . \bce__date_from_timestamp($last);
+          echo '<br>Ends: ' . $formatter->date_from_timestamp($last);
         }
         
       } elseif ( $start_date === $end_date ) {

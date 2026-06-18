@@ -14,9 +14,8 @@ class Queries {
 
     add_action( 'pre_get_posts', [$this, 'handle_query'] );
 
-    add_filter( 'posts_join', [$this, 'events_posts_join'], 10, 2 );
-
-    add_filter( 'posts_where', [$this, 'events_posts_where'], 10, 2 );
+    add_filter( 'posts_clauses', [$this, 'events_posts_clauses'], 10, 2 );
+    
   }
 
 
@@ -36,7 +35,7 @@ class Queries {
       $this->handle_archive_query($query);
     } else {
       $this->taxonomies = Hooks::hook_apply_taxonomy_term_pages();
-      
+
       if ( !empty($this->taxonomies) ) {
         foreach ( $this->taxonomies as $taxonomy ) {
           if ( is_tax($taxonomy) ) {
@@ -92,42 +91,93 @@ class Queries {
 
 
 
-  public function events_posts_join(string $join, \WP_Query $query) {
+  /**
+   * Modify query clauses to join bc_events_table for date filtering and ordering.
+   *
+   * Triggered by the bc_events_query query var. Supports:
+   *   - bc_events_query: 'upcoming' | 'past' | 'range'
+   *   - bc_events_range_start: Unix timestamp (range mode)
+   *   - bc_events_range_end: Unix timestamp (range mode)
+   *   - bc_events_timestamp: Unix timestamp override for 'now' (optional)
+   *   - bc_events_dedupe: true — collapse recurring children to their parent post
+   *
+   * @param array     $clauses
+   * @param \WP_Query $query
+   * @return array
+   */
+  public function events_posts_clauses(array $clauses, \WP_Query $query) : array {
     global $wpdb;
 
-
-    if ( $bce_order = $query->get( 'bce_events_order' ) ) {
-      $bc_events_table = $wpdb->prefix . 'bce_events';
-
-      if ( $bce_order === 'upcoming' ) {
-        $join .= "LEFT JOIN {$bc_events_table} ON {$wpdb->posts}.ID = {$bc_events_table}.post_id ";
-      }
+    $bc_query = $query->get('bc_events_query');
+    if ( !$bc_query ) {
+      return $clauses;
     }
 
-    return $join;
-  }
+    $bc_events_table = $wpdb->prefix . Settings::$events_table;
 
+    $order_raw = strtoupper( $query->get('order') );
+    $order     = in_array( $order_raw, ['ASC', 'DESC'] ) ? $order_raw : 'ASC';
 
+    $dedupe = (bool) $query->get('bc_events_dedupe');
+    if ( !$dedupe && $query->is_main_query() ) {
+      $settings = Hooks::hook_filter_archive_settings();
+      $dedupe   = !empty( $settings['dedupe_main_query'] );
+    }
 
-  public function events_posts_where(string $where, \WP_Query $query) {
-    global $wpdb;
+    $timestamp = (int) $query->get('bc_events_timestamp');
+    if ( !$timestamp ) {
+      $timestamp = ( new \DateTime('now', \wp_timezone()) )->getTimestamp();
+    }
 
-    if ( $bce_order = $query->get( 'bce_events_order' ) ) {
-      if ( $bce_order === 'upcoming' ) {
-        if ( $query->get('bce_events_honor_timestamp') ) {
-          $ts = $query->get('bce_events_honor_timestamp');
-        } else {
-          $tz  = \wp_timezone();
-          $now  = new \DateTime('now', $tz);
-          $ts = $now->getTimestamp();
+    $date_condition = '';
+    switch ( $bc_query ) {
+      case 'upcoming':
+        $date_condition = $wpdb->prepare(
+          "(t.event_start >= %d OR (t.event_start <= %d AND t.event_end >= %d))",
+          $timestamp, $timestamp, $timestamp
+        );
+        break;
+
+      case 'past':
+        $date_condition = $wpdb->prepare( "t.event_end <= %d", $timestamp );
+        break;
+
+      case 'range':
+        $range_start = (int) $query->get('bc_events_range_start');
+        $range_end   = (int) $query->get('bc_events_range_end');
+        if ( $range_start && $range_end ) {
+          $date_condition = $wpdb->prepare(
+            "t.event_start <= %d AND t.event_end >= %d",
+            $range_end, $range_start
+          );
+        } elseif ( $range_start ) {
+          $date_condition = $wpdb->prepare( "t.event_start >= %d", $range_start );
+        } elseif ( $range_end ) {
+          $date_condition = $wpdb->prepare( "t.event_start <= %d", $range_end );
         }
-
-        $table = $wpdb->prefix . 'bce_events';
-        $where .= " AND ( {$table}.event_start_date >= {$ts} OR ( {$table}.event_start_date <= {$ts} AND {$table}.event_end_date >= {$ts} ) )";
-      }
+        break;
     }
 
-    return $where;
+    if ( $dedupe ) {
+      $subquery_where    = $date_condition ? "WHERE {$date_condition}" : '';
+      $clauses['join']  .= " INNER JOIN (
+        SELECT
+          CASE WHEN t.parent_ID != 0 THEN t.parent_ID ELSE t.post_id END AS effective_post_id,
+          MIN(t.event_start) AS event_start
+        FROM {$bc_events_table} t
+        {$subquery_where}
+        GROUP BY effective_post_id
+      ) AS bc_events ON {$wpdb->posts}.ID = bc_events.effective_post_id";
+      $clauses['orderby'] = "bc_events.event_start {$order}";
+    } else {
+      $clauses['join']  .= " INNER JOIN {$bc_events_table} AS t ON {$wpdb->posts}.ID = t.post_id";
+      if ( $date_condition ) {
+        $clauses['where'] .= " AND {$date_condition}";
+      }
+      $clauses['orderby'] = "t.event_start {$order}";
+    }
+
+    return $clauses;
   }
 
 }
