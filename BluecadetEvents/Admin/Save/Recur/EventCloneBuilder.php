@@ -77,6 +77,7 @@ class EventCloneBuilder {
     ];
 
     $final_exclude = array_merge($exclude_keys, $always_exclude);
+    $final_exclude = Hooks::hook_filter_finalized_exclude_cloned_meta_keys($final_exclude);
 
     foreach ( $this->RDATE->all_meta as $key => $value ) {
 

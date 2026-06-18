@@ -2,6 +2,7 @@
 
 namespace BluecadetEvents\Admin\Editor;
 use BluecadetEvents\Plugin\Settings;
+use BluecadetEvents\Plugin\Hooks;
 
 class Gutenberg {
 
@@ -16,14 +17,14 @@ class Gutenberg {
 
     $build_dir = \trailingslashit(Settings::$plugin_dir) . 'editor/blocks/dist';
 
-    foreach ( scandir( $build_dir ) as $result ) {
-      $block_location = $build_dir . '/' . $result;
+    register_block_type( $build_dir . '/event-dates/block.json' );
 
-      if ( ! is_dir( $block_location ) || '.' === $result || '..' === $result ) {
-        continue;
-      }
+    if ( Hooks::hook_filter_use_event_locations() ) {
+      register_block_type( $build_dir . '/location/block.json' );
+    }
 
-      register_block_type( $block_location . '/block.json' );
+    if ( Hooks::hook_filter_use_event_series() ) {
+      register_block_type( $build_dir . '/series/block.json' );
     }
   }
 

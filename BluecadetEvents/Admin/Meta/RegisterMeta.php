@@ -2,6 +2,7 @@
 
 namespace BluecadetEvents\Admin\Meta;
 use BluecadetEvents\Plugin\Settings;
+use BluecadetEvents\Plugin\Hooks;
 
 class RegisterMeta {
   private $keys;
@@ -324,47 +325,41 @@ class RegisterMeta {
 		// ] ) );
 
 
+    
+
+    if ( Hooks::hook_filter_use_event_locations() ) {
+      // Locations
+      register_post_meta( $meta_type, $this->keys['location_ids'], array_merge( $array_args, [
+        'description'   => __( 'Locations where event takes place', 'basecadet' ),
+        'show_in_rest'  => [
+          'schema' => [
+            'type'  => 'array',
+            'items' => [
+              'type' => 'integer',
+            ],
+          ],
+        ],
+      ] ) );
+    }
+
+
+
+
+    if ( Hooks::hook_filter_use_event_series() ) {
+      // Series
+      register_post_meta( $meta_type, $this->keys['series_ids'], array_merge( $array_args, [
+        'description'   => __( 'Series where event belongs', 'basecadet' ),
+        'show_in_rest'  => [
+          'schema' => [
+            'type'  => 'array',
+            'items' => [
+              'type' => 'integer',
+            ],
+          ],
+        ],
+      ] ) );
+    }
+
+
   }
-
-  // private function register_location_meta() {
-  //   $meta_ns = Settings::$locations_meta_ns;
-
-  //   // Location Details
-  //   register_post_meta( Plugin\Settings::$location_machine_name, $meta_ns . 'location_details', [
-  //     'type' => 'array',
-  //     'single' => true,
-  //     'show_in_rest' => true,
-  //     'auth_callback' => function() {
-  //       return current_user_can('edit_posts');
-  //     }
-  //   ] );
-  // }
-
-  // private function register_series_meta() {
-  //   $meta_ns = Settings::$series_meta_ns;
-
-  //   // Series Details
-  //   register_post_meta( Plugin\Settings::$series_machine_name, $meta_ns . 'series_details', [
-  //     'type' => 'array',
-  //     'single' => true,
-  //     'show_in_rest' => true,
-  //     'auth_callback' => function() {
-  //       return current_user_can('edit_posts');
-  //     }
-  //   ] );
-  // }
-
-  // private function register_contact_meta() {
-  //   $meta_ns = Settings::$contact_meta_ns;
-
-  //   // Contact Details
-  //   register_post_meta( Plugin\Settings::$contact_machine_name, $meta_ns . 'contact_details', [
-  //     'type' => 'array',
-  //     'single' => true,
-  //     'show_in_rest' => true,
-  //     'auth_callback' => function() {
-  //       return current_user_can('edit_posts');
-  //     }
-  //   ] );
-  // }
 }

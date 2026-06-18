@@ -2,6 +2,9 @@
 
 namespace BluecadetEvents\Plugin;
 use BluecadetEvents\Admin;
+use BluecadetEvents\ICS;
+use BluecadetEvents\Plugin\Hooks;
+use BluecadetEvents\Plugin\Settings;
 
 class Init {
 
@@ -22,8 +25,19 @@ class Init {
 
 
   private function initialize_plugin() {
+
     new Admin\PostTypes\PostTypes;
     new Admin\Meta\RegisterMeta;
+
+    if ( Hooks::hook_filter_use_event_locations() ) {
+      new Admin\Meta\Locations\RegisterMeta;
+    }
+
+    if ( Hooks::hook_filter_use_event_series() ) {
+      new Admin\Meta\Series\RegisterMeta;
+    }
+
+
     new Admin\Editor\Gutenberg;
     new Admin\Editor\EditorAssets;
     new Admin\Editor\RestRoutes;
@@ -34,6 +48,8 @@ class Init {
       new Admin\Views\AdminEventsViews;
       new Admin\Save\Events;      
     }
+
+    new ICS\TemplateRedirect;
   }
 
 

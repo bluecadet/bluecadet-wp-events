@@ -4,26 +4,27 @@ namespace BluecadetEvents\Plugin;
 
 class Settings {
 
-  private static $initialized = false;
-  public static  $plugin_name;
-  public static  $plugin_dir;
-  public static  $plugin_url;
-  public static  $version;
-  public static  $user_settings;
-  public static  $rest_namespace;
-  public static  $events_meta_ns;
-  public static  $locations_meta_ns;
-  public static  $series_meta_ns;
-  public static  $contact_meta_ns;
-  public static  $events_machine_name;
-  public static  $location_machine_name;
-  public static  $contact_machine_name;
-  public static  $series_machine_name;
-  public static  $date_save_format;
-  public static  $time_save_format;
-  public static  $date_time_save_format;
-  public static  $events_table;
-  public static  $recurring_events_table;
+  private static bool   $initialized = false;
+  public  static string $plugin_name;
+  public  static string $plugin_dir;
+  public  static string $plugin_url;
+  public  static string $version;
+  public  static array  $user_settings;
+  public  static string $rest_namespace;
+  public  static string $events_meta_ns;
+  public  static string $locations_meta_ns;
+  public  static string $series_meta_ns;
+  public  static string $contact_meta_ns;
+  public  static string $ics_param_name;
+  public  static string $events_machine_name;
+  public  static string $locations_machine_name;
+  public  static string $contact_machine_name;
+  public  static string $series_machine_name;
+  public  static string $date_save_format;
+  public  static string $time_save_format;
+  public  static string $date_time_save_format;
+  public  static string $events_table;
+  public  static string $recurring_events_table;
 
 
   public static function __init() {
@@ -44,7 +45,7 @@ class Settings {
     self::$contact_meta_ns   = 'bc_events_contact_';
 
     self::$events_machine_name   = 'bc-events';
-    self::$location_machine_name = 'bc-events-locations';
+    self::$locations_machine_name = 'bc-events-locations';
     self::$contact_machine_name  = 'bc-events-contacts';
     self::$series_machine_name   = 'bc-events-series';
 
@@ -54,6 +55,8 @@ class Settings {
     self::$date_save_format      = 'Y-m-d';
     self::$time_save_format      = 'G:i';
     self::$date_time_save_format = self::$date_save_format . ' ' . self::$time_save_format;
+
+    self::$ics_param_name        = 'bce_ical';
 
   }
 

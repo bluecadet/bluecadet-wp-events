@@ -2,6 +2,7 @@
 
 namespace BluecadetEvents\Admin\Editor;
 use BluecadetEvents\Plugin\Settings;
+use BluecadetEvents\Plugin\Hooks;
 use BluecadetEvents\Admin\Meta\MetaKeys;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
 
@@ -43,6 +44,19 @@ class RestRoutes {
 			)
 		);
 
+    // Get Meta Keys
+    register_rest_route(
+			$namespace,
+			'/get-support-settings',
+			array(
+				'methods'             => 'GET',
+				'callback'            => [$this, 'get_support_settings'],
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
+
 
     // Get Meta Keys
     register_rest_route(
@@ -51,6 +65,32 @@ class RestRoutes {
 			array(
 				'methods'             => 'GET',
 				'callback'            => [$this, 'get_keys'],
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
+
+    // Get Location Meta Keys
+    register_rest_route(
+			$namespace,
+			'/get-locations-keys',
+			array(
+				'methods'             => 'GET',
+				'callback'            => [$this, 'get_location_keys'],
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
+
+    // Get Series Meta Keys
+    register_rest_route(
+			$namespace,
+			'/get-series-keys',
+			array(
+				'methods'             => 'GET',
+				'callback'            => [$this, 'get_series_keys'],
 				'permission_callback' => function () {
 					return current_user_can( 'edit_posts' );
 				},
@@ -119,6 +159,17 @@ class RestRoutes {
   }
 
 
+  public function get_location_keys() : \WP_REST_Response | \WP_Error {
+    $keys = \BluecadetEvents\Admin\Meta\Locations\MetaKeys::get_keys();
+    return rest_ensure_response( $keys );
+  }
+
+  public function get_series_keys() : \WP_REST_Response | \WP_Error {
+    $keys = \BluecadetEvents\Admin\Meta\Series\MetaKeys::get_keys();
+    return rest_ensure_response( $keys );
+  }
+
+
 
   public function is_child(\WP_REST_Request $request) : \WP_REST_Response | \WP_Error {
     $id = $request->get_param( 'id' );
@@ -142,6 +193,24 @@ class RestRoutes {
     }
 
     return \rest_ensure_response( $value );
+  }
+
+
+
+  /**
+   * Provide support settings to Events block
+   *
+   * @param \WP_REST_Request $request
+   * @return \WP_REST_Response | \WP_Error
+   */
+  public function get_support_settings(\WP_REST_Request $request) : \WP_REST_Response | \WP_Error {
+    
+    $settings = [
+      'use_locations' => Hooks::hook_filter_use_event_locations(),
+      'use_series' => Hooks::hook_filter_use_event_series(),
+    ];
+
+    return rest_ensure_response( $settings );
   }
 
 

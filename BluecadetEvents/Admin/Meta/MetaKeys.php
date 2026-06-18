@@ -68,6 +68,8 @@ class MetaKeys {
       'parent_id' => Settings::$events_meta_ns . 'parent_id',
       'date_slug' => Settings::$events_meta_ns . 'date_slug',
       'child_deny_override' => Settings::$events_meta_ns . 'child_deny_override',
+      'location_ids' => Settings::$events_meta_ns . 'location_ids',
+      'series_ids' => Settings::$events_meta_ns . 'series_ids',
       // 'child_remove_from_recurring' => Settings::$events_meta_ns . 'child_remove_from_recurring',
     ];
   }

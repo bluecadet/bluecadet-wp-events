@@ -17,7 +17,9 @@ class PostTypes {
     // $this->settings = \get_option('bc_events_options');
 
     add_action('init', [$this, 'register_custom_post_types']);
-    add_action( 'admin_menu', [$this, 'change_sidebar_menu_label'] );
+
+    add_action( 'admin_head', [$this, 'add_cpt_admin_styles']);
+
   }
 
   /**
@@ -72,15 +74,15 @@ class PostTypes {
 
     register_post_type( $events_machine_name, $args );
 
-    // Add `all` as slug for recurring events
-    add_rewrite_rule(
-      '^events/([^/]+)(?:/([0-9]+))?/([^/]+)/?$',
-      'index.php?post_type=events&name=$matches[1]&all=$matches[3]',
-      'top'
-    );
+    // // Add `all` as slug for recurring events
+    // add_rewrite_rule(
+    //   '^events/([^/]+)(?:/([0-9]+))?/([^/]+)/?$',
+    //   'index.php?post_type=events&name=$matches[1]&all=$matches[3]',
+    //   'top'
+    // );
 
-    //You then need to add a tag to it
-    add_rewrite_tag('%all%','([^&]+)');
+    // //You then need to add a tag to it
+    // add_rewrite_tag('%all%','([^&]+)');
 
 
 
@@ -97,6 +99,15 @@ class PostTypes {
       $public   = Plugin\Hooks::hook_filter_set_locations_public();
       $supports = Plugin\Hooks::hook_filter_locations_supports();
 
+      $template = Plugin\Hooks::hook_filter_locations_gutenberg_template([
+        ['bc-events/location', [
+          'lock' => [
+            'move'   => true,  // prevents reordering
+            'remove' => true,  // prevents deletion
+          ]
+        ]]
+      ]);
+
       $default_args = array(
         'label'                 => $labels['name'],
         'labels'                => $labels,
@@ -109,6 +120,7 @@ class PostTypes {
         'has_archive'           => $public,
         'show_in_nav_menus'			=> $public,
         'show_in_rest'          => true,
+        'template'              => $template,
         'show_in_menu'          => 'edit.php?post_type=' . $events_machine_name,
         'rewrite'               => [
           'slug' => $loc_slug,
@@ -118,46 +130,7 @@ class PostTypes {
 
       $args = \apply_filters('bc_events_location_post_type_settings', $default_args);
 
-      register_post_type( Plugin\Settings::$location_machine_name, $args );
-    }
-
-
-
-    // Event Locations
-    $use_contacts = Plugin\Hooks::hook_filter_use_event_contacts();
-
-    if ( $use_contacts ) {
-      $loc_slug = Plugin\Hooks::hook_filter_event_contacts_rewrite_slug();
-
-      $labels = new LabelMaker('Event Contacts', 'Event Contact');
-      $labels->labels['all_items'] = 'Event Contacts';
-      $labels = $labels->labels;
-
-      $public = Plugin\Hooks::hook_filter_set_contacts_public();
-      $supports = Plugin\Hooks::hook_filter_contacts_supports();
-
-      $default_args = array(
-        'label'                 => $labels['name'],
-        'labels'                => $labels,
-        'supports'              => $supports,
-        'hierarchical'          => false,
-        'public'                => $public,
-        'show_ui'               => true,
-        'menu_position'         => 25,
-        'menu_icon'             => 'dashicons-building',
-        'has_archive'           => $public,
-        'show_in_nav_menus'			=> $public,
-        'show_in_rest'          => true,
-        'show_in_menu'          => 'edit.php?post_type=' . $events_machine_name,
-        'rewrite'               => [
-          'slug' => $loc_slug,
-          'with_front' => false,
-        ],
-      );
-
-      $args = \apply_filters('bc_events_contact_post_type_settings', $default_args);
-
-      register_post_type( Plugin\Settings::$contact_machine_name, $args );
+      register_post_type( Plugin\Settings::$locations_machine_name, $args );
     }
 
 
@@ -174,6 +147,15 @@ class PostTypes {
       $public = Plugin\Hooks::hook_filter_set_series_public();
       $supports = Plugin\Hooks::hook_filter_series_supports();
 
+      $template = Plugin\Hooks::hook_filter_series_gutenberg_template([
+        ['bc-events/series', [
+          'lock' => [
+            'move'   => true,  // prevents reordering
+            'remove' => true,  // prevents deletion
+          ]
+        ]]
+      ]);
+
       $default_args = array(
         'label'                 => $labels['name'],
         'labels'                => $labels,
@@ -187,6 +169,7 @@ class PostTypes {
         'show_in_nav_menus'			=> $public,
         'show_in_rest'          => true,
         'show_in_menu'          => 'edit.php?post_type=' . $events_machine_name,
+        'template'              => $template,
         'rewrite'               => [
           'slug' => $series_slug,
           'with_front' => false,
@@ -202,21 +185,25 @@ class PostTypes {
   }
 
 
-  public function change_sidebar_menu_label() {
-    global $menu;
-    global $submenu;
 
-    $events_machine_name = Plugin\Settings::$events_machine_name;
-
-    foreach ($submenu as $key => $value) {
-      if ( is_array($value) ) {
-        foreach ( $value as $subkey => $subvalue ) {
-          if ( $subvalue[2] === 'post-new.php?post_type=' . 'edit.php?post_type=' . $events_machine_name) {
-            $submenu[$key][$subkey][0] = 'Add New Event';
-          }
-        }
-      }
-    }
+  public function add_cpt_admin_styles() {
+    $day = date( 'j' );
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><g fill="none" stroke="#a7aaad" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.25" width="14" height="12.75" rx="2.4"/><path d="M3 8.25H17"/><path d="M6.75 2.75V5.75"/><path d="M13.25 2.75V5.75"/></g><text x="10" y="14.7" text-anchor="middle" font-family="sans-serif" font-size="7.4" font-weight="700" fill="#a7aaad">' . $day . '</text></svg>';
+    $uri = 'data:image/svg+xml;base64,' . base64_encode( $svg );
+    ?>
+<style>
+  #menu-posts-bc-events .wp-menu-image { background:none !important; }
+  #menu-posts-bc-events .wp-menu-image::before {
+    content:""; 
+    display:inline-block; 
+    width:20px; 
+    height:20px;
+    background-color: currentColor;
+    -webkit-mask: url('<?php echo $uri; ?>') no-repeat center / 20px;
+            mask: url('<?php echo $uri; ?>') no-repeat center / 20px;
+  }
+</style>
+    <?php
   }
 
 }

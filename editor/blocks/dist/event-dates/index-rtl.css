@@ -657,3 +657,22 @@
   margin-bottom: 0;
   opacity: 1;
 }
+
+.bc-event-repeating-picker__section .bc-events__section-toggle {
+  border-top: 1px solid var(--bce-section-border-color);
+}
+
+.bc-event-repeating-picker__selection {
+  border: 1px solid var(--bce-container-border-color);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  max-width: 750px;
+  display: flex;
+  gap: var(--bce-option-row-gap);
+  justify-content: space-between;
+}
+
+.bc-event-repeating-picker__selection + .bc-event-repeating-picker__selection {
+  margin-top: 32px;
+}

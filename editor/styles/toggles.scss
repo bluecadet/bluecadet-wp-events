@@ -1,0 +1,35 @@
+.bc-event-dates__toggle-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+  font-family: var(--bce-font-family);
+  font-weight: 600;
+  font-size: 16px;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  svg, span {
+    display: block;
+  }
+
+  svg {
+    width: 32px;
+    height: auto;
+  }
+
+  &--title {
+    font-size: 18px;
+  }
+
+  .bc-event-dates__toggle-icon {
+    transition: all 0.24s ease-in-out;
+  }
+
+  &.closed .bc-event-dates__toggle-icon {
+    transform: rotate(180deg);
+  }
+}

@@ -34,7 +34,7 @@ class Hooks {
    * @hookType filter
    * @return string
    */
-  public static function hook_filter_events_rewrite_slug() {
+  public static function hook_filter_events_rewrite_slug() : string {
     return \apply_filters('bc_events_rewrite_slug', 'events');
   }
 
@@ -44,9 +44,9 @@ class Hooks {
    *
    * @hook 'bc_events_gutenberg_template'
    * @hookType filter
-   * @return string
+   * @return array
    */
-  public static function hook_filter_events_gutenberg_template($template) {
+  public static function hook_filter_events_gutenberg_template(array $template) : array {
     return \apply_filters('bc_events_gutenberg_template', $template);
   }
 
@@ -59,39 +59,26 @@ class Hooks {
    * @hookType filter
    * @return array
    */
-  public static function hook_filter_exclude_meta_keys() {
+  public static function hook_filter_exclude_meta_keys() : array {
     return \apply_filters('bc_events_exclude_copy_meta_keys', []);
   }
 
 
 
-  // +=========================================================================+
-  // MAYBE DELETE?
-  // +=========================================================================+
-
-
   /**
-   * hook_filter_exclude_acf_keys
+   * hook_filter_finalized_exclude_cloned_meta_keys
    *
-   * @hook 'bc_events_exclude_copy_acf_keys'
+   * @hook 'bc_events_finalized_exclude_cloned_meta_keys'
    * @hookType filter
    * @return array
    */
-  public static function hook_filter_exclude_acf_keys() {
-    return \apply_filters('bc_events_exclude_copy_acf_keys', []);
+  public static function hook_filter_finalized_exclude_cloned_meta_keys(array $finalized_exclude_keys) : array {
+    return \apply_filters('bc_events_finalized_exclude_cloned_meta_keys', $finalized_exclude_keys);
   }
 
 
-  /**
-   * hook_filter_exclude_acf_keys_if_empty
-   *
-   * @hook 'bc_events_exclude_copy_acf_keys_if_empty'
-   * @hookType filter
-   * @return array
-   */
-  // public static function hook_filter_exclude_acf_keys_if_empty() {
-  //   return \apply_filters('bc_events_exclude_copy_acf_keys_if_empty', []);
-  // }
+
+  
 
 
   
@@ -104,7 +91,7 @@ class Hooks {
    * @hookType filter
    * @return string
    */
-  public static function hook_filter_date_display_format() {
+  public static function hook_filter_date_display_format() : string {
     return \apply_filters('bc_events_date_display_format', 'F j, Y');
   }
 
@@ -116,7 +103,7 @@ class Hooks {
    * @hookType filter
    * @return string
    */
-  public static function hook_filter_time_display_format() {
+  public static function hook_filter_time_display_format() : string {
     return \apply_filters('bc_events_time_display_format', 'g:ia');
   }
 
@@ -128,7 +115,7 @@ class Hooks {
    * @hookType filter
    * @return string
    */
-  public static function hook_filter_date_time_sep_format() {
+  public static function hook_filter_date_time_sep_format() : string {
     return \apply_filters('bc_events_front_end_date_time_sep_format', ' | ');
   }
 
@@ -141,7 +128,7 @@ class Hooks {
    * @hookType filter
    * @return string
    */
-  public static function hook_filter_day_view_title($date) {
+  public static function hook_filter_day_view_title(\DateTime $date) : string {
     $title = $date->format('l, F jS');
     return \apply_filters('bc_events_day_view_title', $title, $date);
   }
@@ -155,7 +142,7 @@ class Hooks {
    * @hookType filter
    * @return string
    */
-  public static function hook_filter_week_of_view_title($date) {
+  public static function hook_filter_week_of_view_title(\DateTime $date) : string {
     $title = 'Week of ' . $date->format('F jS, Y');
     return \apply_filters('bc_events_week_of_view_title', $title, $date);
   }
@@ -169,7 +156,7 @@ class Hooks {
    * @hookType filter
    * @return string
    */
-  public static function hook_filter_month_of_view_title($date) {
+  public static function hook_filter_month_of_view_title(\DateTime $date) : string {
     $title = $date->format('F Y');
     return \apply_filters('bc_events_month_of_view_title', $title, $date);
   }
@@ -177,84 +164,56 @@ class Hooks {
 
 
   /**
-   * hook_filter_recurring_child_slug
-   *
-   * @hook 'bc_events_recurring_child_slug'
-   * @hookType filter
-   * @return string
-   */
-  public static function hook_filter_recurring_child_slug($slug, $start_date, $end_date) {
-    return \apply_filters('bc_events_recurring_child_slug', $slug, $start_date, $end_date);
-  }
-
-  /**
-   * hook_filter_include_all_day_option
-   *
-   * @hook 'bc_events_include_all_day_option'
-   * @hookType filter
-   * @return string
-   */
-  public static function hook_filter_include_all_day_option() {
-    return \apply_filters('bc_events_include_all_day_option', true);
-  }
-
-
-
-  /**
+   * TODO: KEEP OR REMOVE
+   * 
    * hook_filter_use_event_recurring_description
    *
    * @hook 'bc_events_use_event_recurring_description'
    * @hookType filter
-   * @return string
+   * @return bool
    */
-  public static function hook_filter_use_event_recurring_description() {
-    return \apply_filters('bc_events_use_event_recurring_description', true);
-  }
+  // public static function hook_filter_use_event_recurring_description() : bool {
+  //   return \apply_filters('bc_events_use_event_recurring_description', true);
+  // }
 
   /**
+   * TODO: KEEP OR REMOVE
+   * 
    * hook_filter_recurring_description_text
    *
    * @hook 'bc_events_recurring_description_text'
    * @hookType filter
    * @return string
    */
-  public static function hook_filter_recurring_description_text() {
-    return \apply_filters('bc_events_recurring_description_text', "i.e. 'Daily' or 'Every Monday'");
-  }
+  // public static function hook_filter_recurring_description_text() : string {
+  //   return \apply_filters('bc_events_recurring_description_text', "i.e. 'Daily' or 'Every Monday'");
+  // }
 
 
   /**
-   * hook_filter_include_virtual_options
+   * TODO: ADD SUPPORT FOR THIS
+   * 
+   * hook_filter_event_schema
    *
-   * @hook 'bc_events_include_virtual_options'
-   * @hookType filter
-   * @return string
-   */
-  public static function hook_filter_include_virtual_options() {
-    return \apply_filters('bc_events_include_virtual_options', true);
-  }
-
-
-  /**
-   * hook_filter_include_virtual_options
-   *
-   * @hook 'bc_events_include_virtual_options'
+   * @hook 'bc_events_event_schema'
    * @hookType filter
    * @return array
    */
-  public static function hook_filter_event_schema($schema, $post_id, $post) {
+  public static function hook_filter_event_schema(array $schema, int $post_id, \WP_Post $post) : array {
     return \apply_filters('bc_events_event_schema', $schema, $post_id, $post);
   }
 
 
   /**
+   * TODO: ADD SUPPORT FOR THIS
+   * 
    * hook_filter_include_schema
    *
    * @hook 'bc_events_include_schema'
    * @hookType filter
-   * @return string
+   * @return bool
    */
-  public static function hook_filter_include_schema() {
+  public static function hook_filter_include_schema() : bool {
     return \apply_filters('bc_events_include_schema', true);
   }
 
@@ -266,7 +225,7 @@ class Hooks {
    * @hookType filter
    * @return string
    */
-  public static function hook_filter_ics_event_title($title, $post_id) {
+  public static function hook_filter_ics_event_title(string $title, int $post_id) : string {
     return \apply_filters('bc_events_ics_event_title', $title, $post_id);
   }
 
@@ -290,34 +249,12 @@ class Hooks {
    * @hookType filter
    * @return string
    */
-  public static function hook_filter_ics_default_organizer_email() {
-    return \apply_filters('bc_events_ics_default_organizer_email', \get_bloginfo('admin_email'));
-  }
+  // public static function hook_filter_ics_default_organizer_email() {
+  //   return \apply_filters('bc_events_ics_default_organizer_email', \get_bloginfo('admin_email'));
+  // }
 
 
-
-  /**
-   * hook_filter_exclude_cloned_meta_keys
-   *
-   * @hook 'bc_events_exclude_cloned_meta_keys'
-   * @hookType filter
-   * @return string
-   */
-  public static function hook_filter_exclude_cloned_meta_keys(array $exclude_keys) {
-    return \apply_filters('bc_events_exclude_cloned_meta_keys', $exclude_keys);
-  }
-
-
-  /**
-   * hook_filter_finalized_exclude_cloned_meta_keys
-   *
-   * @hook 'bc_events_finalized_exclude_cloned_meta_keys'
-   * @hookType filter
-   * @return string
-   */
-  public static function hook_filter_finalized_exclude_cloned_meta_keys(array $finalized_exclude_keys) {
-    return \apply_filters('bc_events_finalized_exclude_cloned_meta_keys', $finalized_exclude_keys);
-  }
+  
 
 
 
@@ -328,6 +265,7 @@ class Hooks {
   // ==============================
   //        Location Hooks
   // ==============================
+
 
   /**
    * hook_filter_use_event_locations
@@ -341,7 +279,6 @@ class Hooks {
   }
 
 
-
   /**
    * hook_filter_set_locations_public
    *
@@ -350,19 +287,31 @@ class Hooks {
    * @return bool
    */
   public static function hook_filter_set_locations_public() {
-    return \apply_filters('bc_events_set_locations_public', false);
+    return \apply_filters('bc_events_set_locations_public', true);
+  }
+
+
+  /**
+   * hook_filter_locations_gutenberg_template
+   *
+   * @hook 'bc_locations_gutenberg_template'
+   * @hookType filter
+   * @return mixed
+   */
+  public static function hook_filter_locations_gutenberg_template(array $template) : mixed {
+    return \apply_filters('bc_locations_gutenberg_template', $template);
   }
 
 
 
   /**
-   * hook_filter_set_locations_public
+   * hook_filter_set_locations_supports
    *
-   * @hook 'bc_events_set_locations_public'
+   * @hook 'bc_events_set_locations_supports'
    * @hookType filter
-   * @return bool
+   * @return mixed
    */
-  public static function hook_filter_locations_supports($supports = ['title', 'thumbnail', 'slug', 'custom-fields']) {
+  public static function hook_filter_locations_supports(array $supports = ['title', 'thumbnail', 'slug', 'custom-fields', 'editor']) : mixed {
     return \apply_filters('bc_events_locations_supports', $supports);
   }
 
@@ -374,9 +323,9 @@ class Hooks {
    *
    * @hook 'bc_events_locations_rewrite_slug'
    * @hookType filter
-   * @return string
+   * @return mixed
    */
-  public static function hook_filter_event_locations_rewrite_slug() {
+  public static function hook_filter_event_locations_rewrite_slug() : mixed {
     return \apply_filters('bc_events_locations_rewrite_slug', 'event-locations');
   }
 
@@ -387,104 +336,104 @@ class Hooks {
    *
    * @hook 'bc_events_set_locations_multiple'
    * @hookType filter
-   * @return bool
+   * @return mixed
    */
-  public static function hook_filter_locations_allow_multiple() {
+  public static function hook_filter_locations_allow_multiple() : mixed {
     return \apply_filters('bc_events_locations_allow_multiple', false);
   }
 
 
 
-  // ==============================
-  //        Contact Hooks
-  // ==============================
+  // // ==============================
+  // //        Contact Hooks
+  // // ==============================
 
-  /**
-   * hook_filter_use_event_contacts
-   *
-   * @hook 'bc_events_use_event_contacts'
-   * @hookType filter
-   * @return bool
-   */
-  public static function hook_filter_use_event_contacts() {
-    return \apply_filters('bc_events_use_event_contacts', true);
-  }
-
-
-
-  /**
-   * hook_filter_set_contacts_public
-   *
-   * @hook 'bc_events_set_contacts_public'
-   * @hookType filter
-   * @return bool
-   */
-  public static function hook_filter_set_contacts_public() {
-    return \apply_filters('bc_events_set_contacts_public', false);
-  }
+  // /**
+  //  * hook_filter_use_event_contacts
+  //  *
+  //  * @hook 'bc_events_use_event_contacts'
+  //  * @hookType filter
+  //  * @return bool
+  //  */
+  // public static function hook_filter_use_event_contacts() {
+  //   return \apply_filters('bc_events_use_event_contacts', true);
+  // }
 
 
 
-  /**
-   * hook_filter_set_contacts_public
-   *
-   * @hook 'bc_events_set_contacts_public'
-   * @hookType filter
-   * @return bool
-   */
-  public static function hook_filter_contacts_supports($supports = ['title', 'thumbnail', 'slug', 'custom-fields']) {
-    return \apply_filters('bc_events_contacts_supports', $supports);
-  }
-
-
-  /**
-   * hook_filter_event_contacts_rewrite_slug
-   *
-   * @hook 'bc_events_contacts_rewrite_slug'
-   * @hookType filter
-   * @return string
-   */
-  public static function hook_filter_event_contacts_rewrite_slug() {
-    return \apply_filters('bc_events_contacts_rewrite_slug', 'event-contacts');
-  }
-
-
-  /**
-   * hook_filter_set_contacts_multiple
-   *
-   * @hook 'bc_events_set_contacts_multiple'
-   * @hookType filter
-   * @return bool
-   */
-  public static function hook_filter_contacts_allow_multiple() {
-    return \apply_filters('bc_events_contacts_allow_multiple', false);
-  }
+  // /**
+  //  * hook_filter_set_contacts_public
+  //  *
+  //  * @hook 'bc_events_set_contacts_public'
+  //  * @hookType filter
+  //  * @return bool
+  //  */
+  // public static function hook_filter_set_contacts_public() {
+  //   return \apply_filters('bc_events_set_contacts_public', false);
+  // }
 
 
 
-  /**
-   * hook_filter_event_phone_pattern
-   *
-   * @hook 'bc_events_phone_pattern'
-   * @hookType filter
-   * @return string
-   */
-  public static function hook_filter_event_phone_pattern() {
-    return \apply_filters('bc_events_phone_pattern', '[0-9]{3}-[0-9]{3}-[0-9]{4}');
-  }
+  // /**
+  //  * hook_filter_set_contacts_public
+  //  *
+  //  * @hook 'bc_events_set_contacts_public'
+  //  * @hookType filter
+  //  * @return bool
+  //  */
+  // public static function hook_filter_contacts_supports($supports = ['title', 'thumbnail', 'slug', 'custom-fields']) {
+  //   return \apply_filters('bc_events_contacts_supports', $supports);
+  // }
+
+
+  // /**
+  //  * hook_filter_event_contacts_rewrite_slug
+  //  *
+  //  * @hook 'bc_events_contacts_rewrite_slug'
+  //  * @hookType filter
+  //  * @return string
+  //  */
+  // public static function hook_filter_event_contacts_rewrite_slug() {
+  //   return \apply_filters('bc_events_contacts_rewrite_slug', 'event-contacts');
+  // }
+
+
+  // /**
+  //  * hook_filter_set_contacts_multiple
+  //  *
+  //  * @hook 'bc_events_set_contacts_multiple'
+  //  * @hookType filter
+  //  * @return bool
+  //  */
+  // public static function hook_filter_contacts_allow_multiple() {
+  //   return \apply_filters('bc_events_contacts_allow_multiple', false);
+  // }
 
 
 
-  /**
-   * hook_filter_event_phone_description
-   *
-   * @hook 'bc_events_phone_description'
-   * @hookType filter
-   * @return string
-   */
-  public static function hook_filter_event_phone_description() {
-    return \apply_filters('bc_events_phone_description', 'Format: 123-456-7890');
-  }
+  // /**
+  //  * hook_filter_event_phone_pattern
+  //  *
+  //  * @hook 'bc_events_phone_pattern'
+  //  * @hookType filter
+  //  * @return string
+  //  */
+  // public static function hook_filter_event_phone_pattern() {
+  //   return \apply_filters('bc_events_phone_pattern', '[0-9]{3}-[0-9]{3}-[0-9]{4}');
+  // }
+
+
+
+  // /**
+  //  * hook_filter_event_phone_description
+  //  *
+  //  * @hook 'bc_events_phone_description'
+  //  * @hookType filter
+  //  * @return string
+  //  */
+  // public static function hook_filter_event_phone_description() {
+  //   return \apply_filters('bc_events_phone_description', 'Format: 123-456-7890');
+  // }
 
 
 
@@ -497,10 +446,23 @@ class Hooks {
    *
    * @hook 'bc_events_use_event_series'
    * @hookType filter
-   * @return bool
+   * @return mixed
    */
-  public static function hook_filter_use_event_series() {
+  public static function hook_filter_use_event_series() : mixed {
     return \apply_filters('bc_events_use_event_series', true);
+  }
+
+
+
+  /**
+   * hook_filter_series_gutenberg_template
+   *
+   * @hook 'bc_series_gutenberg_template'
+   * @hookType filter
+   * @return mixed
+   */
+  public static function hook_filter_series_gutenberg_template(array $template) : mixed {
+    return \apply_filters('bc_series_gutenberg_template', $template);
   }
 
 
@@ -510,9 +472,9 @@ class Hooks {
    *
    * @hook 'bc_events_set_series_public'
    * @hookType filter
-   * @return bool
+   * @return mixed
    */
-  public static function hook_filter_set_series_public() {
+  public static function hook_filter_set_series_public() : mixed {
     return \apply_filters('bc_events_set_series_public', false);
   }
 
@@ -522,9 +484,9 @@ class Hooks {
    *
    * @hook 'bc_events_series_rewrite_slug'
    * @hookType filter
-   * @return string
+   * @return mixed
    */
-  public static function hook_filter_event_series_rewrite_slug() {
+  public static function hook_filter_event_series_rewrite_slug() : mixed {
     return \apply_filters('bc_events_series_rewrite_slug', 'event-series');
   }
 
@@ -535,9 +497,9 @@ class Hooks {
    *
    * @hook 'bc_events_set_series_public'
    * @hookType filter
-   * @return bool
+   * @return mixed
    */
-  public static function hook_filter_series_supports($supports = ['title', 'thumbnail', 'slug', 'custom-fields']) {
+  public static function hook_filter_series_supports($supports = ['title', 'thumbnail', 'slug', 'custom-fields', 'editor']) : mixed {
     return \apply_filters('bc_events_series_supports', $supports);
   }
 
@@ -547,9 +509,9 @@ class Hooks {
    *
    * @hook 'bc_events_set_series_multiple'
    * @hookType filter
-   * @return bool
+   * @return mixed
    */
-  public static function hook_filter_series_allow_multiple() {
+  public static function hook_filter_series_allow_multiple() : mixed {
     return \apply_filters('bc_events_series_allow_multiple', false);
   }
 
@@ -559,9 +521,9 @@ class Hooks {
    *
    * @hook 'bc_events_series_display_name_tooltip_text'
    * @hookType filter
-   * @return string
+   * @return mixed
    */
-  public static function hook_filter_series_display_name_tooltip_text() {
+  public static function hook_filter_series_display_name_tooltip_text() : mixed {
     $text = 'Use to display a name on the front end different from the CMS title. This field allows CMS titles to be more exact and descriptive, but Display Names to be loose and understandable. <br><br>For example, the CMS title could be "Epic Film Series 2022", but a Display Name value of "Epic Film Series" would display on the front end, rather than the CMS title.';
     return \apply_filters('bc_events_series_display_name_tooltip_text', $text);
   }
@@ -572,9 +534,9 @@ class Hooks {
    *
    * @hook 'bc_events_series_plural_tooltip_text'
    * @hookType filter
-   * @return string
+   * @return mixed
    */
-  public static function hook_filter_series_plural_tooltip_text() {
+  public static function hook_filter_series_plural_tooltip_text() : mixed {
     $text = 'Use this field if the plural name of a series is different from the series name. For example "League Nights" for the series "Bowling League".';
     return \apply_filters('bc_events_series_plural_tooltip_text', $text);
   }
@@ -585,9 +547,9 @@ class Hooks {
    *
    * @hook 'bc_events_series_single_tooltip_text'
    * @hookType filter
-   * @return string
+   * @return mixed
    */
-  public static function hook_filter_series_single_tooltip_text() {
+  public static function hook_filter_series_single_tooltip_text() : mixed {
     $text = 'Use this is the singular name of a series is different from the series name. For example "League Night" for the series "Bowling League".';
     return \apply_filters('bc_events_series_single_tooltip_text', $text);
   }
@@ -605,7 +567,6 @@ class Hooks {
    * @hookType filter
    * @return array
    */
-  // self::$filter_archive_settings
   public static function hook_filter_archive_settings() {
 
     $args = [
@@ -648,9 +609,9 @@ class Hooks {
    *
    * @hook 'bc_events_load_template_css'
    * @hookType filter
-   * @return boolean
+   * @return mixed
    */
-  public static function hook_filter_load_template_css() {
+  public static function hook_filter_load_template_css() : mixed {
     return \apply_filters('bc_events_load_template_css', true);
   }
 
@@ -659,9 +620,9 @@ class Hooks {
    *
    * @hook 'bc_events_load_template_js'
    * @hookType filter
-   * @return boolean
+   * @return mixed
    */
-  public static function hook_filter_load_template_js() {
+  public static function hook_filter_load_template_js() : mixed {
     return \apply_filters('bc_events_load_template_js', true);
   }
 
@@ -682,9 +643,9 @@ class Hooks {
    *      'parameter' => 'parameter-name',
    *    ]
    * ]
-   * @return array
+   * @return mixed
    */
-  public static function hook_filter_filter_taxonomies() {
+  public static function hook_filter_filter_taxonomies() : mixed {
     return \apply_filters('bc_events_filter_taxonomies', []);
   }
 
@@ -697,9 +658,9 @@ class Hooks {
    * @hook 'bc_events_apply_taxonomy_term_pages'
    * @hookType taxonomy
    * @example ['event_type', 'audience']
-   * @return array
+   * @return mixed
    */
-  public static function hook_apply_taxonomy_term_pages() {
+  public static function hook_apply_taxonomy_term_pages() : mixed {
     return \apply_filters('bc_events_apply_taxonomy_term_pages', []);
   }
 
@@ -719,11 +680,11 @@ class Hooks {
    *      'value'      => 'on', // or string or array
    *    ]
    * ]
-   * @return array
+   * @return mixed
    */
-  public static function hook_filter_filter_meta() {
-    return \apply_filters('bc_events_filter_meta', []);
-  }
+  // public static function hook_filter_filter_meta() : mixed {
+  //   return \apply_filters('bc_events_filter_meta', []);
+  // }
 
 
 
@@ -734,7 +695,7 @@ class Hooks {
    * @hookType filter
    * @return string
    */
-  public static function hook_filter_taxonomy_query_field() {
+  public static function hook_filter_taxonomy_query_field() : string {
     $field = \apply_filters('bc_events_filter_taxonomy_query_field', 'slug');
 
     if ( empty($field) || !in_array( $field, ['slug', 'term_id'] ) ) {
@@ -746,18 +707,64 @@ class Hooks {
 
 
 
-    // ==============================
-    //       REST API Hooks
-    // ==============================
 
-    /**
-     * hook_filter_get_events_post_values
-     *
-     * @hook 'bc_events_get_events_post_values'
-     * @hookType filter
-     * @return array
-     */
-    public static function hook_filter_get_events_post_values($post_data, $post) {
-      return \apply_filters('bc_events_get_events_post_values', $post_data, $post);
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // +=========================================================================+
+  // MAYBE DELETE?
+  // +=========================================================================+
+
+
+  /**
+   * hook_filter_exclude_acf_keys
+   *
+   * @hook 'bc_events_exclude_copy_acf_keys'
+   * @hookType filter
+   * @return array
+   */
+  // public static function hook_filter_exclude_acf_keys() : array {
+  //   return \apply_filters('bc_events_exclude_copy_acf_keys', []);
+  // }
+
+
+  /**
+   * hook_filter_exclude_acf_keys_if_empty
+   *
+   * @hook 'bc_events_exclude_copy_acf_keys_if_empty'
+   * @hookType filter
+   * @return array
+   */
+  // public static function hook_filter_exclude_acf_keys_if_empty() : array {
+  //   return \apply_filters('bc_events_exclude_copy_acf_keys_if_empty', []);
+  // }
+
+
+
+  // ==============================
+  //       REST API Hooks
+  // ==============================
+
+  /**
+   * hook_filter_get_events_post_values
+   *
+   * @hook 'bc_events_get_events_post_values'
+   * @hookType filter
+   * @return array
+   */
+  // public static function hook_filter_get_events_post_values($post_data, $post) {
+  //   return \apply_filters('bc_events_get_events_post_values', $post_data, $post);
+  // }
 }
