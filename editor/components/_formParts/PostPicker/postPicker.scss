@@ -1,0 +1,186 @@
+// react-select (AsyncSelect) styled as a popout combobox: a native-select-like
+// toggle button that opens a panel with the search input pinned at the top and
+// the results below it. classNamePrefix="bc-event-post-picker" generates the
+// __control / __menu / __option class names.
+//
+// react-select styles itself at runtime via emotion, which injects into the top
+// document's <head> — NOT the apiVersion:3 editor iframe this block renders in.
+// So the structural layout below is recreated here, and the screen-reader text
+// is re-hidden further down.
+
+.bc-event-post-picker {
+  position: relative; // anchor for the popout panel
+  width: 320px;
+  font-family: var(--bce-font-family);
+  font-size: 14px;
+
+  // Closed control — mirrors .bc-event-dates__input (see styles/base.scss).
+  &__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    height: 44px;
+    padding: 0 0 0 12px;
+    border: 1px solid var(--bce-input-border-color);
+    border-radius: 4px;
+    background-color: #fff;
+    color: #2c3338;
+    font-family: var(--bce-font-family);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--bce-input-border-color);
+    }
+
+    &[aria-expanded="true"] {
+      border-color: var(--bce-brand-color);
+      box-shadow: 0 0 0 1px var(--bce-brand-color);
+
+      .bc-event-post-picker__toggle-chevron {
+        transform: rotate(180deg);
+      }
+    }
+
+    &.is-placeholder .bc-event-post-picker__toggle-label {
+      color: #757575;
+      font-weight: 400;
+    }
+  }
+
+  &__toggle-label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: 500;
+  }
+
+  &__toggle-chevron {
+    display: block;
+    flex-shrink: 0;
+    color: var(--bce-text-color);
+  }
+
+  // The popout panel: search input (control) at top, results (menu) below.
+  &__popout {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 100;
+    width: 100%;
+    margin-top: 4px;
+    background-color: #fff;
+    border: 1px solid var(--bce-input-border-color);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+  }
+
+  // Search field pinned at the top of the panel.
+  &__control {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    min-height: 44px;
+    border: 0;
+    border-bottom: 1px solid var(--bce-section-border-color);
+    border-radius: 0;
+    background-color: #fff;
+    box-shadow: none;
+  }
+
+  &__value-container {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    position: relative;
+    padding: 0 12px;
+  }
+
+  &__input-container,
+  &__input {
+    color: #2c3338;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__placeholder {
+    color: #757575;
+    font-weight: 400;
+  }
+
+  &__indicators {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  &__loading-indicator {
+    display: flex;
+    padding: 8px;
+    color: var(--bce-input-border-color);
+  }
+
+  // The menu flows inside the panel (below the search), not as its own floating
+  // layer — emotion's absolute positioning isn't present in the iframe.
+  &__menu {
+    position: static;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background-color: #fff;
+    font-family: var(--bce-font-family);
+    font-size: 14px;
+  }
+
+  &__menu-list {
+    max-height: 280px;
+    overflow-y: auto;
+  }
+
+  &__option {
+    padding: 8px 12px;
+    color: #2c3338;
+    cursor: pointer;
+  }
+
+  &__option--is-focused {
+    background-color: #f0f0f0; // --bce-block-background
+  }
+
+  &__option--is-selected {
+    background-color: #0049db; // --bce-brand-color
+    color: #fff;
+  }
+
+  &__menu-notice {
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #757575;
+  }
+
+  // Re-hide react-select's assistive text. Stable v5 attributes (not the hashed
+  // emotion classes), so they survive version bumps.
+  span[id$="-live-region"],
+  span[role="log"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+
+.bc-event-post-picker__option {
+  font-weight: 500;
+}

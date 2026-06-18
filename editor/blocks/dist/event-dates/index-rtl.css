@@ -370,6 +370,174 @@
   background: var(--bce-error-color);
 }
 
+.bc-event-post-picker {
+  position: relative;
+  width: 320px;
+  font-family: var(--bce-font-family);
+  font-size: 14px;
+}
+
+.bc-event-post-picker__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  height: 44px;
+  padding: 0 12px 0 0;
+  border: 1px solid var(--bce-input-border-color);
+  border-radius: 4px;
+  background-color: #fff;
+  color: #2c3338;
+  font-family: var(--bce-font-family);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: right;
+  cursor: pointer;
+}
+
+.bc-event-post-picker__toggle:hover {
+  border-color: var(--bce-input-border-color);
+}
+
+.bc-event-post-picker__toggle[aria-expanded=true] {
+  border-color: var(--bce-brand-color);
+  box-shadow: 0 0 0 1px var(--bce-brand-color);
+}
+
+.bc-event-post-picker__toggle[aria-expanded=true] .bc-event-post-picker__toggle-chevron {
+  transform: rotate(-180deg);
+}
+
+.bc-event-post-picker__toggle.is-placeholder .bc-event-post-picker__toggle-label {
+  color: #757575;
+  font-weight: 400;
+}
+
+.bc-event-post-picker__toggle-label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.bc-event-post-picker__toggle-chevron {
+  display: block;
+  flex-shrink: 0;
+  color: var(--bce-text-color);
+}
+
+.bc-event-post-picker__popout {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 100;
+  width: 100%;
+  margin-top: 4px;
+  background-color: #fff;
+  border: 1px solid var(--bce-input-border-color);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.bc-event-post-picker__control {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  min-height: 44px;
+  border: 0;
+  border-bottom: 1px solid var(--bce-section-border-color);
+  border-radius: 0;
+  background-color: #fff;
+  box-shadow: none;
+}
+
+.bc-event-post-picker__value-container {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  position: relative;
+  padding: 0 12px;
+}
+
+.bc-event-post-picker__input-container, .bc-event-post-picker__input {
+  color: #2c3338;
+  margin: 0;
+  padding: 0;
+}
+
+.bc-event-post-picker__placeholder {
+  color: #757575;
+  font-weight: 400;
+}
+
+.bc-event-post-picker__indicators {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.bc-event-post-picker__loading-indicator {
+  display: flex;
+  padding: 8px;
+  color: var(--bce-input-border-color);
+}
+
+.bc-event-post-picker__menu {
+  position: static;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background-color: #fff;
+  font-family: var(--bce-font-family);
+  font-size: 14px;
+}
+
+.bc-event-post-picker__menu-list {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.bc-event-post-picker__option {
+  padding: 8px 12px;
+  color: #2c3338;
+  cursor: pointer;
+}
+
+.bc-event-post-picker__option--is-focused {
+  background-color: #f0f0f0;
+}
+
+.bc-event-post-picker__option--is-selected {
+  background-color: #0049db;
+  color: #fff;
+}
+
+.bc-event-post-picker__menu-notice {
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #757575;
+}
+
+.bc-event-post-picker span[id$=-live-region],
+.bc-event-post-picker span[role=log] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.bc-event-post-picker__option {
+  font-weight: 500;
+}
+
 .bc-events__section-toggle {
   padding: var(--bce-container-padding);
 }
@@ -663,16 +831,17 @@
 }
 
 .bc-event-repeating-picker__selection {
-  border: 1px solid var(--bce-container-border-color);
-  border-radius: 8px;
-  padding: 16px;
   margin-bottom: 24px;
   max-width: 750px;
   display: flex;
   gap: var(--bce-option-row-gap);
-  justify-content: space-between;
 }
 
 .bc-event-repeating-picker__selection + .bc-event-repeating-picker__selection {
   margin-top: 32px;
+}
+
+.bc-event-repeating-picker__section-remove {
+  display: flex;
+  align-items: center;
 }

@@ -26,7 +26,11 @@ export default function RepeatingPostPicker({
     set(`bc-events/${id}-condensed`, 'condensed', value);
   }
 
-  const values = meta?.[ metaKey ] ?? [];
+  // Resolve the namespaced meta key (e.g. 'location_ids' -> 'bc_events_location_ids').
+  // Until the key map has loaded from the REST endpoint, META is null and we no-op.
+  const META = keys ? getKey( metaKey, keys ) : null;
+
+  const values = META ? meta?.[ META ] ?? [] : [];
 
   const addRow = () => {
     const newValues = [ ...values, '' ];
@@ -39,7 +43,10 @@ export default function RepeatingPostPicker({
   }
 
   const onChange = ( newValues ) => {
-    setMeta( { ...meta, [ metaKey ]: newValues } );
+    if ( ! META ) {
+      return;
+    }
+    setMeta( { ...meta, [ META ]: newValues } );
   }
 
   return (
@@ -62,11 +69,14 @@ export default function RepeatingPostPicker({
                   onChange( newValues );
                 }} />
               </div>
-              
-              <button type="button" className="bc-events__button bc-events__button--small bc-events__button--warning" onClick={ () => removeRow( index ) }>{ removeButtonText }</button>
+              <div className="bc-event-repeating-picker__section-remove">
+                <button type="button" className="bc-events__button bc-events__button--small bc-events__button--warning" onClick={ () => removeRow( index ) }>{ removeButtonText }</button>
+              </div>
             </div>
           ) ) }
-          <button type="button" className="bc-events__button bc-events__button--secondary" onClick={ addRow }>{ addButtonTitle }</button>
+          <div className="bc-event-repeating-picker__section-add">
+            <button type="button" className="bc-events__button bc-events__button--secondary" onClick={ addRow }>{ addButtonTitle }</button>
+          </div>
         </div>
       ) }
     </div>

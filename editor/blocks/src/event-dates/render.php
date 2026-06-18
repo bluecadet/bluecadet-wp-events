@@ -16,6 +16,22 @@ $hide_end_time   = (bool) get_post_meta( $post_id, 'bc_events_hide_end_time_disp
 $is_virtual      = (bool) get_post_meta( $post_id, 'bc_events_virtual_event',         true );
 $virtual_url     = get_post_meta( $post_id, 'bc_events_virtual_url',           true );
 
+$location_ids = get_post_meta($post_id, 'bc_events_location_ids', true );
+$locations = [];
+if ( is_array( $location_ids ) ) {
+	foreach ( $location_ids as $location_id ) {
+		$locations[] = get_the_title($location_id);
+	}
+}
+
+$series_ids = get_post_meta($post_id, 'bc_events_series_ids', true );
+$seriess = [];
+if ( is_array( $series_ids ) ) {
+	foreach ( $series_ids as $series_id ) {
+		$seriess[] = get_the_title($series_id);
+	}
+}
+
 if ( ! $start_date && ! $end_date ) {
 	return;
 }
@@ -65,6 +81,24 @@ $datetime_attr = static function ( string $date, string $time ): string {
 					<?php echo esc_html( $virtual_url ); ?>
 				</a>
 			<?php endif; ?>
+		</div>
+	<?php endif; ?>
+
+	<?php if ( $locations && count( $locations ) > 0 ) : ?>
+		<div class="bc-event-dates__group bc-event-dates__group--location">
+			<span class="bc-event-dates__label"><?php esc_html_e( 'Location', 'basecadet' ); ?></span>
+			<span class="bc-event-dates__location-names">
+				<?php echo esc_html( implode( ', ', $locations ) ); ?>
+			</span>
+		</div>
+	<?php endif; ?>
+
+	<?php if ( $seriess && count( $seriess ) > 0 ) : ?>
+		<div class="bc-event-dates__group bc-event-dates__group--series">
+			<span class="bc-event-dates__label"><?php esc_html_e( 'Series', 'basecadet' ); ?></span>
+			<span class="bc-event-dates__series-names">
+				<?php echo esc_html( implode( ', ', $seriess ) ); ?>
+			</span>
 		</div>
 	<?php endif; ?>
 </div>
