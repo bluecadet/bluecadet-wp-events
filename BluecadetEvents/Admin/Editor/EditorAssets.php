@@ -7,6 +7,7 @@ class EditorAssets {
 
   public function __construct() {
     add_action( 'enqueue_block_editor_assets', [$this, 'enqueue'] );
+    add_action( 'admin_enqueue_scripts', [$this, 'enqueue_classic'] );
   }
 
   public function enqueue() {
@@ -41,6 +42,36 @@ class EditorAssets {
         $asset['version']
       );
     }
+  }
+
+  public function enqueue_classic() {
+    $screen = get_current_screen();
+
+    if ( ! $screen ) {
+      return;
+    }
+
+    // Only on the post edit screen, and only when NOT using the block editor.
+    if ( $screen->base !== 'post' || $screen->is_block_editor() ) {
+      return;
+    }
+
+    if ( !in_array( $screen->post_type, [ Settings::$events_machine_name, Settings::$series_machine_name, Settings::$locations_machine_name ] ) ) {
+      return;
+    }
+  
+    $css_file = \trailingslashit(Settings::$plugin_dir) . 'assets/classicEditor/dist/events.css';
+
+    if ( ! file_exists( $css_file ) ) {
+      return;
+    }
+
+    wp_enqueue_style(
+      'bc-events-classic-editor',
+      \trailingslashit(Settings::$plugin_url) . 'assets/classicEditor/dist/events.css',
+      [],
+      filemtime( $css_file )
+    );
   }
 
 }

@@ -42,11 +42,9 @@
   max-width: none;
   color: var(--bce-text-color);
 }
-
 .bc-event-dates.block-editor-block-list__block {
   margin: 0 !important;
 }
-
 .bc-event-dates:focus:after {
   display: none !important;
 }
@@ -133,7 +131,6 @@
   color: var(--bce-brand-color);
   position: relative;
 }
-
 .bce-loader__icon:before {
   content: "";
   display: block;
@@ -146,7 +143,6 @@
   border-radius: 50%;
   animation: pulse-animation 2s infinite;
 }
-
 .bce-loader__icon svg {
   position: relative;
   z-index: 2;
@@ -163,7 +159,6 @@
     box-shadow: 0 0 0 24px rgba(0, 73, 219, 0);
   }
 }
-
 .bc-events__button {
   font-size: 14px;
   font-weight: 600;
@@ -188,7 +183,6 @@
   color: var(--bce-brand-color);
   background: #fff;
 }
-
 .bc-events__button--secondary:hover, .bc-events__button--secondary:focus {
   color: #fff;
   background: var(--bce-brand-color);
@@ -199,7 +193,6 @@
   color: var(--bce-error-color);
   background: #fff;
 }
-
 .bc-events__button--warning:hover {
   color: #fff;
   background: var(--bce-error-color);
@@ -215,28 +208,22 @@
   font-weight: 600;
   font-size: 16px;
 }
-
 .bc-event-dates__toggle-button:hover {
   cursor: pointer;
 }
-
 .bc-event-dates__toggle-button svg, .bc-event-dates__toggle-button span {
   display: block;
 }
-
 .bc-event-dates__toggle-button svg {
   width: 32px;
   height: auto;
 }
-
 .bc-event-dates__toggle-button--title {
   font-size: 18px;
 }
-
 .bc-event-dates__toggle-button .bc-event-dates__toggle-icon {
   transition: all 0.24s ease-in-out;
 }
-
 .bc-event-dates__toggle-button.closed .bc-event-dates__toggle-icon {
   transform: rotate(-180deg);
 }
@@ -250,11 +237,9 @@
   width: min(100%, 400px);
   line-height: 1.5;
 }
-
 .bc-event-dates__location .bc-event-dates__text-group, .bc-event-dates__series .bc-event-dates__text-group {
   align-items: flex-start;
 }
-
 .bc-event-dates__location .bc-event-dates__text-group label, .bc-event-dates__series .bc-event-dates__text-group label {
   width: 145px;
   padding-top: 8px;
@@ -288,7 +273,6 @@
 .bce-caret-icon {
   position: relative;
 }
-
 .bce-caret-icon:before, .bce-caret-icon::after {
   content: "";
   display: block;
@@ -300,11 +284,9 @@
   height: 14px;
   background: var(--bce-text-color);
 }
-
 .bce-caret-icon:after {
   transform: translate(50%, -50%) rotate(-90deg);
 }
-
 .bc-events__section-toggle-button.open .bce-caret-icon:before {
   opacity: 0;
 }

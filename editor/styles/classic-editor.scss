@@ -1,0 +1,25 @@
+#bc-events-metadata {
+
+  .inside {
+    padding: 0;
+    margin: 0;
+  }
+
+  .postbox-header .hndle {
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: var(--bce-font-family);
+    text-box: trim-both cap alphabetic;
+  }
+}
+
+.bc-event-dates--classic {
+  background: transparent;
+  padding: 0;
+
+  .bc-event-dates__container {
+    border: 0;
+    border-radius: 0;
+  }
+}

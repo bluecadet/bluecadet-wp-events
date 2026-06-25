@@ -41,6 +41,7 @@ class Init {
     new Admin\Editor\Gutenberg;
     new Admin\Editor\EditorAssets;
     new Admin\Editor\RestRoutes;
+    new Admin\Editor\ClassicEditor\RegisterMetaBoxes;
 
     BackgroundProcesses::__init();
 

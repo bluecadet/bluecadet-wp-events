@@ -189,6 +189,37 @@ class DatabaseHelpers {
   }
 
 
+
+  /**
+   * Check if event id is in the `child_ID` column of recurring events table
+   *
+   * @param int $event_id
+   * @return false|\WP_Post
+   */
+  public function get_recurring_parent(int $event_id) : false|\WP_Post {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->recurring_table;
+
+    $results = $wpdb->get_results(
+      $wpdb->prepare(
+        "SELECT * FROM $table WHERE child_ID=%d",
+        $event_id
+      )
+    );
+
+    if ( !$results ) { return false; }
+
+    if ( isset($results[0]) ) {
+      $parent_id = (int)$results[0]->parent_ID;
+      $parent_post = get_post($parent_id);
+      return $parent_post;
+    }
+
+    return false;
+
+  }
+
+
   /**
    * Get results of parent/child db rows
    *

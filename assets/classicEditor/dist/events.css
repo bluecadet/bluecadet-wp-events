@@ -1,6 +1,3 @@
-/*!******************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./editor/blocks/src/event-dates/editor.scss ***!
-  \******************************************************************************************************************************************************************************************************************************************************************/
 .bce-sr-only {
   position: absolute;
   width: 1px;
@@ -135,9 +132,9 @@
   content: "";
   display: block;
   position: absolute;
-  right: 50%;
+  left: 50%;
   top: 50%;
-  transform: translate(50%, -50%);
+  transform: translate(-50%, -50%);
   width: 50%;
   height: 50%;
   border-radius: 50%;
@@ -225,7 +222,28 @@
   transition: all 0.24s ease-in-out;
 }
 .bc-event-dates__toggle-button.closed .bc-event-dates__toggle-icon {
-  transform: rotate(-180deg);
+  transform: rotate(180deg);
+}
+
+#bc-events-metadata .inside {
+  padding: 0;
+  margin: 0;
+}
+#bc-events-metadata .postbox-header .hndle {
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--bce-font-family);
+  text-box: trim-both cap alphabetic;
+}
+
+.bc-event-dates--classic {
+  background: transparent;
+  padding: 0;
+}
+.bc-event-dates--classic .bc-event-dates__container {
+  border: 0;
+  border-radius: 0;
 }
 
 .bc-event-dates__date-row {
@@ -280,7 +298,7 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:before {
   background: var(--bce-brand-color);
   border-radius: 50%;
   position: absolute;
-  right: 2px;
+  left: 2px;
   top: 2px;
   transition: all 0.3s ease-in-out;
   margin: 0;
@@ -291,7 +309,7 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked {
 }
 .bc-event-dates__checkbox--toggle:checked:before,
 input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
-  right: calc(100% - 16px);
+  left: calc(100% - 16px);
   background: #fff;
   margin: 0;
 }
@@ -323,7 +341,7 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
   align-items: center;
 }
 .bc-event-dates__checkbox-form-group-option label {
-  text-align: left;
+  text-align: right;
 }
 
 .bce-events-recurring-button {
@@ -367,7 +385,7 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
   gap: 8px;
   width: 100%;
   height: 44px;
-  padding: 0 12px 0 0;
+  padding: 0 0 0 12px;
   border: 1px solid var(--bce-input-border-color);
   border-radius: 4px;
   background-color: #fff;
@@ -375,7 +393,7 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
   font-family: var(--bce-font-family);
   font-size: 14px;
   font-weight: 500;
-  text-align: right;
+  text-align: left;
   cursor: pointer;
 }
 .bc-event-post-picker__toggle:hover {
@@ -386,7 +404,7 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
   box-shadow: 0 0 0 1px var(--bce-brand-color);
 }
 .bc-event-post-picker__toggle[aria-expanded=true] .bc-event-post-picker__toggle-chevron {
-  transform: rotate(-180deg);
+  transform: rotate(180deg);
 }
 .bc-event-post-picker__toggle.is-placeholder .bc-event-post-picker__toggle-label {
   color: #757575;
@@ -406,7 +424,7 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
 .bc-event-post-picker__popout {
   position: absolute;
   top: 100%;
-  right: 0;
+  left: 0;
   z-index: 100;
   width: 100%;
   margin-top: 4px;
@@ -528,15 +546,15 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
   content: "";
   display: block;
   position: absolute;
-  right: 50%;
+  left: 50%;
   top: 50%;
-  transform: translate(50%, -50%);
+  transform: translate(-50%, -50%);
   width: 2px;
   height: 14px;
   background: var(--bce-text-color);
 }
 .bce-caret-icon:after {
-  transform: translate(50%, -50%) rotate(-90deg);
+  transform: translate(-50%, -50%) rotate(90deg);
 }
 .bc-events__section-toggle-button.open .bce-caret-icon:before {
   opacity: 0;
@@ -583,8 +601,8 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
   border-radius: 3px;
   color: var(--bce-error-color);
   font-size: 13px;
-  border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 .bce-events-validation-notice + .bce-events-validation-notice {
   border-radius: 0;
@@ -605,16 +623,16 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
 
 .bc-event-dates__frequency-row .bc-event-dates__label {
   width: var(--bce-recurring-label-width);
-  text-align: left;
+  text-align: right;
 }
 .bc-event-dates__frequency-row .bc-event-dates__checkbox-form-group-option .bc-event-dates__label,
 .bc-event-dates__frequency-row .bc-event-dates__label.bc-event-dates__recurring-end-after-x-label {
   width: auto;
-  text-align: right;
+  text-align: left;
 }
 .bc-event-dates__frequency-row input[type=number] {
   width: 64px;
-  padding-left: 0;
+  padding-right: 0;
   text-align: center;
   font-weight: 500;
 }
@@ -679,8 +697,8 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
 }
 .bc-event__remove-recurring-desc ul {
   list-style: disc;
-  padding-right: 20px;
-  margin: 12px 24px 24px 0;
+  padding-left: 20px;
+  margin: 12px 0 24px 24px;
   font-style: italic;
 }
 .bc-event__remove-recurring-desc .bc-event__important {
@@ -695,8 +713,8 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
 .bc-event__remove-recurring-action {
   border-top: 1px solid var(--bce-error-color);
   background: var(--bce-error-color-light);
-  border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 .bc-event__remove-recurring-action .bc-event-dates__checkbox--toggle {
   border: 1px solid var(--bce-error-color);
@@ -751,7 +769,7 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
 }
 .bc-event__child-content-notes ul {
   list-style: list;
-  padding-right: 20px;
+  padding-left: 20px;
   margin-top: 20px;
 }
 .bc-event__child-content-notes li {
@@ -781,3 +799,5 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
   display: flex;
   align-items: center;
 }
+
+/*# sourceMappingURL=events.css.map */

@@ -1,0 +1,44 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "wp-content/themes/holt/assets/src/**/*.js",
+      "wp-content/themes/holt/components/**/assets/*.js",
+      "wp-content/themes/holt/library/**/*.js",
+      "!**/dist",
+      "!**/*.css",
+      "!**/*.pcss",
+      "!**/*.sass",
+      "!**/*.scss",
+      "!node_modules/**/*",
+      "!**/*.stories.js",
+      "!**/*.stories.ts"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "lineWidth": 120
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "lineWidth": 120
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "useArrowFunction": "off"
+      }
+    }
+  }
+}
