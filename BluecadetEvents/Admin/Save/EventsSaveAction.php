@@ -36,7 +36,7 @@ class EventsSaveAction {
     $this->DB_HELPERS = DatabaseHelpers::get_instance();
 
     if ( $this->RDATE->is_recurring || (!$this->RDATE->is_recurring && $this->RDATE->is_recurring_was) ) {
-      
+
       if ( !$this->RDATE->parent_update ) {
         $this->RDATE->is_parent = false;
       }

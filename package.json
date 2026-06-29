@@ -37,7 +37,7 @@
     "stylelint-config-standard": "^40.0.0"
   },
   "dependencies": {
-    
-    "react-select": "^5.10.2"
+    "react-select": "^5.10.2",
+    "tom-select": "^2.4.1"
   }
 }

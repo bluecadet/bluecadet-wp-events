@@ -32,6 +32,7 @@ class BackgroundEventHandler extends \WP_Background_Process {
    * @return mixed
    */
   protected function task($item) {
+    
     new UpdateOrCreateEvent($item);
 
     return false;

@@ -2,6 +2,7 @@
 
 namespace BluecadetEvents\Admin\Trash;
 use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
 use BluecadetEvents\Admin\Utils\Logger;
 
@@ -65,7 +66,7 @@ class Events {
    * @return void
    */
   public function handle_trashed_post( int $post_id ) : void {
-    if ( \get_post_type( $post_id ) !== 'bc_events' ) {
+    if ( \get_post_type( $post_id ) !== Settings::$events_machine_name ) {
       return;
     }
 
@@ -89,7 +90,7 @@ class Events {
    * @return void
    */
   public function handle_untrashed_post( int $post_id ) : void {
-    if ( \get_post_type( $post_id ) !== 'bc_events' ) {
+    if ( \get_post_type( $post_id ) !== Settings::$events_machine_name ) {
       return;
     }
 
@@ -113,9 +114,9 @@ class Events {
     * @param \WP_Post $post
     * @return void
     */
-  private function handle_before_delete_post( int $post_id, \WP_Post $post ) : void {
+  public function handle_before_delete_post( int $post_id, \WP_Post $post ) : void {
 
-    if ( $post->post_type !== 'bc_events' ) {
+    if ( $post->post_type !== Settings::$events_machine_name ) {
       return;
     }
 

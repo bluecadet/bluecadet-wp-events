@@ -36,6 +36,12 @@ class ChildEvent {
   }
 
   private function create_form() {
+    wp_nonce_field( 'bc_save_meta', 'bc_meta_nonce' );
+
+    // The only meta this child form manages; declared so the save handler resets
+    // it when unchecked (see Admin\Save\Events). The parent owns everything else.
+    printf( '<input type="hidden" name="bc_managed_keys[]" value="%s" />', esc_attr( $this->keys['child_deny_override'] ) );
+
     $parent        = $this->db_helpers->get_recurring_parent($this->post->ID);
     $parent_title  = $parent->post_title;
     $parent_url    = get_edit_post_link($parent->ID);
@@ -46,6 +52,7 @@ class ChildEvent {
     $DENY_OVERRIDE = get_post_meta($this->post->ID, $this->keys['child_deny_override'], true) === '1' ? true : false;
     
     ?>
+    <div class="bc-event-details bc-event__content-section">
     <div class="bc-events__flex-fieldset">
       <div class="bc-event__child-content">
         <p class="bc-event__child-content-title"><strong>This is a child event of <a href="<?= esc_url( $parent_url ) ?>" target="_blank" rel="noopener noreferrer"><?= esc_html( $parent_title ) ?></a></strong></p> 
@@ -78,6 +85,7 @@ class ChildEvent {
           </ul>
         </div>
       </div>
+    </div>
     </div>
 
     <?php

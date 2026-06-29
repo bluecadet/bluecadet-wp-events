@@ -58,12 +58,15 @@ class UpdateOrCreateEvent {
 
   private function update_or_add() : void {  
 
-    if ( $this->item->event_slug ) {
-      $check_slugs = $this->DB_HELPERS->check_child_events_for_date_slug($this->item->event_slug);
+    if ( $this->item->event_slug && $this->item->child_id ) {
+      $check_slugs = $this->DB_HELPERS->check_child_events_for_date_slug($this->item->event_slug, (int) $this->item->child_id);
 
       if ( is_array($check_slugs) && !empty($check_slugs) ) {
         $this->copy_to_id = $check_slugs[0]->child_ID;
         $this->item->post['ID'] = $this->copy_to_id;
+
+
+        Logger::log(['$check_slugs' => $check_slugs]);
 
         // Update the post
         $this->insert_post();
@@ -128,12 +131,11 @@ class UpdateOrCreateEvent {
       update_post_meta( $this->copy_to_id, $key, $value );
     }
 
-    // $taxonomies = get_object_taxonomies( Settings::$events_machine_name );
-
-
     foreach ( $this->item->taxonomies as $taxonomy => $terms ) {
       wp_set_object_terms( $this->copy_to_id, $terms, $taxonomy );
     }
+
+    update_post_meta( $this->copy_to_id, 'bc_events_is_child', 1 );
   }
 
 

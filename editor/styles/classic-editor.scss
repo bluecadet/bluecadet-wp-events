@@ -1,5 +1,9 @@
 #bc-events-metadata {
 
+  p, h1, h2, button {
+    text-box: trim-both cap alphabetic;
+  }
+
   .inside {
     padding: 0;
     margin: 0;
@@ -12,6 +16,56 @@
     font-family: var(--bce-font-family);
     text-box: trim-both cap alphabetic;
   }
+
+  .postbox-header .handle-actions {
+    flex-shrink: 0;
+    position: relative;
+    right: 9px;
+
+    .handle-order-higher,
+    .handle-order-lower {
+      display: none;
+    }
+
+    .handlediv {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .toggle-indicator {
+      position: relative;
+      display: block;
+      width: 14px;
+      height: 14px;
+
+      &::before,
+      &::after {
+        content: "";
+        display: block;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 2px;
+        height: 14px;
+        background: black;
+      }
+
+      &::before {
+        display: none;
+      }
+
+      &:after {
+        transform: translate(-50%, -50%) rotate(90deg);
+      }
+    }
+  }
+
+  &.closed .postbox-header .handle-actions .toggle-indicator::before {
+    display: block;
+  }
 }
 
 .bc-event-dates--classic {
@@ -21,5 +75,198 @@
   .bc-event-dates__container {
     border: 0;
     border-radius: 0;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Post picker (Tom Select) — styled to mimic the native select / .bc-event-
+  // dates__input rather than Tom Select's default theme, so the enhanced
+  // combobox matches the rest of the classic form. The underlying <select> is
+  // synced by Tom Select and kept hidden.
+  // ---------------------------------------------------------------------------
+
+  .ts-hidden-accessible {
+    display: none !important;
+  }
+
+  .ts-wrapper {
+    position: relative; // anchor for the absolutely-positioned dropdown
+    width: 320px;
+    max-width: 100%;
+    font-family: var(--bce-font-family);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  // Closed control — a display-only box (the search field lives in the
+  // dropdown). Mirrors .bc-event-dates__input (styles/base.scss) and the React
+  // popout toggle, with a native-select-style caret.
+  .ts-control {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 44px;
+    padding: 0 32px 0 12px;
+    border: 1px solid var(--bce-input-border-color);
+    border-radius: 4px;
+    background-color: #fff;
+    color: #2c3338;
+    cursor: pointer;
+
+    // The in-control placeholder input (.items-placeholder) shown when nothing
+    // is selected — a display-only label, NOT the search field (that lives in
+    // the dropdown). Strip all input chrome and interaction so it reads as text.
+    input {
+      flex: 1 1 60px;
+      min-width: 60px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      appearance: none;
+      background: transparent;
+      color: #2c3338;
+      font-family: var(--bce-font-family);
+      font-size: 14px;
+      line-height: 1.4;
+      cursor: pointer;
+      caret-color: transparent;
+      pointer-events: none;
+      user-select: none;
+      box-shadow: none;
+      outline: none;
+
+      &::placeholder {
+        color: #757575;
+        font-weight: 400;
+      }
+
+      &:focus {
+        box-shadow: none;
+        outline: none;
+      }
+    }
+
+    .item {
+      color: #2c3338;
+      font-weight: 500;
+    }
+
+    // Caret
+    &::after {
+      content: "";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--bce-text-color);
+      border-bottom: 2px solid var(--bce-text-color);
+      transform: translateY(-65%) rotate(45deg);
+      pointer-events: none;
+    }
+  }
+
+  // Focus / open state — mirrors the react popout toggle focus ring.
+  .ts-wrapper.focus .ts-control,
+  .ts-wrapper.dropdown-active .ts-control {
+    border-color: var(--bce-brand-color);
+    box-shadow: 0 0 0 1px var(--bce-brand-color);
+  }
+
+  .ts-wrapper.dropdown-active .ts-control::after {
+    transform: translateY(-35%) rotate(225deg);
+  }
+
+  // Hide the in-control placeholder input once an item is selected or while the
+  // dropdown (and its search field) is open — normally handled by tom-select's
+  // own plugin CSS, which we don't import.
+  .ts-wrapper.has-items .items-placeholder,
+  .ts-wrapper.dropdown-active .items-placeholder {
+    display: none !important;
+  }
+
+  // Dropdown panel — mirrors .bc-event-post-picker__popout / __menu.
+  .ts-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 100;
+    width: 100%;
+    margin-top: 4px;
+    background-color: #fff;
+    border: 1px solid var(--bce-input-border-color);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+  }
+
+  // Search field pinned at the top of the dropdown (dropdown_input plugin) —
+  // mirrors .bc-event-post-picker__control.
+  .ts-dropdown .dropdown-input-wrap {
+    display: block;
+  }
+
+  .ts-dropdown .dropdown-input {
+    display: block;
+    width: 100%;
+    height: 44px;
+    margin: 0;
+    padding: 0 12px;
+    border: 0;
+    border-bottom: 1px solid var(--bce-section-border-color);
+    background-color: #fff;
+    color: #2c3338;
+    font-family: var(--bce-font-family);
+    font-size: 14px;
+    box-shadow: none;
+    outline: none;
+
+    &::placeholder {
+      color: #757575;
+      font-weight: 400;
+    }
+
+    &:focus {
+      box-shadow: none;
+      outline: none;
+    }
+  }
+
+  .ts-dropdown-content {
+    max-height: 280px;
+    overflow-y: auto;
+  }
+
+  .ts-dropdown .option {
+    padding: 8px 12px;
+    color: #2c3338;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .ts-dropdown .option.active {
+    background-color: var(--bce-block-background);
+  }
+
+  .ts-dropdown .option.selected,
+  .ts-dropdown .option[aria-selected="true"] {
+    background-color: var(--bce-brand-color);
+    color: #fff;
+  }
+
+  .ts-dropdown .no-results {
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #757575;
+  }
+
+  // Visibility fallback (Tom Select also toggles this inline).
+  .ts-dropdown {
+    display: none;
+  }
+
+  .ts-wrapper.dropdown-active .ts-dropdown {
+    display: block;
   }
 }

@@ -59,13 +59,11 @@ class RegisterMetaBoxes {
     ?>
     <div class="bc-event-dates bc-event-dates--classic">
       <div class="bc-event-dates__container">
-        <div class="bc-event-details bc-event__content-section">
-          <?php if ( $is_child_event ) {
-            new FormContent\ChildEvent();
-          } else {
-            new FormContent\Event();
-          } ?>
-        </div>
+        <?php if ( $is_child_event ) {
+          new FormContent\ChildEvent();
+        } else {
+          new FormContent\Event();
+        } ?>
       </div>
     </div>
     <?php

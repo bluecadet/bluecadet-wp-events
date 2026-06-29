@@ -260,6 +260,12 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+.bc-events__section-toggle-button:hover {
+  cursor: pointer;
 }
 
 .bc-event-dates__toggle-icon {

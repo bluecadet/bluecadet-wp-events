@@ -74,6 +74,39 @@ class MetaKeys {
     ];
   }
 
+
+  public static function get_event_save_keys() : array {
+    $instance = self::get_instance();
+    return [
+      $instance->keys['start_date'] => 'string',
+      $instance->keys['start_time'] => 'string',
+      $instance->keys['start_timestamp'] => 'string',
+      $instance->keys['end_date'] => 'string',
+      $instance->keys['end_time'] => 'string',
+      $instance->keys['end_timestamp'] => 'string',
+      $instance->keys['hide_time_display'] => 'boolean',
+      $instance->keys['hide_end_time_display'] => 'boolean',
+      $instance->keys['virtual_event'] => 'boolean',
+      $instance->keys['virtual_url'] => 'string',
+      $instance->keys['is_recurring'] => 'boolean',
+      $instance->keys['use_frequency'] => 'boolean',
+      $instance->keys['freq'] => 'string',
+      $instance->keys['freq_days'] => 'array',
+      $instance->keys['freq_mo_schedule'] => 'string',
+      $instance->keys['freq_mo_day'] => 'string',
+      $instance->keys['freq_mo_date'] => 'string',
+      $instance->keys['freq_end_type'] => 'string',
+      $instance->keys['freq_end_date'] => 'string',
+      $instance->keys['freq_end_after_x'] => 'string',
+      $instance->keys['custom_occurrences'] => 'object',
+      $instance->keys['omissions'] => 'array',
+      $instance->keys['remove_recurring'] => 'string',
+      $instance->keys['child_deny_override'] => 'string',
+      $instance->keys['location_ids'] => 'array',
+      $instance->keys['series_ids'] => 'array',
+    ]; 
+  }
+
 	
 
 }

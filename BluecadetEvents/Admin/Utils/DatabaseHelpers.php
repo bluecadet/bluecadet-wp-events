@@ -445,14 +445,15 @@ class DatabaseHelpers {
    * @param string $slug
    * @return int|false
    */
-  public function check_child_events_for_date_slug(string $slug) : false|array {
+  public function check_child_events_for_date_slug(string $slug, int $child_id) : false|array {
     global $wpdb;
     $table = $wpdb->prefix . $this->recurring_table;
 
     $results = $wpdb->get_results(
       $wpdb->prepare(
-        "SELECT child_ID FROM $table WHERE date_slug=%s AND update_check=0",
-        $slug
+        "SELECT child_ID FROM $table WHERE date_slug=%s AND child_ID=%d AND update_check=0",
+        $slug,
+        $child_id
       )
     );
 

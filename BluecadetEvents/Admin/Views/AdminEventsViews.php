@@ -17,7 +17,7 @@ use BluecadetEvents\Helpers\TemplateHelpers;
  */
 class AdminEventsViews {
 
-  private string $filter_events_param                 = 'bc_query_view';
+  private string $filter_events_param              = 'bc_query_view';
   private string $event_date_filter_param          = 'bc_events_date';
   private string $recurring_children_of_param      = 'recurring-by-id';
   private string $filter_events_default_key        = 'default';
@@ -268,7 +268,7 @@ class AdminEventsViews {
         }
 
         // Only show Primary events
-        if ( $_GET[$this->filter_events_param] === 'default' ) {
+        if ( $_GET[$this->filter_events_param] === 'default' || !isset($_GET[$this->filter_events_param]) ) {
           $queries_applied = false;
         }
       }
@@ -462,8 +462,11 @@ class AdminEventsViews {
 
     $db_helpers          = DatabaseHelpers::get_instance();
     $is_recurring_child  = $db_helpers->is_recurring_child($post->ID);
+    $is_trash            = isset($_GET['post_status']) && $_GET['post_status'] === 'trash';
 
-    if ( $is_recurring_child ) {
+    if ( $is_trash && $is_recurring_child ) {
+      $new_actions = [];
+    } elseif ( $is_recurring_child ) {
       $new_actions = [
         'edit' => $actions['edit'],
         'view' => $actions['view']

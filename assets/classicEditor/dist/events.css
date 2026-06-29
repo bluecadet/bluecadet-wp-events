@@ -225,6 +225,9 @@
   transform: rotate(180deg);
 }
 
+#bc-events-metadata p, #bc-events-metadata h1, #bc-events-metadata h2, #bc-events-metadata button {
+  text-box: trim-both cap alphabetic;
+}
 #bc-events-metadata .inside {
   padding: 0;
   margin: 0;
@@ -236,6 +239,47 @@
   font-family: var(--bce-font-family);
   text-box: trim-both cap alphabetic;
 }
+#bc-events-metadata .postbox-header .handle-actions {
+  flex-shrink: 0;
+  position: relative;
+  right: 9px;
+}
+#bc-events-metadata .postbox-header .handle-actions .handle-order-higher,
+#bc-events-metadata .postbox-header .handle-actions .handle-order-lower {
+  display: none;
+}
+#bc-events-metadata .postbox-header .handle-actions .handlediv {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+#bc-events-metadata .postbox-header .handle-actions .toggle-indicator {
+  position: relative;
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+#bc-events-metadata .postbox-header .handle-actions .toggle-indicator::before, #bc-events-metadata .postbox-header .handle-actions .toggle-indicator::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 14px;
+  background: black;
+}
+#bc-events-metadata .postbox-header .handle-actions .toggle-indicator::before {
+  display: none;
+}
+#bc-events-metadata .postbox-header .handle-actions .toggle-indicator:after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+#bc-events-metadata.closed .postbox-header .handle-actions .toggle-indicator::before {
+  display: block;
+}
 
 .bc-event-dates--classic {
   background: transparent;
@@ -244,6 +288,154 @@
 .bc-event-dates--classic .bc-event-dates__container {
   border: 0;
   border-radius: 0;
+}
+.bc-event-dates--classic .ts-hidden-accessible {
+  display: none !important;
+}
+.bc-event-dates--classic .ts-wrapper {
+  position: relative;
+  width: 320px;
+  max-width: 100%;
+  font-family: var(--bce-font-family);
+  font-size: 14px;
+  font-weight: 500;
+}
+.bc-event-dates--classic .ts-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 44px;
+  padding: 0 32px 0 12px;
+  border: 1px solid var(--bce-input-border-color);
+  border-radius: 4px;
+  background-color: #fff;
+  color: #2c3338;
+  cursor: pointer;
+}
+.bc-event-dates--classic .ts-control input {
+  flex: 1 1 60px;
+  min-width: 60px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  appearance: none;
+  background: transparent;
+  color: #2c3338;
+  font-family: var(--bce-font-family);
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+  caret-color: transparent;
+  pointer-events: none;
+  user-select: none;
+  box-shadow: none;
+  outline: none;
+}
+.bc-event-dates--classic .ts-control input::placeholder {
+  color: #757575;
+  font-weight: 400;
+}
+.bc-event-dates--classic .ts-control input:focus {
+  box-shadow: none;
+  outline: none;
+}
+.bc-event-dates--classic .ts-control .item {
+  color: #2c3338;
+  font-weight: 500;
+}
+.bc-event-dates--classic .ts-control::after {
+  content: "";
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--bce-text-color);
+  border-bottom: 2px solid var(--bce-text-color);
+  transform: translateY(-65%) rotate(45deg);
+  pointer-events: none;
+}
+.bc-event-dates--classic .ts-wrapper.focus .ts-control,
+.bc-event-dates--classic .ts-wrapper.dropdown-active .ts-control {
+  border-color: var(--bce-brand-color);
+  box-shadow: 0 0 0 1px var(--bce-brand-color);
+}
+.bc-event-dates--classic .ts-wrapper.dropdown-active .ts-control::after {
+  transform: translateY(-35%) rotate(225deg);
+}
+.bc-event-dates--classic .ts-wrapper.has-items .items-placeholder,
+.bc-event-dates--classic .ts-wrapper.dropdown-active .items-placeholder {
+  display: none !important;
+}
+.bc-event-dates--classic .ts-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+  margin-top: 4px;
+  background-color: #fff;
+  border: 1px solid var(--bce-input-border-color);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+.bc-event-dates--classic .ts-dropdown .dropdown-input-wrap {
+  display: block;
+}
+.bc-event-dates--classic .ts-dropdown .dropdown-input {
+  display: block;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 1px solid var(--bce-section-border-color);
+  background-color: #fff;
+  color: #2c3338;
+  font-family: var(--bce-font-family);
+  font-size: 14px;
+  box-shadow: none;
+  outline: none;
+}
+.bc-event-dates--classic .ts-dropdown .dropdown-input::placeholder {
+  color: #757575;
+  font-weight: 400;
+}
+.bc-event-dates--classic .ts-dropdown .dropdown-input:focus {
+  box-shadow: none;
+  outline: none;
+}
+.bc-event-dates--classic .ts-dropdown-content {
+  max-height: 280px;
+  overflow-y: auto;
+}
+.bc-event-dates--classic .ts-dropdown .option {
+  padding: 8px 12px;
+  color: #2c3338;
+  font-weight: 500;
+  cursor: pointer;
+}
+.bc-event-dates--classic .ts-dropdown .option.active {
+  background-color: var(--bce-block-background);
+}
+.bc-event-dates--classic .ts-dropdown .option.selected,
+.bc-event-dates--classic .ts-dropdown .option[aria-selected=true] {
+  background-color: var(--bce-brand-color);
+  color: #fff;
+}
+.bc-event-dates--classic .ts-dropdown .no-results {
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #757575;
+}
+.bc-event-dates--classic .ts-dropdown {
+  display: none;
+}
+.bc-event-dates--classic .ts-wrapper.dropdown-active .ts-dropdown {
+  display: block;
 }
 
 .bc-event-dates__date-row {
@@ -360,6 +552,9 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
   background: var(--bce-brand-color);
   color: #fff;
   width: 100%;
+}
+.bce-events-recurring-button:hover {
+  cursor: pointer;
 }
 
 .bc-events__checkbox-button[aria-pressed=true] {
@@ -529,6 +724,12 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+.bc-events__section-toggle-button:hover {
+  cursor: pointer;
 }
 
 .bc-event-dates__toggle-icon {

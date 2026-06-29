@@ -343,6 +343,9 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
   color: #fff;
   width: 100%;
 }
+.bce-events-recurring-button:hover {
+  cursor: pointer;
+}
 
 .bc-events__checkbox-button[aria-pressed=true] {
   border: 1px solid var(--bce-error-color);
@@ -511,6 +514,12 @@ input[type=checkbox].bc-event-dates__checkbox--toggle:checked:before {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+.bc-events__section-toggle-button:hover {
+  cursor: pointer;
 }
 
 .bc-event-dates__toggle-icon {
