@@ -1,0 +1,27 @@
+// Styles for the shared event field set. Imported by EventFields.jsx so the styles
+// land in BOTH the event-dates block (editor iframe) and the settings panel modal
+// (outer admin document) from a single source.
+
+@use '../../../styles/base.scss';
+@use '../../../styles/button.scss';
+@use '../../../styles/toggles.scss';
+
+// Form Parts
+@use '../../_formParts/DateRow/dateRow.scss';
+@use '../../_formParts/BasicCheckbox/basicCheckbox.scss';
+@use '../../_formParts/BasicSelect/basicSelect.scss';
+@use '../../_formParts/CheckboxFormGroup/checkboxFormGroup.scss';
+@use '../../_formParts/RecurringButton/recurringButton.scss';
+@use '../../_formParts/CheckboxButton/checkboxButton.scss';
+@use '../../_formParts/PostPicker/postPicker.scss';
+
+// Sections
+@use '../../SectionToggle/sectionToggle.scss';
+@use '../../_sections/CustomOccurences/customOccurences.scss';
+@use '../../_sections/OmitDates/omitDates.scss';
+@use '../../_sections/Validation/validation.scss';
+@use '../../_sections/Frequency/frequency.scss';
+@use '../../_sections/Recurring/recurring.scss';
+@use '../../_sections/RemoveRecurring/removeRecurring.scss';
+@use '../../_sections/ChildEventDetails/childEventDetails.scss';
+@use '../../_sections/RepeatingPostPicker/repeatingPostPicker.scss';

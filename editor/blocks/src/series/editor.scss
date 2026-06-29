@@ -1,11 +1,3 @@
-@use '../../../styles/base.scss';
-@use '../../../styles/button.scss';
-@use '../../../styles/toggles.scss';
-// @use './styles/recurring.scss';
-
-// Form Parts
-@use '../../../components/_formParts/BasicText/basicText.scss';
-@use '../../../components/_formParts/BasicTextArea/basicTextArea.scss';
-
-// Sections
-@use '../../../components/SectionToggle/sectionToggle.scss';
+// Styles now live in the shared field set (imported by SeriesFields.jsx) so they
+// apply to both this block and the settings panel modal from one source.
+// See: editor/components/_fieldSets/SeriesFields/seriesFields.scss

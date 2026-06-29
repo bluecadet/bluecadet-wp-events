@@ -12,35 +12,54 @@ class EditorAssets {
 
   public function enqueue() {
     $screen = get_current_screen();
-    if ( ! $screen || $screen->post_type !== Settings::$events_machine_name ) {
+
+    $event_post_types = [
+      Settings::$events_machine_name,
+      Settings::$locations_machine_name,
+      Settings::$series_machine_name,
+    ];
+
+    if ( ! $screen || ! in_array( $screen->post_type, $event_post_types, true ) ) {
       return;
     }
 
-    $asset_file = \trailingslashit(Settings::$plugin_dir) . 'editor/scripts/dist/index.asset.php';
+    $dist_url = \trailingslashit( Settings::$plugin_url ) . 'editor/scripts/dist/';
+    $dist_dir = \trailingslashit( Settings::$plugin_dir ) . 'editor/scripts/dist/';
 
-    if ( ! file_exists( $asset_file ) ) {
-      return;
-    }
+    // Bundles to load in the block editor: the legacy script bundle (index) and the
+    // always-available settings panel. Each has its own generated asset manifest.
+    $bundles = [
+      'bc-events-editor-plugin'  => 'index',
+      'bc-events-settings-panel' => 'eventsPluginPanel',
+    ];
 
-    $asset = include $asset_file;
+    foreach ( $bundles as $handle => $name ) {
+      $asset_file = $dist_dir . $name . '.asset.php';
 
-    wp_enqueue_script(
-      'bc-events-editor-plugin',
-      \trailingslashit(Settings::$plugin_url) . 'editor/scripts/dist/index.js',
-      $asset['dependencies'],
-      $asset['version'],
-      true
-    );
+      if ( ! file_exists( $asset_file ) ) {
+        continue;
+      }
 
-    $css_file = \trailingslashit(Settings::$plugin_dir) . 'editor/scripts/dist/index.css';
+      $asset = include $asset_file;
 
-    if ( file_exists( $css_file ) ) {
-      wp_enqueue_style(
-        'bc-events-editor-plugin',
-        \trailingslashit(Settings::$plugin_url) . 'editor/scripts/dist/index.css',
-        [],
-        $asset['version']
+      wp_enqueue_script(
+        $handle,
+        $dist_url . $name . '.js',
+        $asset['dependencies'],
+        $asset['version'],
+        true
       );
+
+      $css_file = $dist_dir . $name . '.css';
+
+      if ( file_exists( $css_file ) ) {
+        wp_enqueue_style(
+          $handle,
+          $dist_url . $name . '.css',
+          [],
+          $asset['version']
+        );
+      }
     }
   }
 

@@ -11,8 +11,8 @@
     "blocks:watch": "wp-scripts start --source-path=editor/blocks/src --output-path=editor/blocks/dist",
     "blocks:hot": "wp-scripts start --source-path=editor/blocks/src --output-path=editor/blocks/dist --hot",
     "blocks:build": "wp-scripts build --source-path=editor/blocks/src --output-path=editor/blocks/dist",
-    "scripts:watch": "wp-scripts start --source-path=editor/scripts/src --output-path=editor/scripts/dist",
-    "scripts:build": "wp-scripts build --source-path=editor/scripts/src --output-path=editor/scripts/dist",
+    "scripts:watch": "wp-scripts start editor/scripts/src/index.js editor/scripts/src/eventsPluginPanel.js --output-path=editor/scripts/dist",
+    "scripts:build": "wp-scripts build editor/scripts/src/index.js editor/scripts/src/eventsPluginPanel.js --output-path=editor/scripts/dist",
     "build": "npm run blocks:build && npm run scripts:build && bldr build"
   },
   "devDependencies": {

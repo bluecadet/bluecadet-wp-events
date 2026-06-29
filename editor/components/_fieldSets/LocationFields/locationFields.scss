@@ -1,0 +1,13 @@
+// Styles for the shared location field set. Imported by LocationFields.jsx so they
+// apply in both the location block (editor iframe) and the settings panel modal.
+
+@use '../../../styles/base.scss';
+@use '../../../styles/button.scss';
+@use '../../../styles/toggles.scss';
+
+// Form Parts
+@use '../../_formParts/BasicText/basicText.scss';
+@use '../../_formParts/BasicTextArea/basicTextArea.scss';
+
+// Sections
+@use '../../SectionToggle/sectionToggle.scss';

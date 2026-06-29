@@ -3,8 +3,21 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
 import { dispatch } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
+import { createContext, useContext } from '@wordpress/element';
 
 export const REST_NAMESPACE = 'bc-events/v1';
+
+/**
+ * Optional staging override for meta.
+ *
+ * When a provider supplies { meta, setMeta }, getStore() returns those instead of
+ * the live post-meta entity prop. This lets the settings modal edit a local buffer
+ * (committed only on Save) while the inline block keeps editing live — the field
+ * components are unaware, since they all read through getStore().
+ *
+ * null = no staging (live entity meta).
+ */
+export const StagingContext = createContext( null );
 
 /** META KEY NAMESPACING */
 export const META_SCOPE = 'bc-events/meta-keys';
@@ -61,12 +74,14 @@ export function getPostType() {
 export function getStore() {
   const keys = loadKeys();
   const postType = getPostType();
-  const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
+  const [ entityMeta, setEntityMeta ] = useEntityProp( 'postType', postType, 'meta' );
+  const staging = useContext( StagingContext );
 
   return {
     keys,
     postType,
-    meta,
-    setMeta
+    // When staged, read/write the modal's buffer; otherwise the live post meta.
+    meta:    staging ? staging.meta    : entityMeta,
+    setMeta: staging ? staging.setMeta : setEntityMeta,
   }
 }

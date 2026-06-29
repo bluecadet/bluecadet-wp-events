@@ -78,12 +78,6 @@ class Hooks {
 
 
 
-  
-
-
-  
-
-
   /**
    * hook_filter_date_display_format
    *
@@ -94,6 +88,7 @@ class Hooks {
   public static function hook_filter_date_display_format() : string {
     return \apply_filters('bc_events_date_display_format', 'F j, Y');
   }
+
 
 
   /**
@@ -107,6 +102,7 @@ class Hooks {
     return \apply_filters('bc_events_time_display_format', 'g:ia');
   }
 
+  
 
   /**
    * hook_filter_date_time_sep_format

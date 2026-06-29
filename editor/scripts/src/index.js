@@ -29,4 +29,8 @@ function EventDatesEnforcer() {
 	return null;
 }
 
-registerPlugin( 'bc-events-enforcer', { render: EventDatesEnforcer } );
+// Disabled: the always-available "Event Settings" panel (eventsPluginPanel.js) now
+// guarantees the meta is editable regardless of the block's presence/position, so the
+// block is freely movable/removable and no longer needs pinning to position 0.
+// Re-enable this line to restore the enforced placement.
+// registerPlugin( 'bc-events-enforcer', { render: EventDatesEnforcer } );

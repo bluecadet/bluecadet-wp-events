@@ -33,13 +33,10 @@ class PostTypes {
 
     $events_slug = Plugin\Hooks::hook_filter_events_rewrite_slug();
     $events_machine_name = Plugin\Settings::$events_machine_name;
+    // Auto-inserted as a convenience, but freely movable/removable: the always-available
+    // "Event Settings" panel guarantees the meta stays editable even without the block.
     $template = Plugin\Hooks::hook_filter_events_gutenberg_template([
-      ['bc-events/event-dates', [
-        'lock' => [
-          'move'   => true,  // prevents reordering
-          'remove' => true,  // prevents deletion
-        ]
-      ]]
+      ['bc-events/event-dates', []]
     ]);
 
     $icon = '<svg width="36" height="34" viewBox="0 0 36 34" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -100,12 +97,7 @@ class PostTypes {
       $supports = Plugin\Hooks::hook_filter_locations_supports();
 
       $template = Plugin\Hooks::hook_filter_locations_gutenberg_template([
-        ['bc-events/location', [
-          'lock' => [
-            'move'   => true,  // prevents reordering
-            'remove' => true,  // prevents deletion
-          ]
-        ]]
+        ['bc-events/location', []]
       ]);
 
       $default_args = array(
@@ -148,12 +140,7 @@ class PostTypes {
       $supports = Plugin\Hooks::hook_filter_series_supports();
 
       $template = Plugin\Hooks::hook_filter_series_gutenberg_template([
-        ['bc-events/series', [
-          'lock' => [
-            'move'   => true,  // prevents reordering
-            'remove' => true,  // prevents deletion
-          ]
-        ]]
+        ['bc-events/series', []]
       ]);
 
       $default_args = array(
