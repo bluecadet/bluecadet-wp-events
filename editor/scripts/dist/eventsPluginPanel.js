@@ -2334,63 +2334,6 @@ var weakMemoize = function weakMemoize(func) {
 
 /***/ },
 
-/***/ "./editor/components/BlockIcon/BlockIcon.jsx"
-/*!***************************************************!*\
-  !*** ./editor/components/BlockIcon/BlockIcon.jsx ***!
-  \***************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ BlockIcon)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__);
-
-
-function BlockIcon() {
-  const DAY = new Date().getDate();
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("svg", {
-    xmlns: "http://www.w3.org/2000/svg",
-    viewBox: "0 0 20 20",
-    width: "20",
-    height: "20",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("g", {
-      fill: "none",
-      stroke: "currentColor",
-      "stroke-width": "1.5",
-      "stroke-linecap": "round",
-      "stroke-linejoin": "round",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("rect", {
-        x: "3",
-        y: "4.25",
-        width: "14",
-        height: "12.75",
-        rx: "2.4"
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("path", {
-        d: "M3 8.25H17"
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("path", {
-        d: "M6.75 2.75V5.75"
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("path", {
-        d: "M13.25 2.75V5.75"
-      })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("text", {
-      x: "10",
-      y: "14.7",
-      "text-anchor": "middle",
-      "font-family": "sans-serif",
-      "font-size": "7.4",
-      "font-weight": "700",
-      fill: "currentColor",
-      children: DAY
-    })]
-  });
-}
-
-/***/ },
-
 /***/ "./editor/components/SectionToggle/SectionToggle.jsx"
 /*!***********************************************************!*\
   !*** ./editor/components/SectionToggle/SectionToggle.jsx ***!
@@ -2604,6 +2547,277 @@ function EventFields() {
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_sections_EventDetails_EventDetails_jsx__WEBPACK_IMPORTED_MODULE_9__["default"], {}), useLocations && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_sections_EventLocations_EventLocations_jsx__WEBPACK_IMPORTED_MODULE_13__["default"], {}), useSeries && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_sections_EventSeries_EventSeries_jsx__WEBPACK_IMPORTED_MODULE_14__["default"], {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_sections_Recurring_Recurring_jsx__WEBPACK_IMPORTED_MODULE_10__["default"], {})]
       })]
     })
+  });
+}
+
+/***/ },
+
+/***/ "./editor/components/_fieldSets/LocationFields/LocationFields.jsx"
+/*!************************************************************************!*\
+  !*** ./editor/components/_fieldSets/LocationFields/LocationFields.jsx ***!
+  \************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ LocationFields)
+/* harmony export */ });
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_preferences__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/preferences */ "@wordpress/preferences");
+/* harmony import */ var _wordpress_preferences__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_preferences__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _utils_store_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../_utils/store.js */ "./editor/components/_utils/store.js");
+/* harmony import */ var _SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../SectionToggle/SectionToggle.jsx */ "./editor/components/SectionToggle/SectionToggle.jsx");
+/* harmony import */ var _sections_Loader_Loader_jsx__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../_sections/Loader/Loader.jsx */ "./editor/components/_sections/Loader/Loader.jsx");
+/* harmony import */ var _formParts_BasicText_BasicText_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../_formParts/BasicText/BasicText.js */ "./editor/components/_formParts/BasicText/BasicText.js");
+/* harmony import */ var _formParts_BasicTextArea_BasicTextArea_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../_formParts/BasicTextArea/BasicTextArea.js */ "./editor/components/_formParts/BasicTextArea/BasicTextArea.js");
+/* harmony import */ var _locationFields_scss__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./locationFields.scss */ "./editor/components/_fieldSets/LocationFields/locationFields.scss");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__);
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Event location meta fields. Shared by the location block and the settings modal.
+ */
+
+function LocationFields() {
+  const {
+    keys,
+    meta,
+    setMeta
+  } = (0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getStore)();
+  const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(!keys);
+  const [isLoadingError, setIsLoadingError] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
+  const isCondensed = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_0__.useSelect)(select => select(_wordpress_preferences__WEBPACK_IMPORTED_MODULE_1__.store).get('bc-events/location-details-condensed', 'condensed'));
+  const {
+    set
+  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_0__.useDispatch)(_wordpress_preferences__WEBPACK_IMPORTED_MODULE_1__.store);
+  const handleToggle = value => {
+    set('bc-events/location-details-condensed', 'condensed', value);
+  };
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    const fetchKeys = async () => {
+      if ((0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.loadKeys)()) {
+        return;
+      }
+      try {
+        const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
+          path: `/${_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.REST_NAMESPACE}/get-locations-keys`
+        });
+        (0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.setKeys)(response);
+      } catch (error) {
+        console.error('Error fetching keys:', error);
+        setIsLoadingError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchKeys();
+  }, []);
+  if (isLoading) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_sections_Loader_Loader_jsx__WEBPACK_IMPORTED_MODULE_7__["default"], {});
+  }
+  const META_ADDRESS = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('address', keys)] ?? '';
+  const META_DESCRIPTION = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('description', keys)] ?? '';
+  const META_WEBSITE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('website', keys)] ?? '';
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)("div", {
+    className: "bc-event-dates__container bc-event-dates__location",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_6__["default"], {
+      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Event Location Details', 'basecadet'),
+      value: isCondensed,
+      onChange: value => handleToggle(value),
+      asTitle: true,
+      titleTag: "h2"
+    }), !isCondensed && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)("div", {
+      className: "bc-event__content-section",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)("div", {
+        className: "bc-events__flex-fieldset",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_formParts_BasicTextArea_BasicTextArea_js__WEBPACK_IMPORTED_MODULE_9__["default"], {
+          id: "location-address",
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Location Address', 'basecadet'),
+          value: META_ADDRESS,
+          onChange: val => setMeta({
+            ...meta,
+            [(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('address', keys)]: val
+          }),
+          rows: 4,
+          useLineBreak: true
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_formParts_BasicTextArea_BasicTextArea_js__WEBPACK_IMPORTED_MODULE_9__["default"], {
+          id: "location-description",
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Location Description', 'basecadet'),
+          value: META_DESCRIPTION,
+          onChange: val => setMeta({
+            ...meta,
+            [(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('description', keys)]: val
+          }),
+          rows: 4,
+          useLineBreak: true
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_formParts_BasicText_BasicText_js__WEBPACK_IMPORTED_MODULE_8__["default"], {
+          id: "location-website",
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Location Website', 'basecadet'),
+          value: META_WEBSITE,
+          onChange: val => setMeta({
+            ...meta,
+            [(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('website', keys)]: val
+          })
+        })]
+      })
+    })]
+  });
+}
+
+/***/ },
+
+/***/ "./editor/components/_fieldSets/SeriesFields/SeriesFields.jsx"
+/*!********************************************************************!*\
+  !*** ./editor/components/_fieldSets/SeriesFields/SeriesFields.jsx ***!
+  \********************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ SeriesFields)
+/* harmony export */ });
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_preferences__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/preferences */ "@wordpress/preferences");
+/* harmony import */ var _wordpress_preferences__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_preferences__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _utils_store_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../_utils/store.js */ "./editor/components/_utils/store.js");
+/* harmony import */ var _SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../SectionToggle/SectionToggle.jsx */ "./editor/components/SectionToggle/SectionToggle.jsx");
+/* harmony import */ var _sections_Loader_Loader_jsx__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../_sections/Loader/Loader.jsx */ "./editor/components/_sections/Loader/Loader.jsx");
+/* harmony import */ var _formParts_BasicText_BasicText_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../_formParts/BasicText/BasicText.js */ "./editor/components/_formParts/BasicText/BasicText.js");
+/* harmony import */ var _formParts_BasicTextArea_BasicTextArea_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../_formParts/BasicTextArea/BasicTextArea.js */ "./editor/components/_formParts/BasicTextArea/BasicTextArea.js");
+/* harmony import */ var _seriesFields_scss__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./seriesFields.scss */ "./editor/components/_fieldSets/SeriesFields/seriesFields.scss");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__);
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Event series meta fields. Shared by the series block and the settings modal.
+ */
+
+function SeriesFields() {
+  const {
+    keys,
+    meta,
+    setMeta
+  } = (0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getStore)();
+  const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(!keys);
+  const [isLoadingError, setIsLoadingError] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
+  const isCondensed = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_0__.useSelect)(select => select(_wordpress_preferences__WEBPACK_IMPORTED_MODULE_1__.store).get('bc-events/series-details-condensed', 'condensed'));
+  const {
+    set
+  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_0__.useDispatch)(_wordpress_preferences__WEBPACK_IMPORTED_MODULE_1__.store);
+  const handleToggle = value => {
+    set('bc-events/series-details-condensed', 'condensed', value);
+  };
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    const fetchKeys = async () => {
+      if ((0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.loadKeys)()) {
+        return;
+      }
+      try {
+        const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
+          path: `/${_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.REST_NAMESPACE}/get-series-keys`
+        });
+        (0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.setKeys)(response);
+      } catch (error) {
+        console.error('Error fetching keys:', error);
+        setIsLoadingError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchKeys();
+  }, []);
+  if (isLoading) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_sections_Loader_Loader_jsx__WEBPACK_IMPORTED_MODULE_7__["default"], {});
+  }
+  const META_DISPLAY_NAME = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('display_name', keys)] ?? '';
+  const META_PLURAL_NAME = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('plural_name', keys)] ?? '';
+  const META_SINGULAR_NAME = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('singular_name', keys)] ?? '';
+  const META_DESCRIPTION = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('description', keys)] ?? '';
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)("div", {
+    className: "bc-event-dates__container bc-event-dates__series",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_6__["default"], {
+      title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Event Series Details', 'basecadet'),
+      value: isCondensed,
+      onChange: value => handleToggle(value),
+      asTitle: true,
+      titleTag: "h2"
+    }), !isCondensed && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)("div", {
+      className: "bc-event__content-section",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsxs)("div", {
+        className: "bc-events__flex-fieldset",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_formParts_BasicText_BasicText_js__WEBPACK_IMPORTED_MODULE_8__["default"], {
+          id: "series-display-name",
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Series Display Name', 'basecadet'),
+          value: META_DISPLAY_NAME,
+          onChange: val => setMeta({
+            ...meta,
+            [(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('display_name', keys)]: val
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_formParts_BasicText_BasicText_js__WEBPACK_IMPORTED_MODULE_8__["default"], {
+          id: "series-plural-name",
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Series Plural Name', 'basecadet'),
+          value: META_PLURAL_NAME,
+          onChange: val => setMeta({
+            ...meta,
+            [(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('plural_name', keys)]: val
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_formParts_BasicText_BasicText_js__WEBPACK_IMPORTED_MODULE_8__["default"], {
+          id: "series-singular-name",
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Series Singular Name', 'basecadet'),
+          value: META_SINGULAR_NAME,
+          onChange: val => setMeta({
+            ...meta,
+            [(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('singular_name', keys)]: val
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_11__.jsx)(_formParts_BasicTextArea_BasicTextArea_js__WEBPACK_IMPORTED_MODULE_9__["default"], {
+          id: "series-description",
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Series Description', 'basecadet'),
+          value: META_DESCRIPTION,
+          onChange: val => setMeta({
+            ...meta,
+            [(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('description', keys)]: val
+          }),
+          rows: 4,
+          useLineBreak: true
+        })]
+      })
+    })]
   });
 }
 
@@ -5158,10 +5372,10 @@ function memoizeOne(resultFn, isEqual) {
 
 /***/ },
 
-/***/ "./editor/blocks/src/event-dates/editor.scss"
-/*!***************************************************!*\
-  !*** ./editor/blocks/src/event-dates/editor.scss ***!
-  \***************************************************/
+/***/ "./editor/components/_fieldSets/EventFields/eventFields.scss"
+/*!*******************************************************************!*\
+  !*** ./editor/components/_fieldSets/EventFields/eventFields.scss ***!
+  \*******************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
@@ -5170,10 +5384,34 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ },
 
-/***/ "./editor/components/_fieldSets/EventFields/eventFields.scss"
-/*!*******************************************************************!*\
-  !*** ./editor/components/_fieldSets/EventFields/eventFields.scss ***!
-  \*******************************************************************/
+/***/ "./editor/components/_fieldSets/LocationFields/locationFields.scss"
+/*!*************************************************************************!*\
+  !*** ./editor/components/_fieldSets/LocationFields/locationFields.scss ***!
+  \*************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ },
+
+/***/ "./editor/components/_fieldSets/SeriesFields/seriesFields.scss"
+/*!*********************************************************************!*\
+  !*** ./editor/components/_fieldSets/SeriesFields/seriesFields.scss ***!
+  \*********************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ },
+
+/***/ "./editor/scripts/src/eventsPluginPanel.scss"
+/*!***************************************************!*\
+  !*** ./editor/scripts/src/eventsPluginPanel.scss ***!
+  \***************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
@@ -9738,16 +9976,6 @@ module.exports = window["wp"]["blockEditor"];
 
 /***/ },
 
-/***/ "@wordpress/blocks"
-/*!********************************!*\
-  !*** external ["wp","blocks"] ***!
-  \********************************/
-(module) {
-
-module.exports = window["wp"]["blocks"];
-
-/***/ },
-
 /***/ "@wordpress/components"
 /*!************************************!*\
   !*** external ["wp","components"] ***!
@@ -9828,6 +10056,16 @@ module.exports = window["wp"]["i18n"];
 
 /***/ },
 
+/***/ "@wordpress/plugins"
+/*!*********************************!*\
+  !*** external ["wp","plugins"] ***!
+  \*********************************/
+(module) {
+
+module.exports = window["wp"]["plugins"];
+
+/***/ },
+
 /***/ "@wordpress/preferences"
 /*!*************************************!*\
   !*** external ["wp","preferences"] ***!
@@ -9835,16 +10073,6 @@ module.exports = window["wp"]["i18n"];
 (module) {
 
 module.exports = window["wp"]["preferences"];
-
-/***/ },
-
-/***/ "@wordpress/server-side-render"
-/*!******************************************!*\
-  !*** external ["wp","serverSideRender"] ***!
-  \******************************************/
-(module) {
-
-module.exports = window["wp"]["serverSideRender"];
 
 /***/ },
 
@@ -12848,39 +13076,6 @@ const RECURRING_MONTHLY_FREQUENCY_OPTIONS = [{
 
 /***/ },
 
-/***/ "./editor/blocks/src/event-dates/edit.js"
-/*!***********************************************!*\
-  !*** ./editor/blocks/src/event-dates/edit.js ***!
-  \***********************************************/
-(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ Edit)
-/* harmony export */ });
-/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
-/* harmony import */ var _components_fieldSets_EventFields_EventFields_jsx__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../components/_fieldSets/EventFields/EventFields.jsx */ "./editor/components/_fieldSets/EventFields/EventFields.jsx");
-/* harmony import */ var _wordpress_server_side_render__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/server-side-render */ "@wordpress/server-side-render");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-
-
-
-
-function Edit() {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
-    ...(0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.useBlockProps)(),
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-      className: "bc-event-dates",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_components_fieldSets_EventFields_EventFields_jsx__WEBPACK_IMPORTED_MODULE_1__["default"], {})
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_server_side_render__WEBPACK_IMPORTED_MODULE_2__, {
-      block: "bc-events/event-dates",
-      attributes: {}
-    })]
-  });
-}
-
-/***/ },
-
 /***/ "./editor/components/_formParts/BasicCheckbox/BasicCheckbox.js"
 /*!*********************************************************************!*\
   !*** ./editor/components/_formParts/BasicCheckbox/BasicCheckbox.js ***!
@@ -12958,6 +13153,108 @@ function BasicSelect({
         value: option.value,
         children: option.label
       }, option.value))
+    })]
+  });
+}
+
+/***/ },
+
+/***/ "./editor/components/_formParts/BasicText/BasicText.js"
+/*!*************************************************************!*\
+  !*** ./editor/components/_formParts/BasicText/BasicText.js ***!
+  \*************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ BasicText)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+
+function BasicText({
+  id,
+  value,
+  options,
+  onChange,
+  label,
+  className = null
+}) {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+    className: `bc-event-dates__text-group bc-event-dates__input-row ${className ? className : ''}`,
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
+      className: "bc-event-dates__label bc-event-dates__text-group-label",
+      htmlFor: id,
+      children: label
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
+      type: "text",
+      className: "bc-event-dates__input bc-event-dates__text bc-event-dates__text-group-text",
+      id: id,
+      value: value,
+      onChange: e => onChange(e.target.value)
+    })]
+  });
+}
+
+/***/ },
+
+/***/ "./editor/components/_formParts/BasicTextArea/BasicTextArea.js"
+/*!*********************************************************************!*\
+  !*** ./editor/components/_formParts/BasicTextArea/BasicTextArea.js ***!
+  \*********************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ BasicTextArea)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+
+function BasicTextArea({
+  id,
+  value,
+  options,
+  onChange,
+  label,
+  className = null,
+  rows = 2,
+  useLineBreak = false,
+  useParagraphBreak = false
+}) {
+  const handleValue = val => {
+    let newVal = val;
+    if (useLineBreak) {
+      newVal = newVal.replaceAll('\n', '<br>');
+    }
+    if (useParagraphBreak) {
+      newVal = newVal.replaceAll('\n', '</p><p>');
+      newVal = `<p>${newVal}</p>`;
+    }
+    onChange(newVal);
+  };
+  const displayValue = val => {
+    if (!val) return val;
+    let display = val;
+    if (useLineBreak) {
+      display = display.replaceAll('<br>', '\n');
+    }
+    if (useParagraphBreak) {
+      display = display.replace(/^<p>/, '').replace(/<\/p>$/, '');
+      display = display.replaceAll('<\/p><p>', '\n');
+    }
+    return display;
+  };
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+    className: `bc-event-dates__text-group bc-event-dates__input-row ${className ? className : ''}`,
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
+      className: "bc-event-dates__label bc-event-dates__text-group-label",
+      htmlFor: id,
+      children: label
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("textarea", {
+      className: "bc-event-dates__input bc-event-dates__text bc-event-dates__text-group-text",
+      id: id,
+      value: displayValue(value),
+      onChange: e => handleValue(e.target.value),
+      rows: rows ? rows : 2
     })]
   });
 }
@@ -14143,16 +14440,6 @@ function combine (array, callback) {
 }
 
 
-/***/ },
-
-/***/ "./editor/blocks/src/event-dates/block.json"
-/*!**************************************************!*\
-  !*** ./editor/blocks/src/event-dates/block.json ***!
-  \**************************************************/
-(module) {
-
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"bc-events/event-dates","version":"0.1.0","title":"Event Dates Meta Block","category":"bluecadetEvents","icon":"calendar","description":"Sets the start and end dates for an event, stored as post meta.","keywords":["event","date","dates","schedule"],"supports":{"html":false,"align":false,"multiple":false},"editorScript":"file:./index.js","editorStyle":"file:./index.css","render":"file:./render.php"}');
-
 /***/ }
 
 /******/ 	});
@@ -14232,28 +14519,142 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/tru
 var __webpack_exports__ = {};
 // This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
-/*!************************************************!*\
-  !*** ./editor/blocks/src/event-dates/index.js ***!
-  \************************************************/
+/*!*************************************************!*\
+  !*** ./editor/scripts/src/eventsPluginPanel.js ***!
+  \*************************************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/blocks */ "@wordpress/blocks");
-/* harmony import */ var _edit_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./edit.js */ "./editor/blocks/src/event-dates/edit.js");
-/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./editor.scss */ "./editor/blocks/src/event-dates/editor.scss");
-/* harmony import */ var _block_json__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./block.json */ "./editor/blocks/src/event-dates/block.json");
-/* harmony import */ var _components_BlockIcon_BlockIcon_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../components/BlockIcon/BlockIcon.jsx */ "./editor/components/BlockIcon/BlockIcon.jsx");
+/* harmony import */ var _wordpress_plugins__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/plugins */ "@wordpress/plugins");
+/* harmony import */ var _wordpress_editor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/editor */ "@wordpress/editor");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_core_data__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/core-data */ "@wordpress/core-data");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _components_utils_store_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/_utils/store.js */ "./editor/components/_utils/store.js");
+/* harmony import */ var _components_fieldSets_EventFields_EventFields_jsx__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../components/_fieldSets/EventFields/EventFields.jsx */ "./editor/components/_fieldSets/EventFields/EventFields.jsx");
+/* harmony import */ var _components_fieldSets_LocationFields_LocationFields_jsx__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../components/_fieldSets/LocationFields/LocationFields.jsx */ "./editor/components/_fieldSets/LocationFields/LocationFields.jsx");
+/* harmony import */ var _components_fieldSets_SeriesFields_SeriesFields_jsx__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../components/_fieldSets/SeriesFields/SeriesFields.jsx */ "./editor/components/_fieldSets/SeriesFields/SeriesFields.jsx");
+/* harmony import */ var _eventsPluginPanel_scss__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./eventsPluginPanel.scss */ "./editor/scripts/src/eventsPluginPanel.scss");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 
 
 
 
 
-(0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.registerBlockType)(_block_json__WEBPACK_IMPORTED_MODULE_3__.name, {
-  ..._block_json__WEBPACK_IMPORTED_MODULE_3__,
-  icon: _components_BlockIcon_BlockIcon_jsx__WEBPACK_IMPORTED_MODULE_4__["default"],
-  edit: _edit_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  save: () => null
+
+
+
+
+
+
+
+
+
+/**
+ * Each post type maps to the field set its modal renders. Adding a post type here
+ * is all it takes to give it an always-available settings panel.
+ */
+
+const PANEL_MAP = {
+  'bc-events': {
+    Fields: _components_fieldSets_EventFields_EventFields_jsx__WEBPACK_IMPORTED_MODULE_8__["default"],
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Event Settings', 'basecadet')
+  },
+  'bc-events-locations': {
+    Fields: _components_fieldSets_LocationFields_LocationFields_jsx__WEBPACK_IMPORTED_MODULE_9__["default"],
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Location Settings', 'basecadet')
+  },
+  'bc-events-series': {
+    Fields: _components_fieldSets_SeriesFields_SeriesFields_jsx__WEBPACK_IMPORTED_MODULE_10__["default"],
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Series Settings', 'basecadet')
+  }
+};
+
+/**
+ * The modal stages edits in a local buffer seeded from the post's current meta.
+ * Save commits the buffer to the post's pending meta (persisted when the post is
+ * saved/updated); Cancel discards it. The StagingContext makes every field
+ * component read/write the buffer instead of live meta, with no changes to them.
+ */
+function SettingsModal({
+  title,
+  Fields,
+  postType,
+  onClose
+}) {
+  const [entityMeta, setEntityMeta] = (0,_wordpress_core_data__WEBPACK_IMPORTED_MODULE_5__.useEntityProp)('postType', postType, 'meta');
+  const [buffer, setBuffer] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(() => ({
+    ...entityMeta
+  }));
+  const save = () => {
+    setEntityMeta(buffer);
+    onClose();
+  };
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Modal, {
+    title: title,
+    size: "large",
+    onRequestClose: onClose,
+    className: "bc-events-settings-modal",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_utils_store_js__WEBPACK_IMPORTED_MODULE_7__.StagingContext.Provider, {
+      value: {
+        meta: buffer,
+        setMeta: setBuffer
+      },
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
+        className: "bc-event-dates",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(Fields, {})
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("div", {
+      className: "bc-events-settings-modal__actions",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+        variant: "tertiary",
+        onClick: onClose,
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Cancel', 'basecadet')
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+        variant: "primary",
+        onClick: save,
+        children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Save', 'basecadet')
+      })]
+    })]
+  });
+}
+function EventSettingsPanel() {
+  const postType = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_4__.useSelect)(select => select(_wordpress_editor__WEBPACK_IMPORTED_MODULE_1__.store).getCurrentPostType(), []);
+  const [isOpen, setOpen] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(false);
+  const config = PANEL_MAP[postType];
+  if (!config) {
+    return null;
+  }
+  let buttonTitle = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Edit Event Settings', 'basecadet');
+  if (postType === 'bc-events-locations') {
+    buttonTitle = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Edit Location Settings', 'basecadet');
+  } else if (postType === 'bc-events-series') {
+    buttonTitle = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Edit Series Settings', 'basecadet');
+  }
+  const {
+    Fields,
+    title
+  } = config;
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(_wordpress_editor__WEBPACK_IMPORTED_MODULE_1__.PluginDocumentSettingPanel, {
+    name: "bc-event-settings",
+    title: title,
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+      variant: "secondary",
+      onClick: () => setOpen(true),
+      children: buttonTitle
+    }), isOpen && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(SettingsModal, {
+      title: title,
+      Fields: Fields,
+      postType: postType,
+      onClose: () => setOpen(false)
+    })]
+  });
+}
+(0,_wordpress_plugins__WEBPACK_IMPORTED_MODULE_0__.registerPlugin)('bc-events-settings-panel', {
+  render: EventSettingsPanel
 });
 })();
 
 /******/ })()
 ;
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=eventsPluginPanel.js.map

@@ -1,0 +1,39 @@
+// Chrome for the Event Settings modal. The field styles themselves come from the
+// shared field sets (imported by the *Fields components).
+
+.bc-events-settings-modal__actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 24px;
+	padding: 16px 24px;
+	border-top: 1px solid #e0e0e0;
+	position: sticky;
+	bottom: 0;
+	background: #fff;
+}
+
+.bc-events-settings-modal {
+
+	.components-modal__frame {
+		border: 1px solid #8c8f94;
+	}
+
+	.components-modal__header {
+		border-bottom: 1px solid #8c8f94;
+	}
+
+	.components-modal__content {
+		padding: 0;
+	}
+
+	.bc-event-dates {
+		border: 0;
+		padding: 0;
+	}
+
+	.bc-event-dates__container {
+    border: 0;
+		border-radius: 0;
+	}
+}
