@@ -12,6 +12,8 @@ class Gutenberg {
 
     add_filter( 'block_categories_all', [$this, 'add_block_category'], 10, 1 );
 
+    add_filter( 'allowed_block_types_all', [$this, 'filter_allowed_block_types'], 10, 2 );
+
   }
 
 
@@ -47,6 +49,58 @@ class Gutenberg {
       ],
       $categories
     );
+  }
+
+
+
+  /**
+   * Restrict the plugin's meta blocks to their owning post type.
+   *
+   * Each block is insertable only on its post type; everywhere else (other event
+   * types, pages, posts) it is removed from the inserter. All non-plugin blocks
+   * are left untouched.
+   *
+   * Note: this filter is all-or-nothing — returning an array makes *only* those
+   * blocks allowed. So we start from the full registered set and subtract, rather
+   * than build a small allow-list (which would disable every core block).
+   *
+   * @param bool|string[]            $allowed_blocks
+   * @param \WP_Block_Editor_Context $editor_context
+   * @return bool|string[]
+   */
+  public function filter_allowed_block_types( bool|array $allowed_blocks, \WP_Block_Editor_Context $editor_context ) {
+
+    // No post context (e.g. site/widget editor) — nothing to scope.
+    if ( empty( $editor_context->post ) ) {
+      return $allowed_blocks;
+    }
+
+    $post_type = $editor_context->post->post_type;
+
+    // Block name => the only post type it may appear in.
+    $owned_by = [
+      'bc-events/event-dates' => Settings::$events_machine_name,
+      'bc-events/location'    => Settings::$locations_machine_name,
+      'bc-events/series'      => Settings::$series_machine_name,
+    ];
+
+    // If everything is currently allowed, expand to the full registered set so we
+    // can subtract from it without dropping core/third-party blocks.
+    if ( ! is_array( $allowed_blocks ) ) {
+      $allowed_blocks = array_keys(
+        \WP_Block_Type_Registry::get_instance()->get_all_registered()
+      );
+    }
+
+    $allowed_blocks = array_filter(
+      $allowed_blocks,
+      static function ( $name ) use ( $owned_by, $post_type ) {
+        // Drop a plugin block when we're not on its owning post type.
+        return ! isset( $owned_by[ $name ] ) || $owned_by[ $name ] === $post_type;
+      }
+    );
+
+    return array_values( $allowed_blocks );
   }
 
 }

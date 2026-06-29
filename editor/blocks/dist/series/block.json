@@ -3,10 +3,10 @@
   "apiVersion": 3,
   "name": "bc-events/series",
   "version": "0.1.0",
-  "title": "Series",
-  "category": "widgets",
+  "title": "Series Meta Block",
+  "category": "bluecadetEvents",
   "icon": "visibility",
-  "description": "Block to display event series.",
+  "description": "Set meta data for an event series",
   "example": {},
   "supports": {
     "html": false

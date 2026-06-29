@@ -3,10 +3,10 @@
   "apiVersion": 3,
   "name": "bc-events/location",
   "version": "0.1.0",
-  "title": "Location",
-  "category": "widgets",
+  "title": "Location Meta Block",
+  "category": "bluecadetEvents",
   "icon": "location",
-  "description": "Example block scaffolded with Create Block tool.",
+  "description": "Set meta data for an event location",
   "example": {},
   "supports": {
     "html": false
