@@ -109,7 +109,12 @@ class Events {
 
 
   public function handle_wp_after_insert_post(int $post_id, \WP_Post $post, bool $update, null|\WP_Post $post_before) : void {
-  
+
+    // The recurrence engine owns child rows; skip while it is generating them.
+    if ( EventsSaveAction::$generating ) {
+      return;
+    }
+
     if ( $post->post_type !== \BluecadetEvents\Plugin\Settings::$events_machine_name ) {
       return;
     }

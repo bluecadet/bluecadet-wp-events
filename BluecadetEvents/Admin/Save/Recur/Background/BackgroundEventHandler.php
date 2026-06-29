@@ -57,8 +57,8 @@ class BackgroundEventHandler extends \WP_Background_Process {
 
       if ( is_array($unused_checks) && !empty($unused_checks) ) {
         foreach ($unused_checks as $check) {
-          $post_id = (int)$check->child_ID;
-          $DB_HELPERS->delete_recurring_event($post_id);
+          $post_id = (int)$check->post_id;
+          $DB_HELPERS->delete_event($post_id);
           \wp_delete_post( $post_id, true );
         }
       }

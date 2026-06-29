@@ -154,8 +154,8 @@ class AdminEventsViews {
       if ( $is_recurring_child ) {
 
         if ( isset($_GET[$this->recurring_children_of_param]) && !$is_trash) {
-          if (isset($is_recurring_child[0])) {
-            echo '<a href="' . get_edit_post_link($is_recurring_child[0]) . '">Edit Recurring Parent</a>';
+          if ($is_recurring_child) {
+            echo '<a href="' . get_edit_post_link($is_recurring_child) . '">Edit Recurring Parent</a>';
           }
           echo '<br /><a href="' . admin_url('edit.php?post_type=' . Settings::$events_machine_name) . '">Back to Events</a>';
         }

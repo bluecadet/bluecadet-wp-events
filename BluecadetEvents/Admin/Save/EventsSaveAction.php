@@ -18,6 +18,16 @@ use BluecadetEvents\Plugin\BackgroundProcesses;
  *
  */
 class EventsSaveAction {
+
+  /**
+   * When true, the wp_after_insert_post save handler bails. Set by the recurrence
+   * engine while it creates/updates child posts, so the generic save path never
+   * writes child rows — the engine owns them via DatabaseHelpers::upsert_child().
+   *
+   * @var bool
+   */
+  public static bool $generating = false;
+
   private ?DatabaseHelpers $DB_HELPERS;
   private RecurringEvent $RDATE;
   private RecurringEventsArray $recurring_events_array;
@@ -297,21 +307,27 @@ class EventsSaveAction {
 
     if ( $this->RDATE->is_child ) {
       $this->set_meta_update('is_child', '1');
-    } else {
-      $this->set_meta_update('is_child', '0');
+      // Children are written exclusively by the recurrence engine (upsert_child).
+      // A manual save (e.g. editing a child's body) must not clobber the
+      // recur-owned occurrence/lifecycle columns, so we skip the row write here.
+      return;
     }
 
-    // Add event to DB
+    $this->set_meta_update('is_child', '0');
+
+    // Add standalone event / series master to DB. is_parent flags a series master
+    // (has a recurrence rule); standalone events get 0.
     $this->event_post = new EventPost(
       modified: current_time('Y-m-d H:i:s'),
       post_id: $this->RDATE->parent_post_id,
       post_slug: $this->RDATE->parent_post->post_name,
       event_start: (int) $start_timestamp,
       event_end: (int) $end_timestamp,
-      parent_ID: $this->RDATE->is_child && is_array($this->RDATE->is_child) ? (int) $this->RDATE->is_child[0] : 0,
+      parent_ID: 0,
+      is_parent: (bool) $this->RDATE->is_recurring,
     );
 
-    $insert = $this->DB_HELPERS->insert_event($this->event_post);
+    $insert = $this->DB_HELPERS->upsert_event($this->event_post);
 
   }
 

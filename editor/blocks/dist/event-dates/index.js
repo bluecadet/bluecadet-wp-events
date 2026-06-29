@@ -13990,7 +13990,7 @@ function combine (array, callback) {
   \**************************************************/
 (module) {
 
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"bc-events/event-dates","version":"0.1.0","title":"Event Dates","category":"basecadetContent","icon":"calendar","description":"Sets the start and end dates for an event, stored as post meta.","keywords":["event","date","dates","schedule"],"supports":{"html":false,"align":false,"multiple":false},"editorScript":"file:./index.js","editorStyle":"file:./index.css","render":"file:./render.php"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"bc-events/event-dates","version":"0.1.0","title":"Event Dates Meta Block","category":"bluecadetEvents","icon":"calendar","description":"Sets the start and end dates for an event, stored as post meta.","keywords":["event","date","dates","schedule"],"supports":{"html":false,"align":false,"multiple":false},"editorScript":"file:./index.js","editorStyle":"file:./index.css","render":"file:./render.php"}');
 
 /***/ }
 

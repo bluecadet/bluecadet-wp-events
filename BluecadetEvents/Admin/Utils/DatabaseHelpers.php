@@ -8,6 +8,11 @@ use BluecadetEvents\Admin\Save\Recur\Objects\EventPost;
 /**
  * Database helper functions
  *
+ * Single events table (`bc_events`). Every event occurrence is one row keyed by
+ * its post_id. Standalone events and series masters have parent_ID = 0 (masters
+ * additionally have is_parent = 1); recurring children carry parent_ID = the
+ * master's post_id plus the recurrence-generation columns date_slug / update_check.
+ *
  * @package BluecadetEvents
  * @since  1.0.0
  *
@@ -16,15 +21,12 @@ class DatabaseHelpers {
 
   private static ?DatabaseHelpers $_instance = null;
   private string $events_table;
-  private string $recurring_table;
-  // private $meta_table       = 'bce_event_meta_types';
   private string $now_format       = 'Y-m-d H:i:s';
 
 
   private function  __construct() {
     // Locked
-    $this->events_table     = Settings::$events_table;
-    $this->recurring_table  = Settings::$recurring_events_table;
+    $this->events_table = Settings::$events_table;
   }
 
   private function  __clone() {
@@ -40,394 +42,281 @@ class DatabaseHelpers {
   }
 
 
-
-  /**
-   * Insert Event row into database. Will insert new or update existing
-   *
-   * @param EventPost $event_post
-   * @return integer|false
-   */
-  public function insert_event(EventPost $event_post) : int|false {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->events_table;
-
-    $data = [
-      'modified' => $event_post->modified,
-      'post_id' => $event_post->post_id,
-      'post_slug' => $event_post->post_slug,
-      'event_start' => $event_post->event_start,
-      'event_end' => $event_post->event_end,
-      'parent_ID' => $event_post->parent_ID,
-    ];
-
-    $format = ['%s','%d','%s','%d','%d','%d'];
-
-    if ( $this->event_row_exists($event_post->post_id) ) {
-      $where = ['post_id' => $event_post->post_id];
-      $result = $wpdb->update($table, $data, $where, $format, ['%d']);
-      return $result;
-    }
-
-    $result = $wpdb->insert($table, $data, $format);
-
-    return $result;
+  private function now() : string {
+    $now = new \DateTime('now', \wp_timezone());
+    return $now->format($this->now_format);
   }
 
 
+  // =======================================
+  //             Writes
+  // =======================================
+
 
   /**
-   * Delete event row from database
+   * Insert or update an event
+   *
+   * Children are written by upsert_child() from the recurrence engine, never here.
+   *
+   * @param EventPost $event_post
+   * @return bool
+   */
+  public function upsert_event(EventPost $event_post) : bool {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->events_table;
+
+    $result = $wpdb->query(
+      $wpdb->prepare(
+        "INSERT INTO {$table}
+          (modified, post_id, post_slug, event_start, event_end, parent_ID, is_parent)
+         VALUES (%s, %d, %s, %d, %d, %d, %d)
+         ON DUPLICATE KEY UPDATE
+          modified = VALUES(modified),
+          post_slug = VALUES(post_slug),
+          event_start = VALUES(event_start),
+          event_end = VALUES(event_end),
+          parent_ID = VALUES(parent_ID),
+          is_parent = VALUES(is_parent)",
+        $event_post->modified,
+        $event_post->post_id,
+        $event_post->post_slug,
+        $event_post->event_start,
+        $event_post->event_end,
+        $event_post->parent_ID,
+        $event_post->is_parent ? 1 : 0
+      )
+    );
+
+    return $result !== false;
+  }
+
+
+  /**
+   * Insert or update a recurring child row.
+   *
+   * The recurrence engine is the sole writer of child rows. Keyed on the child
+   * post_id, so a regenerated occurrence reusing an existing post updates in place.
+   *
+   * @param EventClone $item
+   * @param int        $child_id
+   * @return bool
+   */
+  public function upsert_child(EventClone $item, int $child_id) : bool {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->events_table;
+
+    $post_slug = isset($item->post['post_name']) ? (string) $item->post['post_name'] : '';
+
+    $result = $wpdb->query(
+      $wpdb->prepare(
+        "INSERT INTO {$table}
+          (modified, post_id, post_slug, event_start, event_end, parent_ID, is_parent, date_slug, update_check)
+         VALUES (%s, %d, %s, %d, %d, %d, 0, %s, 1)
+         ON DUPLICATE KEY UPDATE
+          modified = VALUES(modified),
+          post_slug = VALUES(post_slug),
+          event_start = VALUES(event_start),
+          event_end = VALUES(event_end),
+          parent_ID = VALUES(parent_ID),
+          date_slug = VALUES(date_slug),
+          update_check = VALUES(update_check)",
+        $this->now(),
+        $child_id,
+        $post_slug,
+        $item->start_date->getTimestamp(),
+        $item->end_date->getTimestamp(),
+        $item->parent_id,
+        (string) $item->event_slug
+      )
+    );
+
+    return $result !== false;
+  }
+
+
+  /**
+   * Bump the modified timestamp for a child row.
+   *
+   * @param int $child_id
+   * @return bool
+   */
+  public function update_child_modified(int $child_id) : bool {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->events_table;
+
+    $result = $wpdb->update(
+      $table,
+      ['modified' => $this->now()],
+      ['post_id' => $child_id],
+      ['%s'],
+      ['%d']
+    );
+
+    return $result !== false;
+  }
+
+
+  // =======================================
+  //             Deletes
+  // =======================================
+
+
+  /**
+   * Delete an event row (standalone, master, or child) by post_id.
    *
    * @param integer $post_id
-   * @return integer|false
+   * @return int|false
    */
   public function delete_event(int $post_id) : int|false {
     global $wpdb;
     $table = $wpdb->prefix . $this->events_table;
 
-    $where = ['post_id' => $post_id];
-    $result = $wpdb->delete($table, $where, ['%d']);
-
-    return $result;
+    return $wpdb->delete($table, ['post_id' => $post_id], ['%d']);
   }
 
 
+  // =======================================
+  //             Relationship lookups
+  // =======================================
+
 
   /**
-   * Check if event row exists in database
+   * Get the master post id for a child, or false if not a child.
    *
-   * @param integer $post_id
-   * @return boolean
+   * @param int $event_id
+   * @return int|false
    */
-  public function event_row_exists(int $post_id) : bool {
+  public function is_recurring_child(int $event_id) : int|false {
     global $wpdb;
     $table = $wpdb->prefix . $this->events_table;
 
-    $exists = $wpdb->get_var(
+    $parent_id = $wpdb->get_var(
       $wpdb->prepare(
-        "SELECT 1 FROM $table WHERE post_id=%d LIMIT 1",
-        $post_id
-      )
-    );
-
-    if ( !$exists ) { return false; }
-
-    return true;
-  }
-
-  // =======================================
-  //             Recurring Events
-  // =======================================
-
-
-
-  /**
-   * Check if event id is in the `parent_ID` column of recurring events table
-   *
-   * @param int $event_id
-   * @return array|false
-   */
-  public function is_recurring_parent($event_id) : bool|array {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
-
-    $results = $wpdb->get_results(
-      $wpdb->prepare(
-        "SELECT * FROM $table WHERE parent_ID=%d",
+        "SELECT parent_ID FROM {$table} WHERE post_id=%d AND parent_ID!=0 LIMIT 1",
         $event_id
       )
     );
 
-    if ( !$results ) { return false; }
+    if ( $parent_id === null ) { return false; }
 
-    $eids = [];
-
-    foreach ( $results as $r ) {
-      $eids[] = (int)$r->child_ID;
-    }
-
-    if ( !empty($eids) ) {
-      return $eids;
-    }
-
-    return false;
-
+    return (int) $parent_id;
   }
 
 
   /**
-   * Check if event id is in the `child_ID` column of recurring events table
+   * Get the child post ids for a master, or false if it has none.
    *
    * @param int $event_id
    * @return array|false
    */
-  public function is_recurring_child($event_id) {
+  public function is_recurring_parent(int $event_id) : bool|array {
     global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
+    $table = $wpdb->prefix . $this->events_table;
 
-    $results = $wpdb->get_results(
+    $child_ids = $wpdb->get_col(
       $wpdb->prepare(
-        "SELECT * FROM $table WHERE child_ID=%d",
+        "SELECT post_id FROM {$table} WHERE parent_ID=%d",
         $event_id
       )
     );
 
-    if ( !$results ) { return false; }
+    if ( empty($child_ids) ) { return false; }
 
-    $eids = [];
-
-    foreach ( $results as $r ) {
-      $eids[] = (int)$r->parent_ID;
-    }
-
-    if ( !empty($eids) ) {
-      return $eids;
-    }
-
-    return false;
-
+    return array_map('intval', $child_ids);
   }
 
 
+  /**
+   * Alias of is_recurring_parent(): the child post ids for a master.
+   *
+   * @param int $parent_id
+   * @return array|false
+   */
+  public function get_recurring_child_ids(int $parent_id) : bool|array {
+    return $this->is_recurring_parent($parent_id);
+  }
+
 
   /**
-   * Check if event id is in the `child_ID` column of recurring events table
+   * Get the master post for a child.
    *
    * @param int $event_id
    * @return false|\WP_Post
    */
   public function get_recurring_parent(int $event_id) : false|\WP_Post {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
+    $parent_id = $this->is_recurring_child($event_id);
 
-    $results = $wpdb->get_results(
-      $wpdb->prepare(
-        "SELECT * FROM $table WHERE child_ID=%d",
-        $event_id
-      )
-    );
+    if ( !$parent_id ) { return false; }
 
-    if ( !$results ) { return false; }
+    $parent_post = get_post($parent_id);
 
-    if ( isset($results[0]) ) {
-      $parent_id = (int)$results[0]->parent_ID;
-      $parent_post = get_post($parent_id);
-      return $parent_post;
-    }
-
-    return false;
-
+    return $parent_post instanceof \WP_Post ? $parent_post : false;
   }
 
 
   /**
-   * Get results of parent/child db rows
+   * Get the latest occurrence start for a master's children.
    *
    * @param int $parent_id
-   * @return array|false
+   * @return int|false
    */
-  public function get_recurring_child_ids($parent_id) {
+  public function get_last_child_event(int $parent_id) : false|int {
     global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
+    $table = $wpdb->prefix . $this->events_table;
 
-    $results = $wpdb->get_results(
+    $last = $wpdb->get_var(
       $wpdb->prepare(
-        "SELECT child_ID FROM $table WHERE parent_ID=%d",
+        "SELECT MAX(event_start) FROM {$table} WHERE parent_ID=%d",
         $parent_id
       )
     );
 
-    if ( !$results ) { return false; }
+    if ( $last === null ) { return false; }
 
-    $cids = [];
-
-    foreach ( $results as $r ) {
-      $cids[] = (int)$r->child_ID;
-    }
-
-    if ( !empty($cids) ) { return $cids; }
-
-    return false;
-
+    return (int) $last;
   }
 
-  /**
-   * Create DB row with parent/child ids
-   *
-   * @param int $parent_id
-   * @param int $child_id
-   * @return int|false
-   */
-  public function write_recurring_child($parent_id, $child_id, false|string $date_slug = false, $update_check = false) {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
-    $timezone = \wp_timezone();
-    $now = new \DateTime('now', $timezone);
 
-    $data = array('parent_ID' => $parent_id, 'child_ID' => $child_id, 'modified' => $now->format($this->now_format));
-    $format = array('%d','%d','%s');
-
-    if ( $date_slug ) {
-      $data['date_slug'] = $date_slug;
-      $format[] = '%s';
-    }
-
-    if ( $update_check ) {
-      $data['update_check'] = 1;
-      $format[] = '%d';
-    }
-
-    $result = $wpdb->insert($table, $data, $format);
-
-    return $result;
-  }
+  // =======================================
+  //       Recurrence-generation diffing
+  // =======================================
 
 
   /**
-   * Update DB row with parent/child ids
+   * Clear update checks for a master's children after a generation pass.
    *
    * @param int $parent_id
-   * @param int $child_id
-   * @return int|false
-   */
-  public function update_recurring_child($parent_id, $child_id) {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
-    $timezone = \wp_timezone();
-    $now = new \DateTime('now', $timezone);
-
-    $data = array('modified' => $now->format($this->now_format));
-    $where = array('parent_ID' => $parent_id, 'child_ID' => $child_id);
-    $format = array('%s');
-    $result = $wpdb->update($table, $data, $where, $format, $format);
-
-    return $result;
-  }
-
-
-  /**
-   * Delete DB row with parent/child ids
-   *
-   * @param int $parent_id
-   * @param int $child_id
-   * @return int|false
-   */
-  public function delete_recurring_child($parent_id, $child_id) {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
-
-    $where = array('parent_ID' => $parent_id, 'child_ID' => $child_id);
-    $format = array('%d','%d');
-    $result = $wpdb->delete($table, $where, $format);
-
-    return $result;
-  }
-
-
-
-
-
-  // NEW ========================
-
-  public function write_new_recurring_child(EventClone $item, int $child_id) {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
-    $timezone = \wp_timezone();
-    $now = new \DateTime('now', $timezone);
-
-    $data = array(
-      'modified' => $now->format($this->now_format),
-      'parent_ID' => $item->parent_id,
-      'child_ID' => $child_id,
-      'event_start' => $item->start_date->getTimestamp(),
-      'event_end' => $item->end_date->getTimestamp(),
-      'post_status' => $item->post['post_status'],
-      'update_check' => 1,
-      'date_slug' => $item->event_slug,
-    );
-    $format = array('%s', '%d', '%d', '%d', '%d', '%s', '%d', '%s');
-
-    $result = $wpdb->insert($table, $data, $format);
-
-    return $result;
-  }
-
-
-  public function update_existing_recurring_child(EventClone $item, int $child_id) {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
-    $timezone = \wp_timezone();
-    $now = new \DateTime('now', $timezone);
-
-    $data = array('modified' => $now->format($this->now_format));
-    $format = array('%s');
-    
-
-    $data = array(
-      'modified' => $now->format($this->now_format),
-      'event_start' => $item->start_date->getTimestamp(),
-      'event_end' => $item->end_date->getTimestamp(),
-      'post_status' => $item->post['post_status'],
-      'update_check' => 1,
-      'date_slug' => $item->event_slug,
-    );
-    $where = array('parent_ID' => $item->parent_id, 'child_ID' => $child_id);
-    $format = array('%s', '%d', '%d', '%s', '%d', '%s');
-
-    $result = $wpdb->update($table, $data, $where, $format);
-
-    return $result;
-  }
-
-
-  public function update_existing_recurring_child_modified(int $child_id) {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
-    $timezone = \wp_timezone();
-    $now = new \DateTime('now', $timezone);
-
-    $data = array('modified' => $now->format($this->now_format));
-    $where = array('child_ID' => $child_id);
-    $format = array('%s');
-
-    $result = $wpdb->update($table, $data, $where, $format);
-
-    return $result;
-  }
-
-
-  /**
-   * Clear update checks for recurring events
-   *
-   * @param int $parent_id
-   * @return int|false
+   * @return bool
    */
   public function clear_recurring_update_checks(int $parent_id) : bool {
     global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
+    $table = $wpdb->prefix . $this->events_table;
 
-    $data = array('update_check' => 0);
-    $where = array('parent_ID' => $parent_id);
-    $format = array('%d');
-    $result = $wpdb->update($table, $data, $where, $format);
+    $result = $wpdb->update(
+      $table,
+      ['update_check' => 0],
+      ['parent_ID' => $parent_id],
+      ['%d'],
+      ['%d']
+    );
 
     return (bool) $result;
   }
 
 
   /**
-   * Get events with matching slug
+   * Children that were not touched during the latest generation pass (stale).
    *
    * @param int $parent_id
-   * @return int|false
+   * @return false|array Rows with a `post_id` property.
    */
   public function check_unused_update_checks(int $parent_id) : false|array {
     global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
+    $table = $wpdb->prefix . $this->events_table;
 
     $results = $wpdb->get_results(
       $wpdb->prepare(
-        "SELECT child_ID FROM $table WHERE parent_ID=%d AND update_check=0",
+        "SELECT post_id FROM {$table} WHERE parent_ID=%d AND update_check=0",
         $parent_id
       )
     );
@@ -438,20 +327,20 @@ class DatabaseHelpers {
   }
 
 
-
   /**
-   * Get events with matching slug
+   * Find an existing, not-yet-touched occurrence matching a date slug.
    *
    * @param string $slug
-   * @return int|false
+   * @param int    $child_id
+   * @return false|array Rows with a `post_id` property.
    */
   public function check_child_events_for_date_slug(string $slug, int $child_id) : false|array {
     global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
+    $table = $wpdb->prefix . $this->events_table;
 
     $results = $wpdb->get_results(
       $wpdb->prepare(
-        "SELECT child_ID FROM $table WHERE date_slug=%s AND child_ID=%d AND update_check=0",
+        "SELECT post_id FROM {$table} WHERE date_slug=%s AND post_id=%d AND update_check=0",
         $slug,
         $child_id
       )
@@ -462,57 +351,4 @@ class DatabaseHelpers {
     return $results;
   }
 
-
-
-
-  /**
-   * Delete DB row with parent/child ids
-   *
-   * @param int $post_id
-   * @return int|false
-   * 
-   * delete_recurring_event
-   */
-  public function delete_recurring_event(int $post_id) {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
-
-    $where = array('child_ID' => $post_id);
-    $format = array('%d');
-    $result = $wpdb->delete($table, $where, $format);
-
-    return $result;
-  }
-
-
-
-  /**
-   * Get last child event
-   *
-   * @param int $parent_id
-   * @return int|false
-   */
-  public function get_last_child_event(int $parent_id) : false|int {
-    global $wpdb;
-    $table = $wpdb->prefix . $this->recurring_table;
-
-    $results = $wpdb->get_results(
-      $wpdb->prepare(
-        "SELECT MAX(event_start) AS last_event_start FROM $table WHERE parent_ID=%d",
-        $parent_id
-      )
-    );
-
-    if ( !$results ) { return false; }
-
-    if ( isset($results[0]->last_event_start) ) {
-      return $results[0]->last_event_start;
-    }
-
-    return false;
-  }
-
-
-
-  // NEW ========================
 }

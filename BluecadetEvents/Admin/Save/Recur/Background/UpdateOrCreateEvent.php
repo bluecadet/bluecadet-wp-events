@@ -4,6 +4,7 @@ namespace BluecadetEvents\Admin\Save\Recur\Background;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
 use BluecadetEvents\Admin\Utils\Logger;
 use BluecadetEvents\Admin\Save\Recur\Objects\EventClone;
+use BluecadetEvents\Admin\Save\EventsSaveAction;
 use BluecadetEvents\Plugin\Settings;
 
 /**
@@ -22,11 +23,20 @@ class UpdateOrCreateEvent {
   public function __construct(object $item) {
     $this->DB_HELPERS = DatabaseHelpers::get_instance();
     $this->item = $item;
-    
-    if ( $this->item->child_id ) {
-      $this->update_only();
-    } else {
-      $this->update_or_add();
+
+    // This class is the sole writer of child rows (via upsert_child). Suppress
+    // the generic wp_after_insert_post save path for the duration so it does not
+    // also write/clobber the child's bc_events row.
+    EventsSaveAction::$generating = true;
+
+    try {
+      if ( $this->item->child_id ) {
+        $this->update_only();
+      } else {
+        $this->update_or_add();
+      }
+    } finally {
+      EventsSaveAction::$generating = false;
     }
   }
 
@@ -50,7 +60,7 @@ class UpdateOrCreateEvent {
     $this->copy_data();
 
     // Update modified date
-    $this->DB_HELPERS->update_existing_recurring_child_modified($this->item->child_id);
+    $this->DB_HELPERS->update_child_modified($this->item->child_id);
     
   }
 
@@ -62,7 +72,7 @@ class UpdateOrCreateEvent {
       $check_slugs = $this->DB_HELPERS->check_child_events_for_date_slug($this->item->event_slug, (int) $this->item->child_id);
 
       if ( is_array($check_slugs) && !empty($check_slugs) ) {
-        $this->copy_to_id = $check_slugs[0]->child_ID;
+        $this->copy_to_id = $check_slugs[0]->post_id;
         $this->item->post['ID'] = $this->copy_to_id;
 
 
@@ -70,7 +80,7 @@ class UpdateOrCreateEvent {
 
         // Update the post
         $this->insert_post();
-        $this->DB_HELPERS->update_existing_recurring_child($this->item, $this->copy_to_id);
+        $this->DB_HELPERS->upsert_child($this->item, $this->copy_to_id);
 
       } else {
         $this->add_post();  
@@ -87,7 +97,7 @@ class UpdateOrCreateEvent {
 
   private function add_post() {
     $this->copy_to_id = $this->insert_post();
-    $this->DB_HELPERS->write_new_recurring_child($this->item, $this->copy_to_id);
+    $this->DB_HELPERS->upsert_child($this->item, $this->copy_to_id);
   }
 
 

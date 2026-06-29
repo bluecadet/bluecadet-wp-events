@@ -74,7 +74,7 @@ class EditorScreen {
     }
 
     if ( $this->is_recurring_child ) {
-      $this->parent_link = get_edit_post_link($this->is_recurring_child[0]);
+      $this->parent_link = get_edit_post_link($this->is_recurring_child);
       $this->child_event_details();
     }
   }
