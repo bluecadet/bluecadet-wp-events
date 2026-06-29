@@ -72,11 +72,11 @@ class RecurringEvent {
   public bool|array $is_parent = false;
 
   /**
-   * Whether the event is a parent event
+   * Master post id when this event is a recurring child, false otherwise.
    *
-   * @var boolean|array
+   * @var int|false
    */
-  public bool|array $is_child = false;
+  public int|false $is_child = false;
 
   /**
    * Frequency arguments for the event

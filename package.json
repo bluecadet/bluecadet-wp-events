@@ -6,17 +6,39 @@
   "author": "",
   "type": "module",
   "scripts": {
+    "dev": "bldr dev --start",
+    "dev:once": "bldr dev --once",
     "blocks:watch": "wp-scripts start --source-path=editor/blocks/src --output-path=editor/blocks/dist",
     "blocks:hot": "wp-scripts start --source-path=editor/blocks/src --output-path=editor/blocks/dist --hot",
     "blocks:build": "wp-scripts build --source-path=editor/blocks/src --output-path=editor/blocks/dist",
     "scripts:watch": "wp-scripts start --source-path=editor/scripts/src --output-path=editor/scripts/dist",
     "scripts:build": "wp-scripts build --source-path=editor/scripts/src --output-path=editor/scripts/dist",
-    "build": "npm run blocks:build && npm run scripts:build"
+    "build": "npm run blocks:build && npm run scripts:build && bldr build"
   },
   "devDependencies": {
-    "@wordpress/scripts": "^32.2.0"
+    "@biomejs/biome": "2.4.16",
+    "@bluecadet/bldr": "^2.0.0-alpha.21",
+    "@bluecadet/postcss-do-math": "^0.0.1",
+    "@wordpress/scripts": "^32.2.0",
+    "autoprefixer": "^10.5.0",
+    "cssnano": "^8.0.1",
+    "postcss-advanced-variables": "^5.0.0",
+    "postcss-assets": "^6.0.0",
+    "postcss-class-apply": "^4.0.1",
+    "postcss-custom-media": "^12.0.1",
+    "postcss-discard-comments": "^8.0.0",
+    "postcss-easy-import": "^4.0.0",
+    "postcss-extend": "^1.0.5",
+    "postcss-hexrgba": "^2.1.0",
+    "postcss-mixins": "^12.1.2",
+    "postcss-nested": "^7.0.2",
+    "postcss-preset-env": "^11.3.0",
+    "postcss-utopia": "^1.1.0",
+    "rollup-plugin-inject-process-env": "^1.3.1",
+    "stylelint-config-standard": "^40.0.0"
   },
   "dependencies": {
-    "react-select": "^5.10.2"
+    "react-select": "^5.10.2",
+    "tom-select": "^2.4.1"
   }
 }

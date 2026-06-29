@@ -36,7 +36,7 @@ class BackgroundDeleteHandler extends \WP_Background_Process {
       Logger::log('DELETED POST ID: ' . $post_id);
     }
     
-    $DB_HELPERS->delete_recurring_event($post_id);
+    $DB_HELPERS->delete_event($post_id);
 
     return false;
   }
