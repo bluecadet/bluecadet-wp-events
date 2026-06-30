@@ -31,7 +31,7 @@ export default function OmitDates() {
         { values.map( ( omitDate, index ) => (
           <div className="bc-event-dates__exclusion" key={`${idPrefix}-exclusion-${index}`}>
             <div className="bc-event-dates__input-row">
-              <label htmlFor={`${idPrefix}-date-${index}`} className='u-sr-only'>Omit Date {index + 1}</label>
+              <label htmlFor={`${idPrefix}-date-${index}`} className='bce-sr-only'>Omit Date {index + 1}</label>
               <input
                 className={ `bc-event-dates__input` }
                 type="date"

@@ -29,7 +29,7 @@ class EditorAssets {
     // Bundles to load in the block editor: the legacy script bundle (index) and the
     // always-available settings panel. Each has its own generated asset manifest.
     $bundles = [
-      'bc-events-editor-plugin'  => 'index',
+      'bc-events-editor-plugin'  => 'eventsEditor',
       'bc-events-settings-panel' => 'eventsPluginPanel',
     ];
 
