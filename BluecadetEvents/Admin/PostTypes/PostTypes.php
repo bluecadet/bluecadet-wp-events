@@ -87,7 +87,7 @@ class PostTypes {
     $use_locations = Plugin\Hooks::hook_filter_use_event_locations();
 
     if ( $use_locations ) {
-      $loc_slug = Plugin\Hooks::hook_filter_event_locations_rewrite_slug();
+      $loc_slug = Plugin\Hooks::hook_filter_locations_rewrite_slug();
 
       $labels = new LabelMaker('Event Locations', 'Event Location');
       $labels->labels['all_items'] = 'Event Locations';

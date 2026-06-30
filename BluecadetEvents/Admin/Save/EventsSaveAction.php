@@ -5,6 +5,7 @@ use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
 use BluecadetEvents\Admin\Save\Recur\Objects\RecurringEvent;
 use BluecadetEvents\Admin\Save\Recur\Objects\EventPost;
+use BluecadetEvents\Admin\Save\Recur\Objects\FrequencyArgs;
 use BluecadetEvents\Admin\Save\Recur\EventCloneBuilder;
 use BluecadetEvents\Admin\Save\Recur\Objects\RecurringEventsArray;
 use BluecadetEvents\Admin\Utils\Logger;
@@ -131,19 +132,25 @@ class EventsSaveAction {
     //  Build arrays for RecurringDatesBuilder and `recur_strategy_was`
     // +===============================================================+
 
+    $freq_args = new FrequencyArgs();
+
+    $freq_args->setUseFrequency((bool) ($this->RDATE->get_meta('use_frequency') ?: false));
+    $freq_args->setFrequency((string) ($this->RDATE->get_meta('freq') ?: ''));
+    $freq_args->setWeeklyDays((array)  ($this->RDATE->get_meta('freq_days') ?: []));
+    $freq_args->setMonthSchedule((string) ($this->RDATE->get_meta('freq_mo_schedule') ?: ''));
+    $freq_args->setMonthDay((string) ($this->RDATE->get_meta('freq_mo_day') ?: ''));
+    $freq_args->setMonthDate((string) ($this->RDATE->get_meta('freq_mo_date') ?: ''));
+    $freq_args->setEndType((string) ($this->RDATE->get_meta('freq_end_type') ?: ''));
+    $freq_args->setEndDate((string) ($this->RDATE->get_meta('freq_end_date') ?: ''));
+    $freq_args->setEndAfterX((int) ($this->RDATE->get_meta('freq_end_after_x') ?: 0));
+    $freq_args->setStartDateTimestamp((string) ($this->RDATE->get_meta('start_timestamp') ?: ''));
+    $freq_args_array = $freq_args->to_array();
+
+    // $this->RDATE->freq_args->setUseFrequency((bool) ($this->RDATE->get_meta('use_frequency') ?: false));
+    // $this->RDATE->freq_args->setFrequency((string) ($this->RDATE->get_meta('freq') ?: ''));
+
     // Setup frequency args array for RRuleBuilder and recur_strategy_was meta value
-    $this->RDATE->freq_args = [
-      'use_frequency'         => (bool) ($this->RDATE->get_meta('use_frequency') ?: false),
-      'frequency'             => (string) ($this->RDATE->get_meta('freq') ?: ''),
-      'weekly_days'           => (array)  ($this->RDATE->get_meta('freq_days') ?: []),
-      'month_schedule'        => (string) ($this->RDATE->get_meta('freq_mo_schedule') ?: ''),
-      'month_day'             => (string) ($this->RDATE->get_meta('freq_mo_day') ?: ''),
-      'month_date'            => (string) ($this->RDATE->get_meta('freq_mo_date') ?: ''),
-      'end_type'              => (string) ($this->RDATE->get_meta('freq_end_type') ?: ''),
-      'end_date'              => (string) ($this->RDATE->get_meta('freq_end_date') ?: ''),
-      'end_after_x'           => (string) ($this->RDATE->get_meta('freq_end_after_x') ?: ''),
-      'start_date_timestamp'  => (string) ($this->RDATE->get_meta('start_timestamp') ?: ''),
-    ];
+    $this->RDATE->freq_args = $freq_args_array;
 
     // Set recur_strategy_was for comparison on next save
     $this->RDATE->recur_strategy_was = [
@@ -153,8 +160,10 @@ class EventsSaveAction {
       'primary_end_time'      => (string) ($this->RDATE->get_meta('end_time') ?: ''),
       'omissions' => (array) ($this->RDATE->get_meta('omissions') ?: []),
       'occurences' => (array) ($this->RDATE->get_meta('custom_occurrences') ?: []),
-      ...$this->RDATE->freq_args,
+      ...$freq_args_array,
     ];
+
+    Logger::log($this->RDATE->recur_strategy_was);
 
     $this->set_meta_update('recur_strategy_was', $this->RDATE->recur_strategy_was);
 

@@ -11,19 +11,25 @@ import SectionToggle from '../../SectionToggle/SectionToggle.jsx';
 import RecurringButton from '../../_formParts/RecurringButton/RecurringButton.jsx';
 import RemoveRecurring from '../RemoveRecurring/RemoveRecurring.jsx';
 import RecurringAltered from './RecurringAltered.jsx';
+import BasicText from '../../_formParts/BasicText/BasicText.js';
 
-export default function Recurring() {
+export default function Recurring({ useRecurDesc = false}) {
   const { keys, meta, setMeta } = getStore();
   const { set } = useDispatch(preferencesStore);
 
   const META_IS_RECURRING = getKey( 'is_recurring', keys );
   const META_IS_RECURRING_WAS = getKey( 'is_recurring_was', keys );
+  const META_RECUR_DESC = getKey( 'recur_desc', keys );
 
   const IS_RECURRING = meta?.[ META_IS_RECURRING ] ?? false;
   const IS_RECURRING_WAS = meta?.[ META_IS_RECURRING_WAS ] ?? IS_RECURRING;
  
   const isFreqCondensed = useSelect(select =>
     select(preferencesStore).get('bc-events/frequency-condensed', 'condensed')
+  );
+
+  const isDescCondensed = useSelect(select =>
+    select(preferencesStore).get('bc-events/recur-desc-condensed', 'condensed')
   );
 
   const isCustomOccurrencesCondensed = useSelect(select =>
@@ -67,6 +73,21 @@ export default function Recurring() {
         IS_RECURRING && (
           <div className="bc-event-recurring__inner">
             <RecurringAltered />
+
+            { useRecurDesc && (
+              <div className="bc-event-recurring__section">              
+                <div className="bc-event__content-section">
+                  <BasicText 
+                    id="recur-desc" 
+                    value={meta?.[META_RECUR_DESC]} 
+                    onChange={(val) => setMeta({ ...meta, [META_RECUR_DESC]: val })} 
+                    label={__('Recurring Description', 'basecadet')} 
+                    helperText={useRecurDesc}
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="bc-event-recurring__section">
               <SectionToggle
                 title={ __( 'Frequency Options', 'basecadet' ) }
@@ -81,6 +102,7 @@ export default function Recurring() {
                 </div>
               ) }
             </div>
+
 
             <div className="bc-event-recurring__section">
               <SectionToggle

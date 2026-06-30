@@ -42,12 +42,12 @@ class Init {
     new Admin\Editor\EditorAssets;
     new Admin\Editor\RestRoutes;
     new Admin\Editor\ClassicEditor\RegisterMetaBoxes;
+    new Admin\Save\Events;
 
     BackgroundProcesses::__init();
 
     if ( \is_admin() ) {
-      new Admin\Views\AdminEventsViews;
-      new Admin\Save\Events;      
+      new Admin\Views\AdminEventsViews;      
     }
 
     new ICS\TemplateRedirect;

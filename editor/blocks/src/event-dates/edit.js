@@ -12,6 +12,7 @@ export default function Edit() {
 			<ServerSideRender
 				block="bc-events/event-dates"
 				attributes={ {} }
+				EmptyResponsePlaceholder={ () => null }
 			/>
 		</div>
 	);

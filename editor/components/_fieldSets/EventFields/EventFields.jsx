@@ -24,11 +24,12 @@ import './eventFields.scss';
  */
 export default function EventFields() {
   const keys = loadKeys();
-  const [ isLoading, setIsLoading ] = useState( ! keys );
+  const [ isLoading, setIsLoading ] = useState( true );
   const [ isLoadingError, setIsLoadingError ] = useState( false );
   const [ isChild, setIsChild ] = useState( false );
   const [ useLocations, setUseLocations ] = useState( false );
   const [ useSeries, setUseSeries ] = useState( false );
+  const [ useRecurDesc, setUseRecurDesc ] = useState( false );
   const postID = useSelect( select => select( 'core/editor' ).getCurrentPostId() );
   const { meta, setMeta } = getStore();
 
@@ -50,12 +51,11 @@ export default function EventFields() {
   };
 
   useEffect( () => {
-    // Keys are cached in the preferences store, so only fetch them once across
-    // every mount (block + modal). Other mounts read the cached value.
+    // Always fetch the event key map fresh. The preferences store is a single shared
+    // slot written by every post type's key set, so a cached value may be stale or
+    // from another post type — re-fetching guarantees getKey() resolves correctly
+    // (a stale map silently breaks fields like recur_desc on load and save).
     const fetchKeys = async () => {
-      if ( keys ) {
-        return;
-      }
       try {
         const response = await apiFetch( { path: `/${ REST_NAMESPACE }/get-keys` } );
         setKeys( response );
@@ -84,6 +84,7 @@ export default function EventFields() {
         const response = await apiFetch( { path: `/${ REST_NAMESPACE }/get-support-settings` } );
         setUseLocations( response?.use_locations ?? false );
         setUseSeries( response?.use_series ?? false );
+        setUseRecurDesc( response?.use_recuring_description && response?.recurring_description_helper_text ? response.recurring_description_helper_text : false );
       } catch ( error ) {
         console.error( 'Error fetching support settings:', error );
       }
@@ -128,7 +129,7 @@ export default function EventFields() {
               { useLocations && <EventLocations /> }
               { useSeries && <EventSeries /> }
               <AfterEventDetailsSlot fillProps={{ keys, postID, meta, setMeta }} />
-              <Recurring />
+              <Recurring useRecurDesc={useRecurDesc} />
               <AfterRecurringSlot fillProps={{ keys, postID, meta, setMeta }} />
             </>
           ) }

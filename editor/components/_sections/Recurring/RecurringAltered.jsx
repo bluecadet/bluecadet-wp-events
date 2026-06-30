@@ -6,6 +6,7 @@ import CheckboxButton from '../../_formParts/CheckboxButton/CheckboxButton.jsx';
 import CheckboxFormGroup from '../../_formParts/CheckboxFormGroup/CheckboxFormGroup.js';
 import { useEffect, useState } from '@wordpress/element';
 import { isEqual } from 'lodash';
+import lodash from 'lodash';
 
 
 export default function RecurringAltered() {
@@ -33,8 +34,6 @@ export default function RecurringAltered() {
 
   const RECUR_WAS = meta?.[ getKey( 'recur_strategy_was', keys ) ];
 
-
-
   useEffect( () => {
 
     if ( !RECUR_WAS ) {
@@ -49,7 +48,7 @@ export default function RecurringAltered() {
         month_date: MONTHLY_DATE,
         end_type: END_TYPE_VALUE,
         end_date: END_DATE_VALUE,
-        end_after_x: END_AFTER_X_VALUE,
+        end_after_x: parseInt(END_AFTER_X_VALUE, 10),
         start_date_timestamp: `${START_TIMESTAMP}`,
         occurences: OCCURENCES,
         omissions: OMISSIONS,

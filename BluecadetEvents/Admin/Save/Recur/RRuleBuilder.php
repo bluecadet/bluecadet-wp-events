@@ -189,7 +189,7 @@ class RRuleBuilder {
     if ( $this->args['end_type'] === 'on_date' ) {
       $args['until'] = \DateTime::createFromFormat('Y-m-d', $this->args['end_date'], $this->timezone);
     } else if ( $this->args['end_type'] === 'after_x' ) {
-      $args['count'] = intval($this->args['after_x']) - 1;
+      $args['count'] = intval($this->args['end_after_x']) - 1;
     } else {
       $error = new \WP_Error('bc-events', 'No End Date value set. Please select a end date or ends after value)');
     }

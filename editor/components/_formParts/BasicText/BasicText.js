@@ -1,4 +1,4 @@
-export default function BasicText({ id, value, options, onChange, label, className = null }) {
+export default function BasicText({ id, value, options, onChange, label, className = null, helperText = null }) {
 
   return (
     <div className={`bc-event-dates__text-group bc-event-dates__input-row ${className ? className : ''}`}>
@@ -10,6 +10,7 @@ export default function BasicText({ id, value, options, onChange, label, classNa
         value={value}
         onChange={ ( e ) => onChange( e.target.value ) }
       />
+      {helperText && <p className="bc-event-dates__helper-text">{helperText}</p>}
     </div>
   );
 }

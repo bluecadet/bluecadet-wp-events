@@ -208,6 +208,8 @@ class RestRoutes {
     $settings = [
       'use_locations' => Hooks::hook_filter_use_event_locations(),
       'use_series' => Hooks::hook_filter_use_event_series(),
+      'use_recuring_description' => Hooks::hook_filter_use_event_recurring_description(),
+      'recurring_description_helper_text' => Hooks::hook_filter_recurring_description_helper_text(),
     ];
 
     return rest_ensure_response( $settings );

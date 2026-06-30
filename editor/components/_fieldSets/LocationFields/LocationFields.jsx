@@ -3,7 +3,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { getKey, setKeys, loadKeys, getStore, REST_NAMESPACE } from '../../_utils/store.js';
+import { getKey, setKeys, getStore, REST_NAMESPACE } from '../../_utils/store.js';
 
 import SectionToggle from '../../SectionToggle/SectionToggle.jsx';
 import Loader from '../../_sections/Loader/Loader.jsx';
@@ -17,7 +17,7 @@ import './locationFields.scss';
  */
 export default function LocationFields() {
   const { keys, meta, setMeta } = getStore();
-  const [ isLoading, setIsLoading ] = useState( ! keys );
+  const [ isLoading, setIsLoading ] = useState( true );
   const [ isLoadingError, setIsLoadingError ] = useState( false );
 
   const isCondensed = useSelect( select =>
@@ -30,10 +30,9 @@ export default function LocationFields() {
   };
 
   useEffect( () => {
+    // Always fetch fresh: the preferences key slot is shared across post types,
+    // so a cached map may be stale or belong to a different post type.
     const fetchKeys = async () => {
-      if ( loadKeys() ) {
-        return;
-      }
       try {
         const response = await apiFetch( { path: `/${ REST_NAMESPACE }/get-locations-keys` } );
         setKeys( response );

@@ -210,10 +210,18 @@ class RegisterMeta {
 		] ) );
 
     // Recurring End After X
-    register_post_meta( $meta_type, $this->keys['freq_end_after_x'], array_merge( $string_args, [
+    register_post_meta( $meta_type, $this->keys['freq_end_after_x'], array_merge( $int_args, [
 			'description' => __( 'Event recurrence end after X occurrences', 'basecadet' ),
       'sanitize_callback' => function( $value ) {
         return is_numeric( $value ) ? intval( $value ) : 1;
+      },
+		] ) );
+
+    // Recurring Description
+    register_post_meta( $meta_type, $this->keys['recur_desc'], array_merge( $string_args, [
+			'description' => __( 'Event recurrence description', 'basecadet' ),
+      'sanitize_callback' => function( $value ) {
+        return is_string( $value ) ? $value : '';
       },
 		] ) );
 
@@ -280,7 +288,7 @@ class RegisterMeta {
             'month_date'           => ['type' => 'string'],
             'end_type'             => ['type' => 'string'],
             'end_date'             => ['type' => 'string'],
-            'end_after_x'          => ['type' => 'string'],
+            'end_after_x'          => ['type' => 'integer'],
             'start_date_timestamp' => ['type' => 'string'],
             'occurences'           => ['type' => 'array', 'items' => ['type' => 'object', 'additionalProperties' => true]],
             'omissions'            => ['type' => 'array', 'items' => ['type' => 'string']],

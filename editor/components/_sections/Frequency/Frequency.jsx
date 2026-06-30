@@ -126,7 +126,6 @@ export default function Frequency() {
                   { value: 'after_x', label: __( 'After [X] Events', 'basecadet' ) },
                 ] }
                 onChange={ ( val ) => {
-                  console.log(val);
                   setMeta( { ...meta, [ META_END_TYPE ]: val } ) 
                 } }
               />
@@ -155,7 +154,7 @@ export default function Frequency() {
                   id="recurring-end-after-x"
                   value={ END_AFTER_X_VALUE }
                   min={ 1 }
-                  onChange={ ( e ) => setMeta( { ...meta, [ META_END_AFTER_X ]: e.target.value } ) }
+                  onChange={ ( e ) => setMeta( { ...meta, [ META_END_AFTER_X ]: parseInt(e.target.value, 10) } ) }
                 />
                 <span className="bc-event-dates__label bc-event-dates__recurring-end-after-x-label">{ __( 'events', 'basecadet' ) }</span>
               </div>
