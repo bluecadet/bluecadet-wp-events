@@ -58,21 +58,12 @@ export default function RecurringAltered() {
         primary_end_time: END_TIME,
       }
 
-      console.log('HELLO');
-
-      const RESULT = lodash.filter(
+      const diffs = lodash.filter(
         lodash.keys(currentRecur), 
-        key => {
-          if ( currentRecur[key] !== RECUR_WAS[key] ) {
-            console.log(key, typeof(currentRecur[key]),  currentRecur[key], typeof(RECUR_WAS[key]), RECUR_WAS[key]);
-          }
-          return currentRecur[key] !== RECUR_WAS[key]
-        }
+        key => !lodash.isEqual(currentRecur[key], RECUR_WAS[key])
       );
 
-      console.log(RESULT)
-
-      setHasRecurDiff( !isEqual( currentRecur, RECUR_WAS ) );
+      setHasRecurDiff( diffs.length > 0 );
     }
 
   }, [

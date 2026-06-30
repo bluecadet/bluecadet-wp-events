@@ -4430,7 +4430,6 @@ function Recurring({
       unlockPostSaving(LOCK_KEY);
     }
   }, [IS_RECURRING, IS_RECURRING_WAS, userAllowDelete]);
-  console.log(frequencyOptions);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)("div", {
     className: "bc-event-recurring",
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)("div", {
@@ -4585,15 +4584,8 @@ function RecurringAltered() {
         primary_end_date: END_DATE,
         primary_end_time: END_TIME
       };
-      console.log('HELLO');
-      const RESULT = lodash__WEBPACK_IMPORTED_MODULE_7___default().filter(lodash__WEBPACK_IMPORTED_MODULE_7___default().keys(currentRecur), key => {
-        if (currentRecur[key] !== RECUR_WAS[key]) {
-          console.log(key, typeof currentRecur[key], currentRecur[key], typeof RECUR_WAS[key], RECUR_WAS[key]);
-        }
-        return currentRecur[key] !== RECUR_WAS[key];
-      });
-      console.log(RESULT);
-      setHasRecurDiff(!(0,lodash__WEBPACK_IMPORTED_MODULE_7__.isEqual)(currentRecur, RECUR_WAS));
+      const diffs = lodash__WEBPACK_IMPORTED_MODULE_7___default().filter(lodash__WEBPACK_IMPORTED_MODULE_7___default().keys(currentRecur), key => !lodash__WEBPACK_IMPORTED_MODULE_7___default().isEqual(currentRecur[key], RECUR_WAS[key]));
+      setHasRecurDiff(diffs.length > 0);
     }
   }, [USE_FREQUENCY, FREQUENCY_VALUE, WEEKLY_DAYS, MONTHLY_SCHED, MONTHLY_DAY, MONTHLY_DATE, END_TYPE_VALUE, END_DATE_VALUE, END_AFTER_X_VALUE, START_TIMESTAMP, RECUR_WAS, OCCURENCES, OMISSIONS, START_DATE, START_TIME, END_DATE, END_TIME]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {

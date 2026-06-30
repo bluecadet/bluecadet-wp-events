@@ -63,8 +63,6 @@ export default function Recurring({ useRecurDesc = false, frequencyOptions = {} 
     }
   }, [ IS_RECURRING, IS_RECURRING_WAS, userAllowDelete ] );
 
-  console.log(frequencyOptions)
-
   return (
     <div className="bc-event-recurring">
       <div className="bc-event__content-section">
