@@ -92,6 +92,9 @@ class Events {
         case 'boolean':
           update_post_meta( $post_id, $key, $present ? filter_var( $_POST[$key], FILTER_VALIDATE_BOOLEAN ) : false );
           break;
+        case 'integer':
+          update_post_meta( $post_id, $key, $present ? intval( $_POST[$key] ) : 0 );
+          break;
         case 'array':
           update_post_meta( $post_id, $key, $present ? array_map( 'sanitize_text_field', (array) $_POST[$key] ) : [] );
           break;

@@ -78,6 +78,10 @@ class RecurringDatesArrayBuilder {
    * @return void
    */
   private function handle_custom_occurences() : void {
+
+    if ( $this->RDATE->freq_args['frequency'] === 'consecutive' ) {
+      return;
+    }
     
     if ( is_array($this->RDATE->get_meta('custom_occurrences')) ) {
       foreach ($this->RDATE->get_meta('custom_occurrences') as $key => $values) {
@@ -154,6 +158,11 @@ class RecurringDatesArrayBuilder {
    * @return boolean
    */
   private function check_against_omission_array(string $date_str) : bool {
+
+    if ( $this->RDATE->freq_args['frequency'] === 'consecutive' ) {
+      return false;
+    }
+
     $omit_dates = $this->RDATE->get_meta('omissions');
     if ( is_array($omit_dates) && in_array($date_str, $omit_dates) ) {
       return true;

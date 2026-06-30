@@ -36,7 +36,7 @@ export default function RecurringAltered() {
 
   useEffect( () => {
 
-    if ( !RECUR_WAS ) {
+    if ( !RECUR_WAS || RECUR_WAS.length === 0 ) {
       setHasRecurDiff(false);
     } else {
       const currentRecur = {
@@ -58,7 +58,12 @@ export default function RecurringAltered() {
         primary_end_time: END_TIME,
       }
 
-      setHasRecurDiff( !isEqual( currentRecur, RECUR_WAS ) );
+      const diffs = lodash.filter(
+        lodash.keys(currentRecur), 
+        key => !lodash.isEqual(currentRecur[key], RECUR_WAS[key])
+      );
+
+      setHasRecurDiff( diffs.length > 0 );
     }
 
   }, [

@@ -43,17 +43,20 @@ export default function MissingFields({ onError, onSuccess }) {
           }
         }
 
-        if ( FREQ_END_TYPE === 'on_date' ) {
-          validationChecks.freq_end_date = {
-            test: FREQ_END_DATE !== '',
-            label: __( 'At the end of day', 'basecadet' ),
-          }
-        }
+        if ( FREQ !== 'consecutive' ) {
 
-        if ( FREQ_END_TYPE === 'after_x' ) {
-          validationChecks.freq_end_after_x = {
-            test: FREQ_END_AFTER_X !== '',
-            label: __( 'After [X] Events', 'basecadet' ),
+          if ( FREQ_END_TYPE === 'on_date' ) {
+            validationChecks.freq_end_date = {
+              test: FREQ_END_DATE !== '',
+              label: __( 'At the end of day', 'basecadet' ),
+            }
+          }
+
+          if ( FREQ_END_TYPE === 'after_x' ) {
+            validationChecks.freq_end_after_x = {
+              test: FREQ_END_AFTER_X !== '',
+              label: __( 'After [X] Events', 'basecadet' ),
+            }
           }
         }
       }

@@ -13,7 +13,7 @@ import RemoveRecurring from '../RemoveRecurring/RemoveRecurring.jsx';
 import RecurringAltered from './RecurringAltered.jsx';
 import BasicText from '../../_formParts/BasicText/BasicText.js';
 
-export default function Recurring({ useRecurDesc = false}) {
+export default function Recurring({ useRecurDesc = false, frequencyOptions = {} }) {
   const { keys, meta, setMeta } = getStore();
   const { set } = useDispatch(preferencesStore);
 
@@ -23,6 +23,9 @@ export default function Recurring({ useRecurDesc = false}) {
 
   const IS_RECURRING = meta?.[ META_IS_RECURRING ] ?? false;
   const IS_RECURRING_WAS = meta?.[ META_IS_RECURRING_WAS ] ?? IS_RECURRING;
+
+  const USE_FREQUENCY = meta?.[ getKey( 'use_frequency', keys ) ] ?? false;
+  const FREQUENCY_VALUE = meta?.[ getKey( 'freq', keys ) ] ?? '';
  
   const isFreqCondensed = useSelect(select =>
     select(preferencesStore).get('bc-events/frequency-condensed', 'condensed')
@@ -88,49 +91,60 @@ export default function Recurring({ useRecurDesc = false}) {
               </div>
             )}
 
-            <div className="bc-event-recurring__section">
-              <SectionToggle
-                title={ __( 'Frequency Options', 'basecadet' ) }
-                value={ isFreqCondensed }
-                onChange={ (value) => toggleCondensed('frequency', value) }
-                asTitle={false}
-                titleTag='h3'
-              />
-              { !isFreqCondensed && (
-                <div className="bc-event__content-section">
-                  <Frequency />
+            {
+              Object.keys(frequencyOptions).length > 0 && (
+                <div className="bc-event-recurring__section">
+                  <SectionToggle
+                    title={ __( 'Frequency Options', 'basecadet' ) }
+                    value={ isFreqCondensed }
+                    onChange={ (value) => toggleCondensed('frequency', value) }
+                    asTitle={false}
+                    titleTag='h3'
+                  />
+                  { !isFreqCondensed && (
+                    <div className="bc-event__content-section">
+                      <Frequency frequencyOptions={frequencyOptions} />
+                    </div>
+                  ) }
                 </div>
-              ) }
-            </div>
+              )
+            }
+            
+            {
+              (!USE_FREQUENCY || (USE_FREQUENCY && FREQUENCY_VALUE !== 'consecutive')) && (
+                <>
+                  <div className="bc-event-recurring__section">
+                    <SectionToggle
+                      title={ __( 'Specific Dates', 'basecadet' ) }
+                      value={ isCustomOccurrencesCondensed }
+                      onChange={ (value) => toggleCondensed('custom-occurrences', value) }
+                      asTitle={false}
+                    />
+                    { !isCustomOccurrencesCondensed && (
+                      <div className="bc-event__content-section">
+                        <CustomOccurences />
+                      </div>
+                    )}
+                  </div>
 
+                  <div className="bc-event-recurring__section">
+                    <SectionToggle
+                      title={ __( 'Exclusions', 'basecadet' ) }
+                      value={ isOmitDatesCondensed }
+                      onChange={ (value) => toggleCondensed('omit-dates', value) }
+                      asTitle={false}
+                    />
+                    { !isOmitDatesCondensed && (
+                      <div className="bc-event__content-section">
+                        <OmitDates />
+                      </div>
+                    )}
+                  </div>
+                </>
+              )
+            }
 
-            <div className="bc-event-recurring__section">
-              <SectionToggle
-                title={ __( 'Specific Dates', 'basecadet' ) }
-                value={ isCustomOccurrencesCondensed }
-                onChange={ (value) => toggleCondensed('custom-occurrences', value) }
-                asTitle={false}
-              />
-              { !isCustomOccurrencesCondensed && (
-                <div className="bc-event__content-section">
-                  <CustomOccurences />
-                </div>
-              )}
-            </div>
-
-            <div className="bc-event-recurring__section">
-              <SectionToggle
-                title={ __( 'Exclusions', 'basecadet' ) }
-                value={ isOmitDatesCondensed }
-                onChange={ (value) => toggleCondensed('omit-dates', value) }
-                asTitle={false}
-              />
-              { !isOmitDatesCondensed && (
-                <div className="bc-event__content-section">
-                  <OmitDates />
-                </div>
-              )}
-            </div>
+            
           </div>
         )
       }

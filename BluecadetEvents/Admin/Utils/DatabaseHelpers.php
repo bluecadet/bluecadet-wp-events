@@ -277,6 +277,29 @@ class DatabaseHelpers {
   }
 
 
+  /**
+   * Get the latest occurrence end for a master's children.
+   *
+   * @param int $parent_id
+   * @return int|false
+   */
+  public function get_last_child_event_end(int $parent_id) : false|int {
+    global $wpdb;
+    $table = $wpdb->prefix . $this->events_table;
+
+    $last = $wpdb->get_var(
+      $wpdb->prepare(
+        "SELECT MAX(event_end) FROM {$table} WHERE parent_ID=%d",
+        $parent_id
+      )
+    );
+
+    if ( $last === null ) { return false; }
+
+    return (int) $last;
+  }
+
+
   // =======================================
   //       Recurrence-generation diffing
   // =======================================

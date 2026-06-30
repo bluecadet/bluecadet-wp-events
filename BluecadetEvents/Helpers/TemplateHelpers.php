@@ -302,6 +302,20 @@ class TemplateHelpers {
   }
 
 
+  /**
+   * Given a timestamp, format a time string to event settings
+   *
+   * @param integer $timestamp
+   * @return string
+   */
+  public function time_from_timestamp( int $timestamp ) : string {
+    $settings = $this->get_date_display_options();
+    $fDate    = new \DateTime( '', \wp_timezone() );
+    $fDate->setTimestamp( $timestamp );
+    return $fDate->format( $settings['time_format'] );
+  }
+
+
 
   // ========================================================================================================
   //  MULTIDAY STUFF

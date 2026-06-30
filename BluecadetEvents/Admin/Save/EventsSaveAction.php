@@ -140,14 +140,14 @@ class EventsSaveAction {
     $freq_args->setMonthSchedule((string) ($this->RDATE->get_meta('freq_mo_schedule') ?: ''));
     $freq_args->setMonthDay((string) ($this->RDATE->get_meta('freq_mo_day') ?: ''));
     $freq_args->setMonthDate((string) ($this->RDATE->get_meta('freq_mo_date') ?: ''));
+    $freq_args->setConsecutiveOffset((int) ($this->RDATE->get_meta('freq_consecutive_buffer') ?: 0));
+    $freq_args->setConsecutiveCount((int) ($this->RDATE->get_meta('freq_consecutive_count') ?: 0));
     $freq_args->setEndType((string) ($this->RDATE->get_meta('freq_end_type') ?: ''));
     $freq_args->setEndDate((string) ($this->RDATE->get_meta('freq_end_date') ?: ''));
     $freq_args->setEndAfterX((int) ($this->RDATE->get_meta('freq_end_after_x') ?: 0));
     $freq_args->setStartDateTimestamp((string) ($this->RDATE->get_meta('start_timestamp') ?: ''));
+    $freq_args->setEndDateTimestamp((string) ($this->RDATE->get_meta('end_timestamp') ?: ''));
     $freq_args_array = $freq_args->to_array();
-
-    // $this->RDATE->freq_args->setUseFrequency((bool) ($this->RDATE->get_meta('use_frequency') ?: false));
-    // $this->RDATE->freq_args->setFrequency((string) ($this->RDATE->get_meta('freq') ?: ''));
 
     // Setup frequency args array for RRuleBuilder and recur_strategy_was meta value
     $this->RDATE->freq_args = $freq_args_array;
@@ -245,7 +245,6 @@ class EventsSaveAction {
       $child_id = (int)$cid;
       $clone_builder->set_child_update_meta($child_id);
       $clone_data = $clone_builder->get_clone();
-      $clone = clone $clone_data;
       $this->background_event_handler->push_to_queue(clone $clone_data);
     }
 
@@ -278,6 +277,8 @@ class EventsSaveAction {
       'freq_mo_schedule',
       'freq_mo_day',
       'freq_mo_date',
+      'freq_consecutive_buffer',
+      'freq_consecutive_count',
       'freq_end_type',
       'freq_end_date',
       'freq_end_after_x',

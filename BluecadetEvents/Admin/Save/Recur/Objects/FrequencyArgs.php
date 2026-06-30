@@ -10,70 +10,91 @@ class FrequencyArgs {
    *
    * @var boolean
    */
-  public bool $use_frequency;
+  private bool $use_frequency;
 
   /**
    * The frequency of the event
    *
    * @var string
    */
-  public string $frequency;
+  private string $frequency;
 
   /**
    * The days of the week for weekly frequency
    *
    * @var array
    */
-  public array $weekly_days;
+  private array $weekly_days;
 
   /**
    * The schedule for monthly frequency
    *
    * @var string
    */
-  public string $month_schedule;
+  private string $month_schedule;
 
   /**
    * The day of the month for monthly frequency
    *
    * @var string
    */
-  public string $month_day;
+  private string $month_day;
 
   /**
    * The date of the month for monthly frequency
    *
    * @var string
    */
-  public string $month_date;
+  private string $month_date;
+
+  /**
+   * The offset of a consecutive date
+   *
+   * @var integer
+   */
+  private int $consecutive_buffer;
+
+  /**
+   * The count of a consecutive date
+   *
+   * @var integer
+   */
+  private int $consecutive_count;
 
   /**
    * The end type for the frequency
    *
    * @var string
    */
-  public string $end_type;
+  private string $end_type;
 
   /**
    * The end date for the frequency
    *
    * @var string
    */
-  public string $end_date;
+  private string $end_date;
 
   /**
    * The number of occurrences for the frequency
    *
    * @var integer
    */
-  public int $end_after_x;
+  private int $end_after_x;
 
   /**
    * The start date timestamp for the frequency
    *
    * @var string
    */
-  public string $start_date_timestamp;
+  private string $start_date_timestamp;
+
+  /**
+   * The end date timestamp for the frequency
+   *
+   * @var string
+   */
+  private string $end_date_timestamp;
 
 
   public function __construct() {
@@ -83,10 +104,13 @@ class FrequencyArgs {
     $this->month_schedule = '';
     $this->month_day = '';
     $this->month_date = '';
+    $this->consecutive_buffer = 0;
+    $this->consecutive_count = 0;
     $this->end_type = '';
     $this->end_date = '';
     $this->end_after_x = 0;
     $this->start_date_timestamp = '';
+    $this->end_date_timestamp = '';
   }
 
 
@@ -114,6 +138,14 @@ class FrequencyArgs {
     $this->month_date = $value;
   }
 
+  public function setConsecutiveOffset(int $value) {
+    $this->consecutive_buffer = $value;
+  }
+
+  public function setConsecutiveCount(int $value) {
+    $this->consecutive_count = $value;
+  }
+
   public function setEndType(string $value) {
     $this->end_type = $value;
   }
@@ -130,6 +162,9 @@ class FrequencyArgs {
     $this->start_date_timestamp = $value;
   }
 
+  public function setEndDateTimestamp(string $value) {
+    $this->end_date_timestamp = $value;
+  }
 
   public function to_array() {
     return [
@@ -139,10 +174,13 @@ class FrequencyArgs {
       'month_schedule'        => $this->month_schedule,
       'month_day'             => $this->month_day,
       'month_date'            => $this->month_date,
+      'consecutive_buffer'     => $this->consecutive_buffer,
+      'consecutive_count'      => $this->consecutive_count,
       'end_type'              => $this->end_type,
       'end_date'              => $this->end_date,
       'end_after_x'           => $this->end_after_x,
       'start_date_timestamp'  => $this->start_date_timestamp,
+      'end_date_timestamp'    => $this->end_date_timestamp,
     ];
   }
 
