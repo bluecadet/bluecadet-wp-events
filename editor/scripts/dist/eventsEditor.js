@@ -1,0 +1,1 @@
+(()=>{"use strict";const e=window.wp.components,{Fill:t,Slot:l}=(0,e.createSlotFill)("AfterEventDetails"),{Fill:i,Slot:n}=(0,e.createSlotFill)("AfterRecurring");window.BluecadetEvents=window.BluecadetEvents||{},window.BluecadetEvents.AfterEventDetailsFill=t,window.BluecadetEvents.AfterRecurringFill=i})();

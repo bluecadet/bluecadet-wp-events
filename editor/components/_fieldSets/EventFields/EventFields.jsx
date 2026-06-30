@@ -4,7 +4,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { setKeys, loadKeys, REST_NAMESPACE } from '../../_utils/store.js';
+import { setKeys, loadKeys, REST_NAMESPACE, getStore } from '../../_utils/store.js';
 
 import Loader from '../../_sections/Loader/Loader.jsx';
 import SectionToggle from '../../SectionToggle/SectionToggle.jsx';
@@ -14,6 +14,7 @@ import Validation from '../../_sections/Validation/Validation.jsx';
 import ChildEventDetails from '../../_sections/ChildEventDetails/ChildEventDetails.jsx';
 import EventLocations from '../../_sections/EventLocations/EventLocations.jsx';
 import EventSeries from '../../_sections/EventSeries/EventSeries.jsx';
+import { AfterEventDetailsSlot, AfterRecurringSlot} from '../../_utils/slots.js';
 
 import './eventFields.scss';
 
@@ -29,6 +30,7 @@ export default function EventFields() {
   const [ useLocations, setUseLocations ] = useState( false );
   const [ useSeries, setUseSeries ] = useState( false );
   const postID = useSelect( select => select( 'core/editor' ).getCurrentPostId() );
+  const { meta, setMeta } = getStore();
 
   const isCondensed = useSelect( select =>
     select( preferencesStore ).get( 'bc-events/details-condensed', 'condensed' )
@@ -125,7 +127,9 @@ export default function EventFields() {
               <EventDetails />
               { useLocations && <EventLocations /> }
               { useSeries && <EventSeries /> }
+              <AfterEventDetailsSlot fillProps={{ keys, postID, meta, setMeta }} />
               <Recurring />
+              <AfterRecurringSlot fillProps={{ keys, postID, meta, setMeta }} />
             </>
           ) }
         </>

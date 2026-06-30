@@ -5,7 +5,6 @@ import metadata from './block.json';
 import BlockIcon from '../../../components/BlockIcon/BlockIcon.jsx';
 
 
-
 registerBlockType( metadata.name, {
 	...metadata,
 	icon: BlockIcon,

@@ -1,1 +1,0 @@
-(()=>{"use strict";window.wp.element,window.wp.data,window.wp.blockEditor,window.wp.plugins})();
