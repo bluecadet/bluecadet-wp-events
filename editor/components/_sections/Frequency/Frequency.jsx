@@ -5,7 +5,7 @@ import BasicSelect from '../../_formParts/BasicSelect/BasicSelect';
 import CheckboxButton from '../../_formParts/CheckboxButton/CheckboxButton.jsx';
 import CheckboxFormGroup from '../../_formParts/CheckboxFormGroup/CheckboxFormGroup.js';
 import BasicNumber from '../../_formParts/BasicNumber/BasicNumber.js';
-import Concurrent from '../Concurrent/Concurrent.jsx';
+import Consecutive from '../Consecutive/Consecutive.jsx';
 
 
 export default function Frequency({ frequencyOptions = [] }) {
@@ -121,11 +121,11 @@ export default function Frequency({ frequencyOptions = [] }) {
             ) }
 
 
-            { FREQUENCY_VALUE === 'concurrent' && (
-              <Concurrent/>
+            { FREQUENCY_VALUE === 'consecutive' && (
+              <Consecutive/>
             ) }
 
-            { FREQUENCY_VALUE !== 'concurrent' && (
+            { FREQUENCY_VALUE !== 'consecutive' && (
               <>
                 <div className="bc-event-dates__frequency-row">
                   <BasicSelect

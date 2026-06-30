@@ -1,14 +1,14 @@
 import { __ } from '@wordpress/i18n';
-import { getKey, getStore } from '../../_utils/store';
+import { getKey, getStore } from '../../_utils/store.js';
 import BasicNumber from '../../_formParts/BasicNumber/BasicNumber.js';
 import { useEffect, useState } from '@wordpress/element';
 
-export default function Concurrent() {
+export default function Consecutive() {
 
   const { keys, meta, setMeta } = getStore();
 
-  const META_FREQ_CON_OFFSET = getKey( 'freq_concurrent_offset', keys );
-  const META_FREQ_CON_COUNT = getKey( 'freq_concurrent_count', keys );
+  const META_FREQ_CON_OFFSET = getKey( 'freq_consecutive_buffer', keys );
+  const META_FREQ_CON_COUNT = getKey( 'freq_consecutive_count', keys );
   
   const FREQ_CON_OFFSET = meta?.[ META_FREQ_CON_OFFSET ] ?? 0;
   const FREQ_CON_COUNT = meta?.[ META_FREQ_CON_COUNT ] ?? 2;
@@ -86,10 +86,10 @@ export default function Concurrent() {
   }, [START_DATE, START_TIME, END_DATE, END_TIME, FREQ_CON_OFFSET, FREQ_CON_COUNT] );
 
   return (
-    <div className="bc-event-dates__frequency-row bc-event-dates__frequency-row--concurrent">
+    <div className="bc-event-dates__frequency-row bc-event-dates__frequency-row--consecutive">
       <div class="bc-events__flex-fieldset">
         <BasicNumber
-          id="recurring-concurrent-offset"
+          id="recurring-consecutive-offset"
           label={ __( 'Offset (minutes)', 'basecadet' ) }
           value={ meta?.[ META_FREQ_CON_OFFSET ] ?? 0 }
           min={ 0 }
@@ -97,19 +97,19 @@ export default function Concurrent() {
           helperText={__('How long after the event ends does the next begin?', 'basecadet')}
         />
         <BasicNumber
-          id="recurring-concurrent-count"
+          id="recurring-consecutive-count"
           label={ __( 'Count', 'basecadet' ) }
           value={ meta?.[ META_FREQ_CON_COUNT ] ?? 2 }
           min={ 2 }
           onChange={ ( val ) => setMeta( { ...meta, [ META_FREQ_CON_COUNT ]: parseInt(val, 10) } ) }
           helperText={__('How many occurrences should there be? (minimum 2)', 'basecadet')}
         />
-        <div className="bc-event-dates__concurrent-duration">
+        <div className="bc-event-dates__consecutive-duration">
           <p className="bc-event-dates__description">This event has a duration of <strong>{ duration }</strong>. With an offset of { FREQ_CON_OFFSET } minutes, there will be an occurrence every <strong>{ durationTotal }</strong>:</p>
           {
             occurenceList.length > 0 && (
               <>
-                <ul className="bc-event-dates__concurrent-list">
+                <ul className="bc-event-dates__consecutive-list">
                   { occurenceList.map( ( occurrence, index ) => (
                     <li key={ `occurrence-list-${index}` } className="bc-event-dates__description">
                       <p><strong>Start:</strong> { occurrence.start }</p>
@@ -121,8 +121,8 @@ export default function Concurrent() {
             )
           }
 
-          <div className="bc-event-dates__concurrent-duration-notice bc-events__recurring-notice-inner">
-            <p className="bc-event-dates__description"><strong>Specific Dates and Exclusions cannot be added when the Frequency is set to Concurrent.</strong></p>
+          <div className="bc-event-dates__consecutive-duration-notice bc-events__recurring-notice-inner">
+            <p className="bc-event-dates__description"><strong>Specific Dates and Exclusions cannot be added when the Frequency is set to consecutive.</strong></p>
           </div>
           
         </div>

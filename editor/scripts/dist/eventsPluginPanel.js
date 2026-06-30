@@ -3468,19 +3468,19 @@ function ChildEventDetails({
 
 /***/ },
 
-/***/ "./editor/components/_sections/Concurrent/Concurrent.jsx"
-/*!***************************************************************!*\
-  !*** ./editor/components/_sections/Concurrent/Concurrent.jsx ***!
-  \***************************************************************/
+/***/ "./editor/components/_sections/Consecutive/Consecutive.jsx"
+/*!*****************************************************************!*\
+  !*** ./editor/components/_sections/Consecutive/Consecutive.jsx ***!
+  \*****************************************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ Concurrent)
+/* harmony export */   "default": () => (/* binding */ Consecutive)
 /* harmony export */ });
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _utils_store__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../_utils/store */ "./editor/components/_utils/store.js");
+/* harmony import */ var _utils_store_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../_utils/store.js */ "./editor/components/_utils/store.js");
 /* harmony import */ var _formParts_BasicNumber_BasicNumber_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../_formParts/BasicNumber/BasicNumber.js */ "./editor/components/_formParts/BasicNumber/BasicNumber.js");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__);
@@ -3491,20 +3491,20 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function Concurrent() {
+function Consecutive() {
   const {
     keys,
     meta,
     setMeta
-  } = (0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getStore)();
-  const META_FREQ_CON_OFFSET = (0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_concurrent_offset', keys);
-  const META_FREQ_CON_COUNT = (0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_concurrent_count', keys);
+  } = (0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getStore)();
+  const META_FREQ_CON_OFFSET = (0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_consecutive_buffer', keys);
+  const META_FREQ_CON_COUNT = (0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_consecutive_count', keys);
   const FREQ_CON_OFFSET = meta?.[META_FREQ_CON_OFFSET] ?? 0;
   const FREQ_CON_COUNT = meta?.[META_FREQ_CON_COUNT] ?? 2;
-  const START_DATE = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_date', keys)];
-  const START_TIME = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_time', keys)];
-  const END_DATE = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('end_date', keys)];
-  const END_TIME = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('end_time', keys)];
+  const START_DATE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_date', keys)];
+  const START_TIME = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_time', keys)];
+  const END_DATE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('end_date', keys)];
+  const END_TIME = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('end_time', keys)];
   const [duration, setDuration] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(0);
   const [durationTotal, setDurationTotal] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)('0');
   const [lastStart, setLastStart] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)('');
@@ -3564,11 +3564,11 @@ function Concurrent() {
     }
   }, [START_DATE, START_TIME, END_DATE, END_TIME, FREQ_CON_OFFSET, FREQ_CON_COUNT]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
-    className: "bc-event-dates__frequency-row bc-event-dates__frequency-row--concurrent",
+    className: "bc-event-dates__frequency-row bc-event-dates__frequency-row--consecutive",
     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
       class: "bc-events__flex-fieldset",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_formParts_BasicNumber_BasicNumber_js__WEBPACK_IMPORTED_MODULE_2__["default"], {
-        id: "recurring-concurrent-offset",
+        id: "recurring-consecutive-offset",
         label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Offset (minutes)', 'basecadet'),
         value: meta?.[META_FREQ_CON_OFFSET] ?? 0,
         min: 0,
@@ -3578,7 +3578,7 @@ function Concurrent() {
         }),
         helperText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('How long after the event ends does the next begin?', 'basecadet')
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_formParts_BasicNumber_BasicNumber_js__WEBPACK_IMPORTED_MODULE_2__["default"], {
-        id: "recurring-concurrent-count",
+        id: "recurring-consecutive-count",
         label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Count', 'basecadet'),
         value: meta?.[META_FREQ_CON_COUNT] ?? 2,
         min: 2,
@@ -3588,7 +3588,7 @@ function Concurrent() {
         }),
         helperText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('How many occurrences should there be? (minimum 2)', 'basecadet')
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
-        className: "bc-event-dates__concurrent-duration",
+        className: "bc-event-dates__consecutive-duration",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("p", {
           className: "bc-event-dates__description",
           children: ["This event has a duration of ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("strong", {
@@ -3598,7 +3598,7 @@ function Concurrent() {
           }), ":"]
         }), occurenceList.length > 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("ul", {
-            className: "bc-event-dates__concurrent-list",
+            className: "bc-event-dates__consecutive-list",
             children: occurenceList.map((occurrence, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("li", {
               className: "bc-event-dates__description",
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("p", {
@@ -3613,11 +3613,11 @@ function Concurrent() {
             }, `occurrence-list-${index}`))
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
-          className: "bc-event-dates__concurrent-duration-notice bc-events__recurring-notice-inner",
+          className: "bc-event-dates__consecutive-duration-notice bc-events__recurring-notice-inner",
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("p", {
             className: "bc-event-dates__description",
             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("strong", {
-              children: "Specific Dates and Exclusions cannot be added when the Frequency is set to Concurrent."
+              children: "Specific Dates and Exclusions cannot be added when the Frequency is set to consecutive."
             })
           })
         })]
@@ -3996,7 +3996,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _formParts_CheckboxButton_CheckboxButton_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../_formParts/CheckboxButton/CheckboxButton.jsx */ "./editor/components/_formParts/CheckboxButton/CheckboxButton.jsx");
 /* harmony import */ var _formParts_CheckboxFormGroup_CheckboxFormGroup_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../_formParts/CheckboxFormGroup/CheckboxFormGroup.js */ "./editor/components/_formParts/CheckboxFormGroup/CheckboxFormGroup.js");
 /* harmony import */ var _formParts_BasicNumber_BasicNumber_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../_formParts/BasicNumber/BasicNumber.js */ "./editor/components/_formParts/BasicNumber/BasicNumber.js");
-/* harmony import */ var _Concurrent_Concurrent_jsx__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../Concurrent/Concurrent.jsx */ "./editor/components/_sections/Concurrent/Concurrent.jsx");
+/* harmony import */ var _Consecutive_Consecutive_jsx__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../Consecutive/Consecutive.jsx */ "./editor/components/_sections/Consecutive/Consecutive.jsx");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__);
 
@@ -4119,7 +4119,7 @@ function Frequency({
             })
           })
         })]
-      }), FREQUENCY_VALUE === 'concurrent' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_Concurrent_Concurrent_jsx__WEBPACK_IMPORTED_MODULE_7__["default"], {}), FREQUENCY_VALUE !== 'concurrent' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
+      }), FREQUENCY_VALUE === 'consecutive' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_Consecutive_Consecutive_jsx__WEBPACK_IMPORTED_MODULE_7__["default"], {}), FREQUENCY_VALUE !== 'consecutive' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
           className: "bc-event-dates__frequency-row",
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_formParts_BasicSelect_BasicSelect__WEBPACK_IMPORTED_MODULE_3__["default"], {
@@ -4470,7 +4470,7 @@ function Recurring({
             frequencyOptions: frequencyOptions
           })
         })]
-      }), (!USE_FREQUENCY || USE_FREQUENCY && FREQUENCY_VALUE !== 'concurrent') && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.Fragment, {
+      }), (!USE_FREQUENCY || USE_FREQUENCY && FREQUENCY_VALUE !== 'consecutive') && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.Fragment, {
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)("div", {
           className: "bc-event-recurring__section",
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_9__["default"], {
@@ -5021,7 +5021,7 @@ function MissingFields({
             };
           }
         }
-        if (FREQ !== 'concurrent') {
+        if (FREQ !== 'consecutive') {
           if (FREQ_END_TYPE === 'on_date') {
             validationChecks.freq_end_date = {
               test: FREQ_END_DATE !== '',
@@ -13242,7 +13242,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 
 const FREQUENCY_OPTIONS = options => {
-  const allowedKeys = ['daily', 'weekly', 'monthly', 'yearly', 'concurrent'];
+  const allowedKeys = ['daily', 'weekly', 'monthly', 'yearly', 'consecutive'];
   let filteredOptions = [];
   if (options && Object.keys(options).length > 0) {
     Object.keys(options).forEach(key => {

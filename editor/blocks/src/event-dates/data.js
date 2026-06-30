@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 
 export const FREQUENCY_OPTIONS = (options) => {
-  const allowedKeys = ['daily', 'weekly', 'monthly', 'yearly', 'concurrent'];
+  const allowedKeys = ['daily', 'weekly', 'monthly', 'yearly', 'consecutive'];
   let filteredOptions = [];
 
   if (options && Object.keys(options).length > 0) {

@@ -48,18 +48,18 @@ class FrequencyArgs {
   private string $month_date;
 
   /**
-   * The offset of a concurrent date
+   * The offset of a consecutive date
    *
    * @var integer
    */
-  private int $concurrent_offset;
+  private int $consecutive_buffer;
 
   /**
-   * The count of a concurrent date
+   * The count of a consecutive date
    *
    * @var integer
    */
-  private int $concurrent_count;
+  private int $consecutive_count;
 
   /**
    * The end type for the frequency
@@ -104,8 +104,8 @@ class FrequencyArgs {
     $this->month_schedule = '';
     $this->month_day = '';
     $this->month_date = '';
-    $this->concurrent_offset = 0;
-    $this->concurrent_count = 0;
+    $this->consecutive_buffer = 0;
+    $this->consecutive_count = 0;
     $this->end_type = '';
     $this->end_date = '';
     $this->end_after_x = 0;
@@ -138,12 +138,12 @@ class FrequencyArgs {
     $this->month_date = $value;
   }
 
-  public function setConcurrentOffset(int $value) {
-    $this->concurrent_offset = $value;
+  public function setConsecutiveOffset(int $value) {
+    $this->consecutive_buffer = $value;
   }
 
-  public function setConcurrentCount(int $value) {
-    $this->concurrent_count = $value;
+  public function setConsecutiveCount(int $value) {
+    $this->consecutive_count = $value;
   }
 
   public function setEndType(string $value) {
@@ -174,8 +174,8 @@ class FrequencyArgs {
       'month_schedule'        => $this->month_schedule,
       'month_day'             => $this->month_day,
       'month_date'            => $this->month_date,
-      'concurrent_offset'     => $this->concurrent_offset,
-      'concurrent_count'      => $this->concurrent_count,
+      'consecutive_buffer'     => $this->consecutive_buffer,
+      'consecutive_count'      => $this->consecutive_count,
       'end_type'              => $this->end_type,
       'end_date'              => $this->end_date,
       'end_after_x'           => $this->end_after_x,

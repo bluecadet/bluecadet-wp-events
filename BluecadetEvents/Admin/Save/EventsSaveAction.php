@@ -140,8 +140,8 @@ class EventsSaveAction {
     $freq_args->setMonthSchedule((string) ($this->RDATE->get_meta('freq_mo_schedule') ?: ''));
     $freq_args->setMonthDay((string) ($this->RDATE->get_meta('freq_mo_day') ?: ''));
     $freq_args->setMonthDate((string) ($this->RDATE->get_meta('freq_mo_date') ?: ''));
-    $freq_args->setConcurrentOffset((int) ($this->RDATE->get_meta('freq_concurrent_offset') ?: 0));
-    $freq_args->setConcurrentCount((int) ($this->RDATE->get_meta('freq_concurrent_count') ?: 0));
+    $freq_args->setConsecutiveOffset((int) ($this->RDATE->get_meta('freq_consecutive_buffer') ?: 0));
+    $freq_args->setConsecutiveCount((int) ($this->RDATE->get_meta('freq_consecutive_count') ?: 0));
     $freq_args->setEndType((string) ($this->RDATE->get_meta('freq_end_type') ?: ''));
     $freq_args->setEndDate((string) ($this->RDATE->get_meta('freq_end_date') ?: ''));
     $freq_args->setEndAfterX((int) ($this->RDATE->get_meta('freq_end_after_x') ?: 0));
@@ -277,8 +277,8 @@ class EventsSaveAction {
       'freq_mo_schedule',
       'freq_mo_day',
       'freq_mo_date',
-      'freq_concurrent_offset',
-      'freq_concurrent_count',
+      'freq_consecutive_buffer',
+      'freq_consecutive_count',
       'freq_end_type',
       'freq_end_date',
       'freq_end_after_x',

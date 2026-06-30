@@ -131,7 +131,7 @@ class RegisterMeta {
 			'description' => __( 'Event recurrence frequency', 'basecadet' ),
       'default' => 'daily',
       'sanitize_callback' => function( $value ) {
-        $allowed = ['none', 'daily', 'weekly', 'monthly', 'concurrent'];
+        $allowed = ['none', 'daily', 'weekly', 'monthly', 'consecutive'];
         return in_array( $value, $allowed ) ? $value : 'none';
       },
 		] ) );
@@ -177,8 +177,8 @@ class RegisterMeta {
       },
 		] ) );
 
-    // Concurrent Offset
-    register_post_meta( $meta_type, $this->keys['freq_concurrent_offset'], array_merge( $int_args, [
+    // Consecutive Offset
+    register_post_meta( $meta_type, $this->keys['freq_consecutive_buffer'], array_merge( $int_args, [
 			'description' => __( 'Event recurrence offset - time between occurrences', 'basecadet' ),
       'default' => 0,
       'sanitize_callback' => function( $value ) {
@@ -186,8 +186,8 @@ class RegisterMeta {
       },
 		] ) );
 
-    // Concurrent Count
-    register_post_meta( $meta_type, $this->keys['freq_concurrent_count'], array_merge( $int_args, [
+    // Consecutive Count
+    register_post_meta( $meta_type, $this->keys['freq_consecutive_count'], array_merge( $int_args, [
 			'description' => __( 'Event recurrence count - number of occurrences', 'basecadet' ),
       'default' => 2,
       'sanitize_callback' => function( $value ) {

@@ -84,8 +84,8 @@ class AdminEventsViews {
       if ( $freq ) {
         $state = '';
         switch ($freq) {
-          case 'concurrent':
-            $state = ' (Concurrent)';
+          case 'consecutive':
+            $state = ' (Consecutive)';
             break;
           case 'weekly':
             $state = ' (Weekly)';
@@ -94,7 +94,7 @@ class AdminEventsViews {
             $state = ' (Daily)';
             break;
         }
-        $post_states['_bc_events_recurring_parent_concurrent'] = 'Recurring Parent' . $state;
+        $post_states['_bc_events_recurring_parent'] = 'Recurring Parent' . $state;
       } else {
         $post_states['_bc_events_recurring_parent'] = 'Recurring Parent';
       }
@@ -153,13 +153,13 @@ class AdminEventsViews {
 
         $freq = get_post_meta($post_id, $this->keys['freq'], true);
 
-        if ($freq === 'concurrent') {
+        if ($freq === 'consecutive') {
           echo 'First Start: ' . $formatter->get_formatted_start_date($post_id) . ' @ ' . $formatter->get_formatted_start_time($post_id);
         } else {
           echo 'Starts: ' . $start_date;
         }
 
-        if ($freq === 'concurrent') {
+        if ($freq === 'consecutive') {
           $last = $db_helpers->get_last_child_event_end($post_id);
           if ( $last ) {
             echo '<br>Last End: ' . $formatter->date_from_timestamp($last) . ' @ ' . $formatter->time_from_timestamp($last);

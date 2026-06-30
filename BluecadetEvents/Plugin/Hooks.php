@@ -82,7 +82,7 @@ class Hooks {
   /**
    * hook_filter_frequency_options
    * 
-   * Array can only contain 'daily', 'weekly', 'monthly', and 'concurrent'.
+   * Array can only contain 'daily', 'weekly', 'monthly', and 'consecutive'.
    * If array is empty, no recurring frequency options will be available
    *
    * @hook 'bc_events/events/settings/frequency_options'
@@ -97,7 +97,7 @@ class Hooks {
       'daily' => 'Daily',
       'weekly' => 'Weekly',
       'monthly' => 'Monthly',
-      'concurrent' => 'Concurrent',
+      'consecutive' => 'Consecutive',
     ];
 
     $options = \apply_filters('bc_events/events/settings/frequency_options', $allowed);

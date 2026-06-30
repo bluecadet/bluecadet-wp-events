@@ -684,20 +684,20 @@
   min-width:var(--bce-recurring-label-width);
 }
 
-.bc-event-dates__frequency-row--concurrent .bc-event-dates__label{
+.bc-event-dates__frequency-row--consecutive .bc-event-dates__label{
   line-height:1.2;
 }
 
-.bc-event-dates__concurrent-duration{
+.bc-event-dates__consecutive-duration{
   margin-top:24px;
 }
 
-.bc-event-dates__concurrent-list{
+.bc-event-dates__consecutive-list{
   padding-left:20px;
   list-style:disc;
 }
 
-.bc-event-dates__concurrent-list p + p{
+.bc-event-dates__consecutive-list p + p{
   margin-top:8px;
 }
 

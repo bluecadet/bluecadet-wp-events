@@ -43,7 +43,7 @@ export default function MissingFields({ onError, onSuccess }) {
           }
         }
 
-        if ( FREQ !== 'concurrent' ) {
+        if ( FREQ !== 'consecutive' ) {
 
           if ( FREQ_END_TYPE === 'on_date' ) {
             validationChecks.freq_end_date = {

@@ -111,7 +111,7 @@ export default function Recurring({ useRecurDesc = false, frequencyOptions = {} 
             }
             
             {
-              (!USE_FREQUENCY || (USE_FREQUENCY && FREQUENCY_VALUE !== 'concurrent')) && (
+              (!USE_FREQUENCY || (USE_FREQUENCY && FREQUENCY_VALUE !== 'consecutive')) && (
                 <>
                   <div className="bc-event-recurring__section">
                     <SectionToggle

@@ -79,7 +79,7 @@ class RecurringDatesArrayBuilder {
    */
   private function handle_custom_occurences() : void {
 
-    if ( $this->RDATE->freq_args['frequency'] === 'concurrent' ) {
+    if ( $this->RDATE->freq_args['frequency'] === 'consecutive' ) {
       return;
     }
     
@@ -159,7 +159,7 @@ class RecurringDatesArrayBuilder {
    */
   private function check_against_omission_array(string $date_str) : bool {
 
-    if ( $this->RDATE->freq_args['frequency'] === 'concurrent' ) {
+    if ( $this->RDATE->freq_args['frequency'] === 'consecutive' ) {
       return false;
     }
 
