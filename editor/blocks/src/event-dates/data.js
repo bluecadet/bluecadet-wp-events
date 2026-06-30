@@ -1,11 +1,25 @@
 import { __ } from '@wordpress/i18n';
 
-export const FREQUENCY_OPTIONS = [
-  { value: 'daily', label: __( 'Daily', 'basecadet' ) },
-  { value: 'weekly', label: __( 'Weekly', 'basecadet' ) },
-  { value: 'monthly', label: __( 'Monthly', 'basecadet' ) },
-  // { value: 'yearly', label: __( 'Yearly', 'basecadet' ) },
-];
+export const FREQUENCY_OPTIONS = (options) => {
+  const allowedKeys = ['daily', 'weekly', 'monthly', 'yearly', 'concurrent'];
+  let filteredOptions = [];
+
+  if (options && Object.keys(options).length > 0) {
+    Object.keys(options).forEach((key) => {
+      if (allowedKeys.includes(key)) {
+        filteredOptions.push({ value: key, label: options[key] });
+      }
+    });
+  }
+
+  return filteredOptions;
+} 
+// [
+//   { value: 'daily', label: __( 'Daily', 'basecadet' ) },
+//   { value: 'weekly', label: __( 'Weekly', 'basecadet' ) },
+//   { value: 'monthly', label: __( 'Monthly', 'basecadet' ) },
+//   // { value: 'yearly', label: __( 'Yearly', 'basecadet' ) },
+// ];
 
 
 export const DAY_OF_WEEK_OPTIONS = [

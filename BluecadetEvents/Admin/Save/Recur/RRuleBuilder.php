@@ -80,13 +80,27 @@ class RRuleBuilder {
 
         break;
 
-      case 'yearly':
+      case 'concurrent':
+        $end = new \DateTime('now', $this->timezone);
+        $end->setTimestamp($this->args['end_date_timestamp']);
+        $interval = (int) round(($end->getTimestamp() - $begin->getTimestamp()) / 60);
+        $interval = $interval + $this->args['concurrent_offset'];
+
         $rrule_conditional_args = [
-          'freq'    => 'yearly',
+          'freq'    => 'minutely',
           'dtstart' => $begin,
+          'interval'  => $interval,
         ];
 
         break;
+
+      // case 'yearly':
+      //   $rrule_conditional_args = [
+      //     'freq'    => 'yearly',
+      //     'dtstart' => $begin,
+      //   ];
+
+      //   break;
 
       default:
         // DEFAULTS TO DAILY
@@ -185,6 +199,11 @@ class RRuleBuilder {
    */
   private function handle_recurring_ends_setting() : array {
     $args = [];
+
+    if ( $this->args['frequency'] === 'concurrent' ) {
+      $args['count'] = intval($this->args['concurrent_count']);
+      return $args;
+    }
 
     if ( $this->args['end_type'] === 'on_date' ) {
       $args['until'] = \DateTime::createFromFormat('Y-m-d', $this->args['end_date'], $this->timezone);

@@ -30,6 +30,7 @@ export default function EventFields() {
   const [ useLocations, setUseLocations ] = useState( false );
   const [ useSeries, setUseSeries ] = useState( false );
   const [ useRecurDesc, setUseRecurDesc ] = useState( false );
+  const [ frequencyOptions, setFrequencyOptions] = useState( [] );
   const postID = useSelect( select => select( 'core/editor' ).getCurrentPostId() );
   const { meta, setMeta } = getStore();
 
@@ -85,6 +86,7 @@ export default function EventFields() {
         setUseLocations( response?.use_locations ?? false );
         setUseSeries( response?.use_series ?? false );
         setUseRecurDesc( response?.use_recuring_description && response?.recurring_description_helper_text ? response.recurring_description_helper_text : false );
+        setFrequencyOptions( response?.frequency_options ?? [] );
       } catch ( error ) {
         console.error( 'Error fetching support settings:', error );
       }
@@ -129,7 +131,7 @@ export default function EventFields() {
               { useLocations && <EventLocations /> }
               { useSeries && <EventSeries /> }
               <AfterEventDetailsSlot fillProps={{ keys, postID, meta, setMeta }} />
-              <Recurring useRecurDesc={useRecurDesc} />
+              <Recurring useRecurDesc={useRecurDesc} frequencyOptions={frequencyOptions} />
               <AfterRecurringSlot fillProps={{ keys, postID, meta, setMeta }} />
             </>
           ) }

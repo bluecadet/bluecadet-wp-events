@@ -79,7 +79,25 @@ class AdminEventsViews {
       }
 
     } elseif ( $is_recurring_parent ) {
-      $post_states['_bc_events_recurring_parent'] = 'Recurring Parent';
+      $freq = get_post_meta($post->ID, $this->keys['freq'], true);
+
+      if ( $freq ) {
+        $state = '';
+        switch ($freq) {
+          case 'concurrent':
+            $state = ' (Concurrent)';
+            break;
+          case 'weekly':
+            $state = ' (Weekly)';
+            break;
+          case 'daily':
+            $state = ' (Daily)';
+            break;
+        }
+        $post_states['_bc_events_recurring_parent_concurrent'] = 'Recurring Parent' . $state;
+      } else {
+        $post_states['_bc_events_recurring_parent'] = 'Recurring Parent';
+      }
     }
 
     return $post_states;
@@ -128,16 +146,29 @@ class AdminEventsViews {
     if ( 'event_date' === $column ) {
 
       $formatter  = TemplateHelpers::getInstance();
-
       $start_date = $formatter->get_formatted_start_date($post_id);
       $end_date   = $formatter->get_formatted_end_date($post_id);
 
       if ( $is_recurring_parent ) {
-        echo 'Starts: ' . $start_date;
 
-        $last = $db_helpers->get_last_child_event($post_id);
-        if ( $last ) {
-          echo '<br>Ends: ' . $formatter->date_from_timestamp($last);
+        $freq = get_post_meta($post_id, $this->keys['freq'], true);
+
+        if ($freq === 'concurrent') {
+          echo 'First Start: ' . $formatter->get_formatted_start_date($post_id) . ' @ ' . $formatter->get_formatted_start_time($post_id);
+        } else {
+          echo 'Starts: ' . $start_date;
+        }
+
+        if ($freq === 'concurrent') {
+          $last = $db_helpers->get_last_child_event_end($post_id);
+          if ( $last ) {
+            echo '<br>Last End: ' . $formatter->date_from_timestamp($last) . ' @ ' . $formatter->time_from_timestamp($last);
+          }
+        } else {
+          $last = $db_helpers->get_last_child_event($post_id);
+          if ( $last ) {
+            echo '<br>Ends: ' . $formatter->date_from_timestamp($last);
+          }
         }
         
       } elseif ( $start_date === $end_date ) {

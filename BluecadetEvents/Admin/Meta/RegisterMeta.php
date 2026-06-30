@@ -131,7 +131,7 @@ class RegisterMeta {
 			'description' => __( 'Event recurrence frequency', 'basecadet' ),
       'default' => 'daily',
       'sanitize_callback' => function( $value ) {
-        $allowed = ['none', 'daily', 'weekly', 'monthly'];
+        $allowed = ['none', 'daily', 'weekly', 'monthly', 'concurrent'];
         return in_array( $value, $allowed ) ? $value : 'none';
       },
 		] ) );
@@ -177,22 +177,23 @@ class RegisterMeta {
       },
 		] ) );
 
-    // Multi Times - array of 24 hour times (e.g. ['14:00', '16:00'])
-    // register_post_meta( $meta_type, $meta_ns  . 'recurring_use_multi_time', array_merge( $bool_args, [
-		// 	'description' => __( 'Event multi times', 'basecadet' ),
-		// ] ) );
+    // Concurrent Offset
+    register_post_meta( $meta_type, $this->keys['freq_concurrent_offset'], array_merge( $int_args, [
+			'description' => __( 'Event recurrence offset - time between occurrences', 'basecadet' ),
+      'default' => 0,
+      'sanitize_callback' => function( $value ) {
+        return is_numeric( $value ) ? intval( $value ) : 0;
+      },
+		] ) );
 
-
-    // Multi Times - array of 24 hour times (e.g. ['14:00', '16:00'])
-    // register_post_meta( $meta_type, $meta_ns  . 'recurring_multi_time', array_merge( $array_args, [
-		// 	'description' => __( 'Event multi times', 'basecadet' ),
-    //   'sanitize_callback' => function( $value ) {
-    //     if ( ! is_array( $value ) ) {
-    //       return [];
-    //     }
-    //     return array_filter( $value, fn( $item ) => preg_match( '/^(2[0-3]|[01]?[0-9]):([0-5]?[0-9])$/', $item ) );
-    //   },
-		// ] ) );
+    // Concurrent Count
+    register_post_meta( $meta_type, $this->keys['freq_concurrent_count'], array_merge( $int_args, [
+			'description' => __( 'Event recurrence count - number of occurrences', 'basecadet' ),
+      'default' => 2,
+      'sanitize_callback' => function( $value ) {
+        return is_numeric( $value ) ? intval( $value ) : 2;
+      },
+		] ) );
 
     // Recurrence End Options
     register_post_meta( $meta_type, $this->keys['freq_end_type'], array_merge( $string_args, [

@@ -210,6 +210,7 @@ class RestRoutes {
       'use_series' => Hooks::hook_filter_use_event_series(),
       'use_recuring_description' => Hooks::hook_filter_use_event_recurring_description(),
       'recurring_description_helper_text' => Hooks::hook_filter_recurring_description_helper_text(),
+      'frequency_options' => Hooks::hook_filter_frequency_options(),
     ];
 
     return rest_ensure_response( $settings );

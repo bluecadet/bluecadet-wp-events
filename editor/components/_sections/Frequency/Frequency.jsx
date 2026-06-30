@@ -4,9 +4,11 @@ import { FREQUENCY_OPTIONS, RECURRING_MONTHLY_FREQUENCY_OPTIONS, DAY_OF_WEEK_OPT
 import BasicSelect from '../../_formParts/BasicSelect/BasicSelect';
 import CheckboxButton from '../../_formParts/CheckboxButton/CheckboxButton.jsx';
 import CheckboxFormGroup from '../../_formParts/CheckboxFormGroup/CheckboxFormGroup.js';
+import BasicNumber from '../../_formParts/BasicNumber/BasicNumber.js';
+import Concurrent from '../Concurrent/Concurrent.jsx';
 
 
-export default function Frequency() {
+export default function Frequency({ frequencyOptions = [] }) {
 
   const { keys, meta, setMeta } = getStore();
 
@@ -35,6 +37,8 @@ export default function Frequency() {
   const MONTHLY_DATE = meta?.[ META_MONTHLY_DATE ] ?? '';
   const START_DATE_VALUE = meta?.[ META_START_DATE ];
 
+  const FREQ_OPTS_MERGED = FREQUENCY_OPTIONS( frequencyOptions );
+
   
 
   return (
@@ -50,7 +54,7 @@ export default function Frequency() {
                 id="recurring-frequency"
                 label={ __( 'Frequency', 'basecadet' ) }
                 value={ FREQUENCY_VALUE }
-                options={ FREQUENCY_OPTIONS }
+                options={ FREQ_OPTS_MERGED }
                 onChange={ ( val ) => setMeta( { ...meta, [ META_FREQUENCY ]: val } ) }
               />
             </div>
@@ -116,49 +120,59 @@ export default function Frequency() {
               </>
             ) }
 
-            <div className="bc-event-dates__frequency-row">
-              <BasicSelect
-                id="end-type"
-                label={ __( 'Ends', 'basecadet' ) }
-                value={ END_TYPE_VALUE }
-                options={ [
-                  { value: 'on_date', label: __( 'On Selected Date', 'basecadet' ) },
-                  { value: 'after_x', label: __( 'After [X] Events', 'basecadet' ) },
-                ] }
-                onChange={ ( val ) => {
-                  setMeta( { ...meta, [ META_END_TYPE ]: val } ) 
-                } }
-              />
-            </div>
 
-            { END_TYPE_VALUE === 'on_date' && (
-              <div className="bc-event-dates__frequency-row bc-event-dates__input-row">
-                <label className="bc-event-dates__label" htmlFor="recurring-end-date">{ __( 'At the end of day:', 'basecadet' ) }</label>
-                <input
-                  className={ `bc-event-dates__input` }
-                  type="date"
-                  id="recurring-end-date"
-                  value={ END_DATE_VALUE }
-                  min={ START_DATE_VALUE || undefined }
-                  onChange={ ( e ) => setMeta( { ...meta, [ META_END_DATE ]: e.target.value } ) }
-                />
-              </div>
+            { FREQUENCY_VALUE === 'concurrent' && (
+              <Concurrent/>
             ) }
 
-            { END_TYPE_VALUE === 'after_x' && (
-              <div className="bc-event-dates__frequency-row bc-event-dates__input-row">
-                <label className="bc-event-dates__label" htmlFor="recurring-end-after-x">{ __( 'After', 'basecadet' ) }</label>
-                <input
-                  className={ `bc-event-dates__input` }
-                  type="number"
-                  id="recurring-end-after-x"
-                  value={ END_AFTER_X_VALUE }
-                  min={ 1 }
-                  onChange={ ( e ) => setMeta( { ...meta, [ META_END_AFTER_X ]: parseInt(e.target.value, 10) } ) }
-                />
-                <span className="bc-event-dates__label bc-event-dates__recurring-end-after-x-label">{ __( 'events', 'basecadet' ) }</span>
-              </div>
+            { FREQUENCY_VALUE !== 'concurrent' && (
+              <>
+                <div className="bc-event-dates__frequency-row">
+                  <BasicSelect
+                    id="end-type"
+                    label={ __( 'Ends', 'basecadet' ) }
+                    value={ END_TYPE_VALUE }
+                    options={ [
+                      { value: 'on_date', label: __( 'On Selected Date', 'basecadet' ) },
+                      { value: 'after_x', label: __( 'After [X] Events', 'basecadet' ) },
+                    ] }
+                    onChange={ ( val ) => {
+                      setMeta( { ...meta, [ META_END_TYPE ]: val } ) 
+                    } }
+                  />
+                </div>
+
+                { END_TYPE_VALUE === 'on_date' && (
+                  <div className="bc-event-dates__frequency-row bc-event-dates__input-row">
+                    <label className="bc-event-dates__label" htmlFor="recurring-end-date">{ __( 'At the end of day:', 'basecadet' ) }</label>
+                    <input
+                      className={ `bc-event-dates__input` }
+                      type="date"
+                      id="recurring-end-date"
+                      value={ END_DATE_VALUE }
+                      min={ START_DATE_VALUE || undefined }
+                      onChange={ ( e ) => setMeta( { ...meta, [ META_END_DATE ]: e.target.value } ) }
+                    />
+                  </div>
+                ) }
+
+                { END_TYPE_VALUE === 'after_x' && (
+                  <div className="bc-event-dates__frequency-row bc-event-dates__input-row">
+                    <label className="bc-event-dates__label" htmlFor="recurring-end-after-x">{ __( 'After', 'basecadet' ) }</label>
+                    <input
+                      className={ `bc-event-dates__input` }
+                      type="number"
+                      id="recurring-end-after-x"
+                      value={ END_AFTER_X_VALUE }
+                      min={ 1 }
+                      onChange={ ( e ) => setMeta( { ...meta, [ META_END_AFTER_X ]: parseInt(e.target.value, 10) } ) }
+                    />
+                    <span className="bc-event-dates__label bc-event-dates__recurring-end-after-x-label">{ __( 'events', 'basecadet' ) }</span>
+                  </div>
+                ) }
+              </>
             ) }
+            
 
           </div>
         )

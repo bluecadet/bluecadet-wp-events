@@ -36,4 +36,24 @@
 }
 
 
+.bc-event-dates__frequency-row--concurrent {
+
+  .bc-event-dates__label {
+    line-height: 1.2;
+  }
+}
+
+.bc-event-dates__concurrent-duration {
+  margin-top: 24px;
+}
+
+.bc-event-dates__concurrent-list {
+  padding-left: 20px;
+  list-style: disc;
+
+  p + p {
+    margin-top: 8px;
+  }
+}
+
 

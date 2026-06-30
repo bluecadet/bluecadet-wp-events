@@ -2520,6 +2520,7 @@ function EventFields() {
   const [useLocations, setUseLocations] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
   const [useSeries, setUseSeries] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
   const [useRecurDesc, setUseRecurDesc] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
+  const [frequencyOptions, setFrequencyOptions] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useState)([]);
   const postID = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_0__.useSelect)(select => select('core/editor').getCurrentPostId());
   const {
     meta,
@@ -2577,6 +2578,7 @@ function EventFields() {
         setUseLocations(response?.use_locations ?? false);
         setUseSeries(response?.use_series ?? false);
         setUseRecurDesc(response?.use_recuring_description && response?.recurring_description_helper_text ? response.recurring_description_helper_text : false);
+        setFrequencyOptions(response?.frequency_options ?? []);
       } catch (error) {
         console.error('Error fetching support settings:', error);
       }
@@ -2616,7 +2618,8 @@ function EventFields() {
             setMeta
           }
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_sections_Recurring_Recurring_jsx__WEBPACK_IMPORTED_MODULE_10__["default"], {
-          useRecurDesc: useRecurDesc
+          useRecurDesc: useRecurDesc,
+          frequencyOptions: frequencyOptions
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_17__.jsx)(_utils_slots_js__WEBPACK_IMPORTED_MODULE_15__.AfterRecurringSlot, {
           fillProps: {
             keys,
@@ -3253,6 +3256,166 @@ function ChildEventDetails({
 
 /***/ },
 
+/***/ "./editor/components/_sections/Concurrent/Concurrent.jsx"
+/*!***************************************************************!*\
+  !*** ./editor/components/_sections/Concurrent/Concurrent.jsx ***!
+  \***************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Concurrent)
+/* harmony export */ });
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _utils_store__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../_utils/store */ "./editor/components/_utils/store.js");
+/* harmony import */ var _formParts_BasicNumber_BasicNumber_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../_formParts/BasicNumber/BasicNumber.js */ "./editor/components/_formParts/BasicNumber/BasicNumber.js");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+
+function Concurrent() {
+  const {
+    keys,
+    meta,
+    setMeta
+  } = (0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getStore)();
+  const META_FREQ_CON_OFFSET = (0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_concurrent_offset', keys);
+  const META_FREQ_CON_COUNT = (0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('freq_concurrent_count', keys);
+  const FREQ_CON_OFFSET = meta?.[META_FREQ_CON_OFFSET] ?? 0;
+  const FREQ_CON_COUNT = meta?.[META_FREQ_CON_COUNT] ?? 2;
+  const START_DATE = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_date', keys)];
+  const START_TIME = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('start_time', keys)];
+  const END_DATE = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('end_date', keys)];
+  const END_TIME = meta?.[(0,_utils_store__WEBPACK_IMPORTED_MODULE_1__.getKey)('end_time', keys)];
+  const [duration, setDuration] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)(0);
+  const [durationTotal, setDurationTotal] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)('0');
+  const [lastStart, setLastStart] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)('');
+  const [lastEnd, setLastEnd] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)('');
+  const [occurenceList, setOccurenceList] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useState)([]);
+  const minutesToNaturalTime = minutes => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours === 0 && mins === 0) return '0 minutes';
+    const hourPart = hours > 0 ? `${hours} ${hours === 1 ? 'hour' : 'hours'}` : '';
+    const minPart = mins > 0 ? `${mins} ${mins === 1 ? 'minute' : 'minutes'}` : '';
+    return [hourPart, minPart].filter(Boolean).join(' and ');
+  };
+  const formatDate = date => {
+    return date.toLocaleString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    }).replace(',', '').replace(', ', ' at ');
+  };
+  const getAllOccurrences = (startDate, endDate, count, offsetMinutes) => {
+    const durationMs = endDate - startDate;
+    const offsetMs = offsetMinutes * 60 * 1000;
+    const intervalMs = durationMs + offsetMs;
+    return Array.from({
+      length: count
+    }, (_, i) => {
+      const occurrenceStart = new Date(startDate.getTime() + intervalMs * i);
+      const occurrenceEnd = new Date(occurrenceStart.getTime() + durationMs);
+      return {
+        start: formatDate(occurrenceStart),
+        end: formatDate(occurrenceEnd)
+      };
+    });
+  };
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
+    if (START_DATE && START_TIME && END_DATE && END_TIME) {
+      const startDateTime = new Date(`${START_DATE}T${START_TIME}`);
+      const endDateTime = new Date(`${END_DATE}T${END_TIME}`);
+      const durationInMs = endDateTime - startDateTime;
+      const offsetInMs = FREQ_CON_OFFSET * 60 * 1000;
+      const durationInMinutes = Math.floor(durationInMs / (1000 * 60));
+      const durationTotal = durationInMinutes + FREQ_CON_OFFSET;
+
+      // const lastStartDate = new Date( startDateTime.getTime() + ( durationTotal * ( FREQ_CON_COUNT - 1 ) * 60 * 1000 ) );
+      // const lastEndDate = new Date( lastStartDate.getTime() + ( durationInMinutes * 60 * 1000 ) );
+
+      // setLastStart( formatDate( lastStartDate ) );
+      // setLastEnd( formatDate( lastEndDate ) );
+
+      setDuration(minutesToNaturalTime(durationInMinutes));
+      setDurationTotal(minutesToNaturalTime(durationTotal));
+      setOccurenceList(getAllOccurrences(startDateTime, endDateTime, FREQ_CON_COUNT, FREQ_CON_OFFSET));
+    }
+  }, [START_DATE, START_TIME, END_DATE, END_TIME, FREQ_CON_OFFSET, FREQ_CON_COUNT]);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+    className: "bc-event-dates__frequency-row bc-event-dates__frequency-row--concurrent",
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+      class: "bc-events__flex-fieldset",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_formParts_BasicNumber_BasicNumber_js__WEBPACK_IMPORTED_MODULE_2__["default"], {
+        id: "recurring-concurrent-offset",
+        label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Offset (minutes)', 'basecadet'),
+        value: meta?.[META_FREQ_CON_OFFSET] ?? 0,
+        min: 0,
+        onChange: val => setMeta({
+          ...meta,
+          [META_FREQ_CON_OFFSET]: parseInt(val, 10)
+        }),
+        helperText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('How long after the event ends does the next begin?', 'basecadet')
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_formParts_BasicNumber_BasicNumber_js__WEBPACK_IMPORTED_MODULE_2__["default"], {
+        id: "recurring-concurrent-count",
+        label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Count', 'basecadet'),
+        value: meta?.[META_FREQ_CON_COUNT] ?? 2,
+        min: 2,
+        onChange: val => setMeta({
+          ...meta,
+          [META_FREQ_CON_COUNT]: parseInt(val, 10)
+        }),
+        helperText: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('How many occurrences should there be? (minimum 2)', 'basecadet')
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+        className: "bc-event-dates__concurrent-duration",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("p", {
+          className: "bc-event-dates__description",
+          children: ["This event has a duration of ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("strong", {
+            children: duration
+          }), ". With an offset of ", FREQ_CON_OFFSET, " minutes, there will be an occurrence every ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("strong", {
+            children: durationTotal
+          }), ":"]
+        }), occurenceList.length > 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("ul", {
+            className: "bc-event-dates__concurrent-list",
+            children: occurenceList.map((occurrence, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("li", {
+              className: "bc-event-dates__description",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("p", {
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("strong", {
+                  children: "Start:"
+                }), " ", occurrence.start]
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("p", {
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("strong", {
+                  children: "End:"
+                }), " ", occurrence.end]
+              })]
+            }, `occurrence-list-${index}`))
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+          className: "bc-event-dates__concurrent-duration-notice bc-events__recurring-notice-inner",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("p", {
+            className: "bc-event-dates__description",
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("strong", {
+              children: "Specific Dates and Exclusions cannot be added when the Frequency is set to Concurrent."
+            })
+          })
+        })]
+      })]
+    })
+  });
+}
+
+/***/ },
+
 /***/ "./editor/components/_sections/CustomOccurences/CustomOccurences.jsx"
 /*!***************************************************************************!*\
   !*** ./editor/components/_sections/CustomOccurences/CustomOccurences.jsx ***!
@@ -3620,8 +3783,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _formParts_BasicSelect_BasicSelect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../_formParts/BasicSelect/BasicSelect */ "./editor/components/_formParts/BasicSelect/BasicSelect.js");
 /* harmony import */ var _formParts_CheckboxButton_CheckboxButton_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../_formParts/CheckboxButton/CheckboxButton.jsx */ "./editor/components/_formParts/CheckboxButton/CheckboxButton.jsx");
 /* harmony import */ var _formParts_CheckboxFormGroup_CheckboxFormGroup_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../_formParts/CheckboxFormGroup/CheckboxFormGroup.js */ "./editor/components/_formParts/CheckboxFormGroup/CheckboxFormGroup.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _formParts_BasicNumber_BasicNumber_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../_formParts/BasicNumber/BasicNumber.js */ "./editor/components/_formParts/BasicNumber/BasicNumber.js");
+/* harmony import */ var _Concurrent_Concurrent_jsx__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../Concurrent/Concurrent.jsx */ "./editor/components/_sections/Concurrent/Concurrent.jsx");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__);
 
 
 
@@ -3629,7 +3794,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function Frequency() {
+
+
+function Frequency({
+  frequencyOptions = []
+}) {
   const {
     keys,
     meta,
@@ -3657,28 +3826,29 @@ function Frequency() {
   const MONTHLY_DAY = meta?.[META_MONTHLY_DAY] ?? '';
   const MONTHLY_DATE = meta?.[META_MONTHLY_DATE] ?? '';
   const START_DATE_VALUE = meta?.[META_START_DATE];
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
+  const FREQ_OPTS_MERGED = (0,_blocks_src_event_dates_data_js__WEBPACK_IMPORTED_MODULE_2__.FREQUENCY_OPTIONS)(frequencyOptions);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
     className: "bc-event-dates__frequency",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("p", {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("p", {
       className: "bc-event-dates__description",
       children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('If your event recurs on a specific schedule, you can set the frequency here.', 'bluecadet-events')
-    }), USE_FREQUENCY && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
+    }), USE_FREQUENCY && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
       className: "bc-events__flex-fieldset",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
         className: "bc-event-dates__frequency-row",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_formParts_BasicSelect_BasicSelect__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_formParts_BasicSelect_BasicSelect__WEBPACK_IMPORTED_MODULE_3__["default"], {
           id: "recurring-frequency",
           label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Frequency', 'basecadet'),
           value: FREQUENCY_VALUE,
-          options: _blocks_src_event_dates_data_js__WEBPACK_IMPORTED_MODULE_2__.FREQUENCY_OPTIONS,
+          options: FREQ_OPTS_MERGED,
           onChange: val => setMeta({
             ...meta,
             [META_FREQUENCY]: val
           })
         })
-      }), FREQUENCY_VALUE === 'weekly' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+      }), FREQUENCY_VALUE === 'weekly' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
         className: "bc-event-dates__frequency-row",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_formParts_CheckboxFormGroup_CheckboxFormGroup_js__WEBPACK_IMPORTED_MODULE_5__["default"], {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_formParts_CheckboxFormGroup_CheckboxFormGroup_js__WEBPACK_IMPORTED_MODULE_5__["default"], {
           id: "recurring-custom-occurrences",
           label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Day(s) of the week', 'basecadet'),
           values: WEEKLY_DAYS,
@@ -3690,10 +3860,10 @@ function Frequency() {
             });
           }
         })
-      }), FREQUENCY_VALUE === 'monthly' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+      }), FREQUENCY_VALUE === 'monthly' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
           className: "bc-event-dates__frequency-row",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_formParts_BasicSelect_BasicSelect__WEBPACK_IMPORTED_MODULE_3__["default"], {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_formParts_BasicSelect_BasicSelect__WEBPACK_IMPORTED_MODULE_3__["default"], {
             id: "recurring-monthly-schedule",
             label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Schedule', 'basecadet'),
             value: MONTHLY_SCHED,
@@ -3703,12 +3873,12 @@ function Frequency() {
               [META_MONTHLY_SCHEDULE]: val
             })
           })
-        }), MONTHLY_SCHED === 'date' ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
+        }), MONTHLY_SCHED === 'date' ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
           className: "bc-event-dates__frequency-row bc-event-dates__input-row",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("label", {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("label", {
             className: "bc-event-dates__label",
             children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Day of Month', 'basecadet')
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("input", {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("input", {
             className: "bc-event-dates__input",
             type: "number",
             value: MONTHLY_DATE,
@@ -3724,9 +3894,9 @@ function Frequency() {
               });
             }
           })]
-        }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+        }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
           className: "bc-event-dates__frequency-row",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_formParts_BasicSelect_BasicSelect__WEBPACK_IMPORTED_MODULE_3__["default"], {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_formParts_BasicSelect_BasicSelect__WEBPACK_IMPORTED_MODULE_3__["default"], {
             id: "recurring-monthly-day",
             label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Weekday', 'basecadet'),
             value: MONTHLY_DAY,
@@ -3737,67 +3907,69 @@ function Frequency() {
             })
           })
         })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
-        className: "bc-event-dates__frequency-row",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_formParts_BasicSelect_BasicSelect__WEBPACK_IMPORTED_MODULE_3__["default"], {
-          id: "end-type",
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Ends', 'basecadet'),
-          value: END_TYPE_VALUE,
-          options: [{
-            value: 'on_date',
-            label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('On Selected Date', 'basecadet')
-          }, {
-            value: 'after_x',
-            label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('After [X] Events', 'basecadet')
-          }],
-          onChange: val => {
-            setMeta({
+      }), FREQUENCY_VALUE === 'concurrent' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_Concurrent_Concurrent_jsx__WEBPACK_IMPORTED_MODULE_7__["default"], {}), FREQUENCY_VALUE !== 'concurrent' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
+          className: "bc-event-dates__frequency-row",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_formParts_BasicSelect_BasicSelect__WEBPACK_IMPORTED_MODULE_3__["default"], {
+            id: "end-type",
+            label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Ends', 'basecadet'),
+            value: END_TYPE_VALUE,
+            options: [{
+              value: 'on_date',
+              label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('On Selected Date', 'basecadet')
+            }, {
+              value: 'after_x',
+              label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('After [X] Events', 'basecadet')
+            }],
+            onChange: val => {
+              setMeta({
+                ...meta,
+                [META_END_TYPE]: val
+              });
+            }
+          })
+        }), END_TYPE_VALUE === 'on_date' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
+          className: "bc-event-dates__frequency-row bc-event-dates__input-row",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("label", {
+            className: "bc-event-dates__label",
+            htmlFor: "recurring-end-date",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('At the end of day:', 'basecadet')
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("input", {
+            className: `bc-event-dates__input`,
+            type: "date",
+            id: "recurring-end-date",
+            value: END_DATE_VALUE,
+            min: START_DATE_VALUE || undefined,
+            onChange: e => setMeta({
               ...meta,
-              [META_END_TYPE]: val
-            });
-          }
-        })
-      }), END_TYPE_VALUE === 'on_date' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-        className: "bc-event-dates__frequency-row bc-event-dates__input-row",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("label", {
-          className: "bc-event-dates__label",
-          htmlFor: "recurring-end-date",
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('At the end of day:', 'basecadet')
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("input", {
-          className: `bc-event-dates__input`,
-          type: "date",
-          id: "recurring-end-date",
-          value: END_DATE_VALUE,
-          min: START_DATE_VALUE || undefined,
-          onChange: e => setMeta({
-            ...meta,
-            [META_END_DATE]: e.target.value
-          })
-        })]
-      }), END_TYPE_VALUE === 'after_x' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-        className: "bc-event-dates__frequency-row bc-event-dates__input-row",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("label", {
-          className: "bc-event-dates__label",
-          htmlFor: "recurring-end-after-x",
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('After', 'basecadet')
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("input", {
-          className: `bc-event-dates__input`,
-          type: "number",
-          id: "recurring-end-after-x",
-          value: END_AFTER_X_VALUE,
-          min: 1,
-          onChange: e => setMeta({
-            ...meta,
-            [META_END_AFTER_X]: parseInt(e.target.value, 10)
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("span", {
-          className: "bc-event-dates__label bc-event-dates__recurring-end-after-x-label",
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('events', 'basecadet')
+              [META_END_DATE]: e.target.value
+            })
+          })]
+        }), END_TYPE_VALUE === 'after_x' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
+          className: "bc-event-dates__frequency-row bc-event-dates__input-row",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("label", {
+            className: "bc-event-dates__label",
+            htmlFor: "recurring-end-after-x",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('After', 'basecadet')
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("input", {
+            className: `bc-event-dates__input`,
+            type: "number",
+            id: "recurring-end-after-x",
+            value: END_AFTER_X_VALUE,
+            min: 1,
+            onChange: e => setMeta({
+              ...meta,
+              [META_END_AFTER_X]: parseInt(e.target.value, 10)
+            })
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("span", {
+            className: "bc-event-dates__label bc-event-dates__recurring-end-after-x-label",
+            children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('events', 'basecadet')
+          })]
         })]
       })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
       className: "bc-event-dates__frequency-row bc-event-dates__frequency-toggle",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_formParts_CheckboxButton_CheckboxButton_jsx__WEBPACK_IMPORTED_MODULE_4__["default"], {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_formParts_CheckboxButton_CheckboxButton_jsx__WEBPACK_IMPORTED_MODULE_4__["default"], {
         id: "use-frequency",
         label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Set a Frequency', 'basecadet'),
         pressedLabel: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Remove Frequency', 'basecadet'),
@@ -4002,7 +4174,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function Recurring({
-  useRecurDesc = false
+  useRecurDesc = false,
+  frequencyOptions = {}
 }) {
   const {
     keys,
@@ -4017,6 +4190,8 @@ function Recurring({
   const META_RECUR_DESC = (0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('recur_desc', keys);
   const IS_RECURRING = meta?.[META_IS_RECURRING] ?? false;
   const IS_RECURRING_WAS = meta?.[META_IS_RECURRING_WAS] ?? IS_RECURRING;
+  const USE_FREQUENCY = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('use_frequency', keys)] ?? false;
+  const FREQUENCY_VALUE = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_5__.getKey)('freq', keys)] ?? '';
   const isFreqCondensed = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useSelect)(select => select(_wordpress_preferences__WEBPACK_IMPORTED_MODULE_3__.store).get('bc-events/frequency-condensed', 'condensed'));
   const isDescCondensed = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useSelect)(select => select(_wordpress_preferences__WEBPACK_IMPORTED_MODULE_3__.store).get('bc-events/recur-desc-condensed', 'condensed'));
   const isCustomOccurrencesCondensed = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useSelect)(select => select(_wordpress_preferences__WEBPACK_IMPORTED_MODULE_3__.store).get('bc-events/custom-occurrences-condensed', 'condensed'));
@@ -4043,6 +4218,7 @@ function Recurring({
       unlockPostSaving(LOCK_KEY);
     }
   }, [IS_RECURRING, IS_RECURRING_WAS, userAllowDelete]);
+  console.log(frequencyOptions);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)("div", {
     className: "bc-event-recurring",
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)("div", {
@@ -4069,7 +4245,7 @@ function Recurring({
             helperText: useRecurDesc
           })
         })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)("div", {
+      }), Object.keys(frequencyOptions).length > 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)("div", {
         className: "bc-event-recurring__section",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_9__["default"], {
           title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Frequency Options', 'basecadet'),
@@ -4079,29 +4255,33 @@ function Recurring({
           titleTag: "h3"
         }), !isFreqCondensed && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)("div", {
           className: "bc-event__content-section",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_Frequency_Frequency_jsx__WEBPACK_IMPORTED_MODULE_6__["default"], {})
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_Frequency_Frequency_jsx__WEBPACK_IMPORTED_MODULE_6__["default"], {
+            frequencyOptions: frequencyOptions
+          })
         })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)("div", {
-        className: "bc-event-recurring__section",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_9__["default"], {
-          title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Specific Dates', 'basecadet'),
-          value: isCustomOccurrencesCondensed,
-          onChange: value => toggleCondensed('custom-occurrences', value),
-          asTitle: false
-        }), !isCustomOccurrencesCondensed && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)("div", {
-          className: "bc-event__content-section",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_CustomOccurences_CustomOccurences_jsx__WEBPACK_IMPORTED_MODULE_7__["default"], {})
-        })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)("div", {
-        className: "bc-event-recurring__section",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_9__["default"], {
-          title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Exclusions', 'basecadet'),
-          value: isOmitDatesCondensed,
-          onChange: value => toggleCondensed('omit-dates', value),
-          asTitle: false
-        }), !isOmitDatesCondensed && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)("div", {
-          className: "bc-event__content-section",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_OmitDates_OmitDates_jsx__WEBPACK_IMPORTED_MODULE_8__["default"], {})
+      }), (!USE_FREQUENCY || USE_FREQUENCY && FREQUENCY_VALUE !== 'concurrent') && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)("div", {
+          className: "bc-event-recurring__section",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_9__["default"], {
+            title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Specific Dates', 'basecadet'),
+            value: isCustomOccurrencesCondensed,
+            onChange: value => toggleCondensed('custom-occurrences', value),
+            asTitle: false
+          }), !isCustomOccurrencesCondensed && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)("div", {
+            className: "bc-event__content-section",
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_CustomOccurences_CustomOccurences_jsx__WEBPACK_IMPORTED_MODULE_7__["default"], {})
+          })]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)("div", {
+          className: "bc-event-recurring__section",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_SectionToggle_SectionToggle_jsx__WEBPACK_IMPORTED_MODULE_9__["default"], {
+            title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Exclusions', 'basecadet'),
+            value: isOmitDatesCondensed,
+            onChange: value => toggleCondensed('omit-dates', value),
+            asTitle: false
+          }), !isOmitDatesCondensed && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)("div", {
+            className: "bc-event__content-section",
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_OmitDates_OmitDates_jsx__WEBPACK_IMPORTED_MODULE_8__["default"], {})
+          })]
         })]
       })]
     }), !IS_RECURRING && IS_RECURRING_WAS && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_RemoveRecurring_RemoveRecurring_jsx__WEBPACK_IMPORTED_MODULE_11__["default"], {
@@ -4172,7 +4352,7 @@ function RecurringAltered() {
   const OMISSIONS = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('omissions', keys)];
   const RECUR_WAS = meta?.[(0,_utils_store_js__WEBPACK_IMPORTED_MODULE_1__.getKey)('recur_strategy_was', keys)];
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_6__.useEffect)(() => {
-    if (!RECUR_WAS) {
+    if (!RECUR_WAS || RECUR_WAS.length === 0) {
       setHasRecurDiff(false);
     } else {
       const currentRecur = {
@@ -4193,6 +4373,14 @@ function RecurringAltered() {
         primary_end_date: END_DATE,
         primary_end_time: END_TIME
       };
+      console.log('HELLO');
+      const RESULT = lodash__WEBPACK_IMPORTED_MODULE_7___default().filter(lodash__WEBPACK_IMPORTED_MODULE_7___default().keys(currentRecur), key => {
+        if (currentRecur[key] !== RECUR_WAS[key]) {
+          console.log(key, typeof currentRecur[key], currentRecur[key], typeof RECUR_WAS[key], RECUR_WAS[key]);
+        }
+        return currentRecur[key] !== RECUR_WAS[key];
+      });
+      console.log(RESULT);
       setHasRecurDiff(!(0,lodash__WEBPACK_IMPORTED_MODULE_7__.isEqual)(currentRecur, RECUR_WAS));
     }
   }, [USE_FREQUENCY, FREQUENCY_VALUE, WEEKLY_DAYS, MONTHLY_SCHED, MONTHLY_DAY, MONTHLY_DATE, END_TYPE_VALUE, END_DATE_VALUE, END_AFTER_X_VALUE, START_TIMESTAMP, RECUR_WAS, OCCURENCES, OMISSIONS, START_DATE, START_TIME, END_DATE, END_TIME]);
@@ -4629,17 +4817,19 @@ function MissingFields({
             };
           }
         }
-        if (FREQ_END_TYPE === 'on_date') {
-          validationChecks.freq_end_date = {
-            test: FREQ_END_DATE !== '',
-            label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('At the end of day', 'basecadet')
-          };
-        }
-        if (FREQ_END_TYPE === 'after_x') {
-          validationChecks.freq_end_after_x = {
-            test: FREQ_END_AFTER_X !== '',
-            label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('After [X] Events', 'basecadet')
-          };
+        if (FREQ !== 'concurrent') {
+          if (FREQ_END_TYPE === 'on_date') {
+            validationChecks.freq_end_date = {
+              test: FREQ_END_DATE !== '',
+              label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('At the end of day', 'basecadet')
+            };
+          }
+          if (FREQ_END_TYPE === 'after_x') {
+            validationChecks.freq_end_after_x = {
+              test: FREQ_END_AFTER_X !== '',
+              label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('After [X] Events', 'basecadet')
+            };
+          }
         }
       }
       if (OCCURENCES && OCCURENCES.length && OCCURENCES.some(occ => !occ.start_date)) {
@@ -12833,18 +13023,28 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 
-const FREQUENCY_OPTIONS = [{
-  value: 'daily',
-  label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Daily', 'basecadet')
-}, {
-  value: 'weekly',
-  label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Weekly', 'basecadet')
-}, {
-  value: 'monthly',
-  label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Monthly', 'basecadet')
-}
-// { value: 'yearly', label: __( 'Yearly', 'basecadet' ) },
-];
+const FREQUENCY_OPTIONS = options => {
+  const allowedKeys = ['daily', 'weekly', 'monthly', 'yearly', 'concurrent'];
+  let filteredOptions = [];
+  if (options && Object.keys(options).length > 0) {
+    Object.keys(options).forEach(key => {
+      if (allowedKeys.includes(key)) {
+        filteredOptions.push({
+          value: key,
+          label: options[key]
+        });
+      }
+    });
+  }
+  return filteredOptions;
+};
+// [
+//   { value: 'daily', label: __( 'Daily', 'basecadet' ) },
+//   { value: 'weekly', label: __( 'Weekly', 'basecadet' ) },
+//   { value: 'monthly', label: __( 'Monthly', 'basecadet' ) },
+//   // { value: 'yearly', label: __( 'Yearly', 'basecadet' ) },
+// ];
+
 const DAY_OF_WEEK_OPTIONS = [{
   value: 'sunday',
   label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Sunday', 'basecadet')
@@ -12962,6 +13162,53 @@ function BasicCheckbox({
       className: `bc-event-dates__label ${asToggle ? 'bc-event-dates__checkbox--toggle-label' : 'bc-event-dates__checkbox-label'}`,
       htmlFor: id,
       children: label
+    })]
+  });
+}
+
+/***/ },
+
+/***/ "./editor/components/_formParts/BasicNumber/BasicNumber.js"
+/*!*****************************************************************!*\
+  !*** ./editor/components/_formParts/BasicNumber/BasicNumber.js ***!
+  \*****************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ BasicNumber)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+
+function BasicNumber({
+  id,
+  value,
+  label,
+  onChange,
+  min = null,
+  max = null,
+  step = 1,
+  className = null,
+  helperText = null
+}) {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+    className: `bc-event-dates__text-group bc-event-dates__input-row ${className ? className : ''}`,
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
+      className: "bc-event-dates__label bc-event-dates__text-group-label",
+      htmlFor: id,
+      children: label
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
+      type: "number",
+      min: min ?? 0,
+      step: step ?? 1,
+      max: max ?? 999999,
+      className: "bc-event-dates__input bc-event-dates__number bc-event-dates__text-group-text",
+      id: id,
+      value: value,
+      onChange: e => onChange(e.target.value)
+    }), helperText && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", {
+      className: "bc-event-dates__helper-text",
+      children: helperText
     })]
   });
 }

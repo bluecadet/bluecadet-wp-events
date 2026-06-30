@@ -79,6 +79,48 @@ class Hooks {
 
 
 
+  /**
+   * hook_filter_frequency_options
+   * 
+   * Array can only contain 'daily', 'weekly', 'monthly', and 'concurrent'.
+   * If array is empty, no recurring frequency options will be available
+   *
+   * @hook 'bc_events/events/settings/frequency_options'
+   * @hook_object_type Events
+   * @hook_category Settings
+   * @hook_type filter
+   * @return array
+   */
+  public static function hook_filter_frequency_options() {
+
+    $allowed = [
+      'daily' => 'Daily',
+      'weekly' => 'Weekly',
+      'monthly' => 'Monthly',
+      'concurrent' => 'Concurrent',
+    ];
+
+    $options = \apply_filters('bc_events/events/settings/frequency_options', $allowed);
+
+    if ( !is_array($options) || empty($options) ) {
+      $options = $allowed;
+    }
+
+    foreach ($options as $key => $value) {
+      if ( !array_key_exists($key, $allowed) ) {
+        unset($options[$key]);
+      }
+    }
+
+    if ( !is_array($options) || empty($options) ) {
+      $options = $allowed;
+    }
+
+    return $options;
+  }
+
+
+
   // ==================================
   //  Post Type
   // ==================================
