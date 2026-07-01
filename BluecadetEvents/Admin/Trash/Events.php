@@ -1,7 +1,6 @@
 <?php
 
 namespace BluecadetEvents\Admin\Trash;
-use BluecadetEvents\Admin\Meta\MetaKeys;
 use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
 use BluecadetEvents\Admin\Utils\Logger;
@@ -16,58 +15,54 @@ use BluecadetEvents\Admin\Utils\Logger;
 class Events {
 
   public function __construct() {
-    add_action( 'trashed_post', [ $this, 'handle_trashed_post' ], 99, 1 );
-    add_action( 'untrashed_post', [ $this, 'handle_untrashed_post' ], 99, 1 );
+    add_action( 'transition_post_status', [ $this, 'handle_transition_post_status' ], 99, 3 );
     add_action( 'before_delete_post', [ $this, 'handle_before_delete_post' ], 99, 2 );
   }
 
 
   /**
-   * Handle Trashed Post hook
+   * Cascade a parent's trash/untrash to its child events.
    *
-   * @param integer $post_id
+   * Only the trash lane lives here — non-trash status changes (draft/publish/
+   * pending/etc.) are carried to children by the recurrence engine via the
+   * clone's post_status, so handling them here would double-apply. A directly
+   * trashed/untrashed child has no children of its own, so it cascades nowhere:
+   * parents are the single source of truth.
+   *
+   * @param string   $new_status
+   * @param string   $old_status
+   * @param \WP_Post $post
    * @return void
    */
-  public function handle_trashed_post( int $post_id ) : void {
-    if ( \get_post_type( $post_id ) !== Settings::$events_machine_name ) {
+  public function handle_transition_post_status( string $new_status, string $old_status, \WP_Post $post ) : void {
+    if ( $post->post_type !== Settings::$events_machine_name ) {
+      return;
+    }
+
+    if ( $new_status === $old_status ) {
       return;
     }
 
     $DB_HELPERS = DatabaseHelpers::get_instance();
-    $child_events = $DB_HELPERS->is_recurring_parent( $post_id );
+    $child_events = $DB_HELPERS->is_recurring_parent( $post->ID );
 
-    if ( $child_events ) {
-      // Move Child Events to Trash when Parent Event is Trashed
-      foreach ( $child_events as &$child_event ) {
-        $child_id = (int) $child_event;
-        wp_trash_post( $child_id );
-      }
-    }
-  }
-
-
-
-  /**
-   * Handle untrashed post hook
-   *
-   * @param integer $post_id
-   * @return void
-   */
-  public function handle_untrashed_post( int $post_id ) : void {
-    if ( \get_post_type( $post_id ) !== Settings::$events_machine_name ) {
+    if ( ! $child_events ) {
       return;
     }
 
-    $DB_HELPERS = DatabaseHelpers::get_instance();
-    $child_events = $DB_HELPERS->is_recurring_parent( $post_id );
-
-    if ( $child_events ) {
-      // Move Child Events to Trash when Parent Event is Trashed
-      foreach ( $child_events as &$child_event ) {
-        $child_id = (int) $child_event;
-        wp_untrash_post( $child_id );
+    if ( 'trash' === $new_status ) {
+      // Parent trashed -> trash the children.
+      foreach ( $child_events as $child_event ) {
+        wp_trash_post( (int) $child_event );
+      }
+    } elseif ( 'trash' === $old_status ) {
+      // Parent untrashed -> untrash the children.
+      foreach ( $child_events as $child_event ) {
+        wp_untrash_post( (int) $child_event );
       }
     }
+
+    // Any other transition is owned by the recurrence engine; do nothing.
   }
 
 

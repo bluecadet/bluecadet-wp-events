@@ -135,8 +135,15 @@ class Events {
       return;
     }
 
-    // Bail if the post is being trashed or deleted.
-    if ( 'trash' === $post->post_status ) {
+    // Never regenerate on trash, editor placeholders, or revisions. Trash/untrash
+    // status cascading to children is owned by the transition_post_status handler
+    // in Admin\Trash\Events, not the recurrence engine.
+    if ( in_array( $post->post_status, [ 'trash', 'auto-draft', 'inherit' ], true ) ) {
+      return;
+    }
+
+    // ...and skip untrash (status was 'trash' immediately before this save).
+    if ( $post_before instanceof \WP_Post && 'trash' === $post_before->post_status ) {
       return;
     }
 

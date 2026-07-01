@@ -128,14 +128,10 @@ class UpdateOrCreateEvent {
 
   private function copy_data() {
 
-    // Copy post data
-    $post = \wp_insert_post( $this->item->post, true );
-
-    if ( is_wp_error( $post ) ) {
-      Logger::log('Error creating/updating event: ' . $post->get_error_message());
-      return;
-    }
-
+    // The post is already inserted/updated by insert_post() in every path that
+    // reaches here; copying meta/taxonomies is all that's left. A second
+    // wp_insert_post() here (with no ID in the add path) would create a duplicate
+    // published post with no meta and no bc_events row.
 
     // Update Meta
     foreach ( $this->item->meta as $key => $value ) {
