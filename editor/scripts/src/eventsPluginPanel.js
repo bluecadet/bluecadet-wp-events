@@ -83,7 +83,7 @@ function EventSettingsPanel() {
 
 	return (
 		<PluginDocumentSettingPanel name="bc-event-settings" title={ title }>
-			<Button variant="secondary" onClick={ () => setOpen( true ) }>
+			<Button variant="primary" onClick={ () => setOpen( true ) } className="bc-events-settings-panel__button">
 				{ buttonTitle }
 			</Button>
 

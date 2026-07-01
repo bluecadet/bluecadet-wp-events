@@ -25,3 +25,8 @@
 @use '../../_sections/RemoveRecurring/removeRecurring.scss';
 @use '../../_sections/ChildEventDetails/childEventDetails.scss';
 @use '../../_sections/RepeatingPostPicker/repeatingPostPicker.scss';
+
+.bc-events-settings-panel__button {
+  width: 100%;
+  justify-content: center;
+}
