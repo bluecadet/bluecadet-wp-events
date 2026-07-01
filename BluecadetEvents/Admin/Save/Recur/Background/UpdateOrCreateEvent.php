@@ -35,7 +35,8 @@ class UpdateOrCreateEvent {
       } else {
         $this->update_or_add();
       }
-    } finally {
+    } 
+    finally {
       EventsSaveAction::$generating = false;
     }
   }

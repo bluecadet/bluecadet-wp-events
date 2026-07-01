@@ -43,6 +43,7 @@ class Init {
     new Admin\Editor\RestRoutes;
     new Admin\Editor\ClassicEditor\RegisterMetaBoxes;
     new Admin\Save\Events;
+    new Admin\Trash\Events;
 
     BackgroundProcesses::__init();
 

@@ -15,48 +15,11 @@ use BluecadetEvents\Admin\Utils\Logger;
  */
 class Events {
 
-  /**
-   * Meta keys for the event
-   *
-   * @var array
-   */
-  private array $keys = [];
-
-  /**
-   * Child events for the event
-   *
-   * @var array|false
-   */
-  private array|false $child_events = false;
-
-  /**
-   * Database Helpers
-   *
-   * @var DatabaseHelpers
-   */
-  private DatabaseHelpers $DB_HELPERS;
-
-
   public function __construct() {
     add_action( 'trashed_post', [ $this, 'handle_trashed_post' ], 99, 1 );
     add_action( 'untrashed_post', [ $this, 'handle_untrashed_post' ], 99, 1 );
     add_action( 'before_delete_post', [ $this, 'handle_before_delete_post' ], 99, 2 );
   }
-
-
-
-  /**
-   * Set common vars
-   *
-   * @param integer $post_id
-   * @return void
-   */
-  private function set_vars( int $post_id ) : void {
-    $this->keys = MetaKeys::get_keys();
-    $this->DB_HELPERS = DatabaseHelpers::get_instance();
-    $this->child_events = $this->DB_HELPERS->is_recurring_parent( $post_id );
-  }
-
 
 
   /**
@@ -70,11 +33,12 @@ class Events {
       return;
     }
 
-    $this->set_vars( $post_id );
+    $DB_HELPERS = DatabaseHelpers::get_instance();
+    $child_events = $DB_HELPERS->is_recurring_parent( $post_id );
 
-    if ( $this->child_events ) {
+    if ( $child_events ) {
       // Move Child Events to Trash when Parent Event is Trashed
-      foreach ( $this->child_events as &$child_event ) {
+      foreach ( $child_events as &$child_event ) {
         $child_id = (int) $child_event;
         wp_trash_post( $child_id );
       }
@@ -94,11 +58,12 @@ class Events {
       return;
     }
 
-    $this->set_vars( $post_id );
+    $DB_HELPERS = DatabaseHelpers::get_instance();
+    $child_events = $DB_HELPERS->is_recurring_parent( $post_id );
 
-    if ( $this->child_events ) {
+    if ( $child_events ) {
       // Move Child Events to Trash when Parent Event is Trashed
-      foreach ( $this->child_events as &$child_event ) {
+      foreach ( $child_events as &$child_event ) {
         $child_id = (int) $child_event;
         wp_untrash_post( $child_id );
       }
@@ -120,17 +85,19 @@ class Events {
       return;
     }
 
-    $this->set_vars( $post_id );
+    $DB_HELPERS = DatabaseHelpers::get_instance();
+    $child_events = $DB_HELPERS->is_recurring_parent( $post_id );
 
     // Delete Event from DB
-    $this->DB_HELPERS->delete_event( $post_id );
+    $DB_HELPERS->delete_event( $post_id );
 
-    if ( $this->child_events ) {
+    if ( $child_events ) {
       // Permanently Delete Child Events when Parent Event is Permanently Deleted
-      foreach ( $this->child_events as &$child_event ) {
+      foreach ( $child_events as &$child_event ) {
         $child_id = (int) $child_event;
+        $DB_HELPERS->delete_event( $child_id );
         wp_delete_post( $child_id, true );
-        $this->DB_HELPERS->delete_event( $child_id );
+        Logger::log( 'Child Event Deleted: ' . $child_id );
       }
     }
     

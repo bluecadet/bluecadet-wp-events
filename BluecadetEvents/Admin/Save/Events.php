@@ -35,6 +35,11 @@ class Events {
       return;
     }
 
+    // Bail if the post is being trashed or deleted.
+    if ( 'trash' === $post->post_status ) {
+      return;
+    }
+
     remove_action( 'save_post', [$this, 'handle_save_post'], 10 );
 
     $save_keys = MetaKeys::get_event_save_keys();
@@ -127,6 +132,11 @@ class Events {
     }
 
     if ( !current_user_can( 'edit_post', $post_id ) ) {
+      return;
+    }
+
+    // Bail if the post is being trashed or deleted.
+    if ( 'trash' === $post->post_status ) {
       return;
     }
 

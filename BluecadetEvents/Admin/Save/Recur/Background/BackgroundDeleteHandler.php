@@ -28,7 +28,7 @@ class BackgroundDeleteHandler extends \WP_Background_Process {
     Logger::log('DELETING ITEM: ' . $post_id);
 
     $DB_HELPERS = DatabaseHelpers::get_instance();
-    $result = wp_delete_post( $post_id );
+    $result = wp_delete_post( $post_id, true );
 
     if ( $result === false ) {
       Logger::log('ERROR DELETING POST ID: ' . $post_id);
