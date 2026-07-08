@@ -2,6 +2,7 @@
 
 namespace BluecadetEvents\Admin\PostTypes;
 use BluecadetEvents\Admin\Utils\AbstractService;
+use BluecadetEvents\Admin\PostTypes\LabelMaker;
 use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Plugin\Hooks;
 
@@ -13,6 +14,12 @@ use BluecadetEvents\Plugin\Hooks;
  *
  */
 class PostTypes extends AbstractService {
+
+  private string $events_machine_name;
+
+  public function register() : void {
+    $this->events_machine_name = Settings::$events_machine_name;
+  }
   
   public function boot() : void {
     add_action('init', [$this, 'register_custom_post_types']);
@@ -27,9 +34,31 @@ class PostTypes extends AbstractService {
   public function register_custom_post_types() {
 
     Settings::init();
+    $use_series = Hooks::hook_filter_use_event_series();
+    $use_locations = Hooks::hook_filter_use_event_locations();
+
+    $this->register_events();
+
+    if ( $use_locations ) {
+      $this->register_locations();
+    }
+
+    if ( $use_series ) {
+      $this->register_series();
+    }
+  }
+
+
+
+  /**
+   * Register the Events Post Type
+   *
+   * @return void
+   */
+  private function register_events() : void {
 
     $events_slug = Hooks::hook_filter_events_rewrite_slug();
-    $events_machine_name = Settings::$events_machine_name;
+
     // Auto-inserted as a convenience, but freely movable/removable: the always-available
     // "Event Settings" panel guarantees the meta stays editable even without the block.
     $template = Hooks::hook_filter_events_gutenberg_template([
@@ -66,94 +95,100 @@ class PostTypes extends AbstractService {
 
     $args = \apply_filters('bc_events_events_post_type_settings', $default_args);
 
-    register_post_type( $events_machine_name, $args );
+    register_post_type( $this->events_machine_name, $args );
 
-    // Event Locations
-    $use_locations = Hooks::hook_filter_use_event_locations();
-
-    if ( $use_locations ) {
-      $loc_slug = Hooks::hook_filter_locations_rewrite_slug();
-
-      $labels = new LabelMaker('Event Locations', 'Event Location');
-      $labels->labels['all_items'] = 'Event Locations';
-      $labels = $labels->labels;
-
-      $public   = Hooks::hook_filter_set_locations_public();
-      $supports = Hooks::hook_filter_locations_supports();
-
-      $template = Hooks::hook_filter_locations_gutenberg_template([
-        ['bc-events/location', []]
-      ]);
-
-      $default_args = array(
-        'label'                 => $labels['name'],
-        'labels'                => $labels,
-        'supports'              => $supports,
-        'hierarchical'          => false,
-        'public'                => $public,
-        'show_ui'               => true,
-        'menu_position'         => 25,
-        'menu_icon'             => 'dashicons-building',
-        'has_archive'           => $public,
-        'show_in_nav_menus'			=> $public,
-        'show_in_rest'          => true,
-        'template'              => $template,
-        'show_in_menu'          => 'edit.php?post_type=' . $events_machine_name,
-        'rewrite'               => [
-          'slug' => $loc_slug,
-          'with_front' => false,
-        ],
-      );
-
-      $args = \apply_filters('bc_events_location_post_type_settings', $default_args);
-
-      register_post_type( Settings::$locations_machine_name, $args );
-    }
+  }
 
 
-    // Event Series
-    $use_series = Hooks::hook_filter_use_event_series();
 
-    if ( $use_series ) {
-      $series_slug = Hooks::hook_filter_event_series_rewrite_slug();
+  /**
+   * Register the Locations Post Type
+   *
+   * @return void
+   */
+  private function register_locations() : void {
+    $loc_slug = Hooks::hook_filter_locations_rewrite_slug();
 
-      $labels = new LabelMaker('Event Series', 'Event Series');
-      $labels->labels['all_items'] = 'Event Series';
-      $labels = $labels->labels;
+    $labels = new LabelMaker('Event Locations', 'Event Location');
+    $labels->labels['all_items'] = 'Event Locations';
+    $labels = $labels->labels;
 
-      $public = Hooks::hook_filter_set_series_public();
-      $supports = Hooks::hook_filter_series_supports();
+    $public   = Hooks::hook_filter_set_locations_public();
+    $supports = Hooks::hook_filter_locations_supports();
 
-      $template = Hooks::hook_filter_series_gutenberg_template([
-        ['bc-events/series', []]
-      ]);
+    $template = Hooks::hook_filter_locations_gutenberg_template([
+      ['bc-events/location', []]
+    ]);
 
-      $default_args = array(
-        'label'                 => $labels['name'],
-        'labels'                => $labels,
-        'supports'              => $supports,
-        'hierarchical'          => false,
-        'public'                => $public,
-        'show_ui'               => true,
-        'menu_position'         => 25,
-        'menu_icon'             => 'dashicons-list-view',
-        'has_archive'           => $public,
-        'show_in_nav_menus'			=> $public,
-        'show_in_rest'          => true,
-        'show_in_menu'          => 'edit.php?post_type=' . $events_machine_name,
-        'template'              => $template,
-        'rewrite'               => [
-          'slug' => $series_slug,
-          'with_front' => false,
-        ],
-      );
+    $default_args = array(
+      'label'                 => $labels['name'],
+      'labels'                => $labels,
+      'supports'              => $supports,
+      'hierarchical'          => false,
+      'public'                => $public,
+      'show_ui'               => true,
+      'menu_position'         => 25,
+      'menu_icon'             => 'dashicons-building',
+      'has_archive'           => $public,
+      'show_in_nav_menus'			=> $public,
+      'show_in_rest'          => true,
+      'template'              => $template,
+      'show_in_menu'          => 'edit.php?post_type=' . $this->events_machine_name,
+      'rewrite'               => [
+        'slug' => $loc_slug,
+        'with_front' => false,
+      ],
+    );
 
-      $args = \apply_filters('bc_events_series_post_type_settings', $default_args);
+    $args = \apply_filters('bc_events_location_post_type_settings', $default_args);
 
-      register_post_type( Settings::$series_machine_name, $args );
-    }
+    register_post_type( Settings::$locations_machine_name, $args );
+  }
 
 
+
+  /**
+   * Register the Series Post Type
+   *
+   * @return void
+   */
+  private function register_series() : void {
+    $series_slug = Hooks::hook_filter_event_series_rewrite_slug();
+
+    $labels = new LabelMaker('Event Series', 'Event Series');
+    $labels->labels['all_items'] = 'Event Series';
+    $labels = $labels->labels;
+
+    $public = Hooks::hook_filter_set_series_public();
+    $supports = Hooks::hook_filter_series_supports();
+
+    $template = Hooks::hook_filter_series_gutenberg_template([
+      ['bc-events/series', []]
+    ]);
+
+    $default_args = array(
+      'label'                 => $labels['name'],
+      'labels'                => $labels,
+      'supports'              => $supports,
+      'hierarchical'          => false,
+      'public'                => $public,
+      'show_ui'               => true,
+      'menu_position'         => 25,
+      'menu_icon'             => 'dashicons-list-view',
+      'has_archive'           => $public,
+      'show_in_nav_menus'			=> $public,
+      'show_in_rest'          => true,
+      'show_in_menu'          => 'edit.php?post_type=' . $this->events_machine_name,
+      'template'              => $template,
+      'rewrite'               => [
+        'slug' => $series_slug,
+        'with_front' => false,
+      ],
+    );
+
+    $args = \apply_filters('bc_events_series_post_type_settings', $default_args);
+
+    register_post_type( Settings::$series_machine_name, $args );
   }
 
 

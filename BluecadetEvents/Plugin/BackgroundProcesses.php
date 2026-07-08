@@ -10,7 +10,7 @@ class BackgroundProcesses {
   private static BackgroundEventHandler $background_event_handler;
   private static BackgroundDeleteHandler $background_delete_handler;
 
-  public static function __init() {
+  public static function init() {
 
     if ( self::$initialized ) {
       return;
