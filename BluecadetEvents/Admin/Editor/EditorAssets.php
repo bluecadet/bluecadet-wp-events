@@ -1,16 +1,17 @@
 <?php
 
 namespace BluecadetEvents\Admin\Editor;
+use BluecadetEvents\Admin\Utils\AbstractService;
 use BluecadetEvents\Plugin\Settings;
 
-class EditorAssets {
+class EditorAssets extends AbstractService {
 
-  public function __construct() {
+  public function boot() : void {
     add_action( 'enqueue_block_editor_assets', [$this, 'enqueue'] );
     add_action( 'admin_enqueue_scripts', [$this, 'enqueue_classic'] );
   }
 
-  public function enqueue() {
+  public function enqueue() : void {
     $screen = get_current_screen();
 
     $event_post_types = [
@@ -63,7 +64,7 @@ class EditorAssets {
     }
   }
 
-  public function enqueue_classic() {
+  public function enqueue_classic() : void {
     $screen = get_current_screen();
 
     if ( ! $screen ) {

@@ -23,7 +23,7 @@ class EditorScreen {
 
   public function __construct() {
 
-    Settings::__init();
+    Settings::init();
 
     add_action( 'edit_form_after_title', array( $this, 'edit_form_after_title' ) );
 

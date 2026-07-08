@@ -2,7 +2,7 @@
 
 namespace BluecadetEvents\Admin\Editor\ClassicEditor\FormContent;
 use BluecadetEvents\Plugin;
-use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
 
 /**
  * Metabox form component kinda-sorta-api thing.
@@ -26,7 +26,7 @@ class MetaBoxPatterns {
 
   public function __construct(\WP_Post $post) {
     $this->post = $post;
-    $this->keys = MetaKeys::get_keys();
+    $this->keys = EventsMetaKeys::get_keys();
   }
 
 

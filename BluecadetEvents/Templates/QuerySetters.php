@@ -3,7 +3,7 @@
 namespace BluecadetEvents\Templates;
 use BluecadetEvents\Plugin\Hooks;
 use BluecadetEvents\Plugin\Settings;
-use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
 
 class QuerySetters {
 
@@ -28,7 +28,7 @@ class QuerySetters {
     $this->timezone         = \wp_timezone();
     $this->args             = [];
     $this->query_decorators = [];
-    $this->keys             = MetaKeys::get_keys();
+    $this->keys             = EventsMetaKeys::get_keys();
     $this->now_date         = new \DateTime('now', $this->timezone);
     $this->now_ts           = $this->now_date->format('U');
     $this->is_past          = isset($_GET[$this->settings['past_parameter']]);

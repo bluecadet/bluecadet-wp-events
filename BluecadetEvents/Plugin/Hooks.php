@@ -4,25 +4,6 @@ namespace BluecadetEvents\Plugin;
 
 class Hooks {
 
-  private static $_instance = null;
-
-
-  private function  __construct() {
-    // Locked
-  }
-
-  private function  __clone() {
-    // Locked
-  }
-
-  public static function get_instance() {
-    if ( self::$_instance == null ) {
-      self::$_instance = new Hooks();
-    }
-
-    return self::$_instance;
-  }
-
   // ==========================================================================
   //                                Event Hooks
   // ==========================================================================
@@ -151,7 +132,13 @@ class Hooks {
    * @return array
    */
   public static function hook_filter_events_gutenberg_template(array $template) : array {
-    return \apply_filters('bc_events/events/post_type/gutenberg_template', $template);
+    $template = \apply_filters('bc_events/events/post_type/gutenberg_template', $template);
+    
+    if ( !is_array($template) || empty($template) ) {
+      $template = [];
+    }
+    
+    return $template;
   }
 
 

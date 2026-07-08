@@ -1,6 +1,7 @@
 <?php
 
 namespace BluecadetEvents\Admin\Trash;
+use BluecadetEvents\Admin\Utils\AbstractService;
 use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
 use BluecadetEvents\Admin\Utils\Logger;
@@ -12,9 +13,9 @@ use BluecadetEvents\Admin\Utils\Logger;
  * @since  1.0.0
  *
  */
-class Events {
+class Events extends AbstractService {
 
-  public function __construct() {
+  public function boot() : void {
     add_action( 'transition_post_status', [ $this, 'handle_transition_post_status' ], 99, 3 );
     add_action( 'before_delete_post', [ $this, 'handle_before_delete_post' ], 99, 2 );
   }

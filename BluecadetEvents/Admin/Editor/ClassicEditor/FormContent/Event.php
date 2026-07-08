@@ -3,7 +3,7 @@
 namespace BluecadetEvents\Admin\Editor\ClassicEditor\FormContent;
 use BluecadetEvents\Admin\Editor\ClassicEditor\FormContent\MetaBoxPatterns;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
-use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
 use BluecadetEvents\Plugin\Hooks;
 
 
@@ -30,7 +30,7 @@ class Event {
     $this->patterns = new MetaBoxPatterns($post);
     $this->DB_HELPERS = DatabaseHelpers::get_instance();  
     $this->is_recurring_parent = $this->DB_HELPERS->is_recurring_parent($this->post->ID);
-    $this->keys = MetaKeys::get_keys();
+    $this->keys = EventsMetaKeys::get_keys();
     $this->use_locations = Hooks::hook_filter_use_event_locations();
     $this->use_series = Hooks::hook_filter_use_event_series();
 

@@ -3,7 +3,7 @@
 namespace BluecadetEvents\Admin\Editor\ClassicEditor\FormContent;
 use BluecadetEvents\Admin\Editor\ClassicEditor\FormContent\MetaBoxPatterns;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
-use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
 
 
 /**
@@ -25,7 +25,7 @@ class ChildEvent {
     $this->post = $post;
     $this->patterns = new MetaBoxPatterns($post);
     $this->db_helpers = DatabaseHelpers::get_instance(); 
-    $this->keys = MetaKeys::get_keys();
+    $this->keys = EventsMetaKeys::get_keys();
 
     $this->create_form();
   }

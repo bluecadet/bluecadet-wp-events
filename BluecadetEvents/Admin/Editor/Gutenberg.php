@@ -1,23 +1,22 @@
 <?php
 
 namespace BluecadetEvents\Admin\Editor;
+use BluecadetEvents\Admin\Utils\AbstractService;
 use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Plugin\Hooks;
 
-class Gutenberg {
+class Gutenberg extends AbstractService {
 
-  public function __construct() {
+  public function boot() : void {
 
     add_action( 'init', [$this, 'register_blocks'] );
-
     add_filter( 'block_categories_all', [$this, 'add_block_category'], 10, 1 );
-
     add_filter( 'allowed_block_types_all', [$this, 'filter_allowed_block_types'], 10, 2 );
 
   }
 
 
-  public function register_blocks() {
+  public function register_blocks() : void {
 
     $build_dir = \trailingslashit(Settings::$plugin_dir) . 'editor/blocks/dist';
 
@@ -68,7 +67,7 @@ class Gutenberg {
    * @param \WP_Block_Editor_Context $editor_context
    * @return bool|string[]
    */
-  public function filter_allowed_block_types( bool|array $allowed_blocks, \WP_Block_Editor_Context $editor_context ) {
+  public function filter_allowed_block_types( bool|array $allowed_blocks, \WP_Block_Editor_Context $editor_context ) : bool|array {
 
     // No post context (e.g. site/widget editor) — nothing to scope.
     if ( empty( $editor_context->post ) ) {

@@ -1,42 +1,13 @@
 <?php
 
-namespace BluecadetEvents\Admin\Meta;
+namespace BluecadetEvents\Admin\Meta\Keys;
 use BluecadetEvents\Plugin\Settings;
 
-class MetaKeys {
-	private static $_instance = null;
-  private array $keys;
-
-	private function __construct() {
-		Settings::__init();
-    $this->generate_keys();
-	}
-
-	private function __clone() {
-		// Locked.
-	}
-
-	public static function __init() {
-		return self::get_instance();
-	}
-
-	public static function get_instance() {
-		if ( self::$_instance === null ) {
-			self::$_instance = new self();
-		}
-
-		return self::$_instance;
-	}
+class EventsMetaKeys extends AbstractMetaKeys {
 
 
-  public static function get_keys() : array {
-    $instance = self::get_instance();
-    return $instance->keys; 
-  }
-
-
-  private function generate_keys() {
-    $this->keys = [
+  protected function generate_keys(): array {
+    return [
       'start_date' => Settings::$events_meta_ns . 'start_date',
       'start_time' => Settings::$events_meta_ns . 'start_time',
       'start_timestamp' => Settings::$events_meta_ns . 'start_timestamp',
@@ -107,13 +78,10 @@ class MetaKeys {
       $instance->keys['custom_occurrences'] => 'object',
       $instance->keys['omissions'] => 'array',
       $instance->keys['remove_recurring'] => 'string',
-      $instance->keys['child_deny_override'] => 'string',
+      $instance->keys['child_deny_override'] => 'boolean',
       $instance->keys['location_ids'] => 'array',
       $instance->keys['series_ids'] => 'array',
-    ]; 
+    ];
   }
 
-	
-
 }
-  

@@ -1,11 +1,12 @@
 <?php
 
 namespace BluecadetEvents\Admin\Views;
+use BluecadetEvents\Admin\Utils\AbstractService;
 use BluecadetEvents\Plugin;
 use BluecadetEvents\Admin\Admin_Utils;
 use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
-use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
 use BluecadetEvents\Helpers\TemplateHelpers;
 
 /**
@@ -15,7 +16,7 @@ use BluecadetEvents\Helpers\TemplateHelpers;
  * @since  1.0.0
  *
  */
-class AdminEventsViews {
+class AdminEventsViews extends AbstractService {
 
   private string $filter_events_param              = 'bc_query_view';
   private string $event_date_filter_param          = 'bc_events_date';
@@ -24,13 +25,13 @@ class AdminEventsViews {
   private string $filter_events_all_events_key     = 'show_all_events';
   private string $filter_events_parent_only_key    = 'parent_only';
   private string $filter_events_no_alterations_key = 'no_filters';
+  private array  $keys;
 
-  private array $keys;
-
-  function __construct() {
-
-    $this->keys = MetaKeys::get_keys();
+  public function register() : void {
+    $this->keys = EventsMetaKeys::get_keys();
+  }
     
+  public function boot() : void {
     // Add post state to admin list
     add_filter( 'display_post_states', [$this, 'post_states'], 10, 2 );
 
@@ -62,7 +63,7 @@ class AdminEventsViews {
    * @return array
    * @since 1.0.0
    */
-  function post_states( array $post_states, \WP_Post $post ) : array {
+  public function post_states( array $post_states, \WP_Post $post ) : array {
 
     if ( $post->post_type !== 'bc-events') {
       return $post_states;
@@ -113,7 +114,7 @@ class AdminEventsViews {
    * @return array
    * @since 1.0.0
    */
-  function columns_display( array $columns ) : array {
+  public function columns_display( array $columns ) : array {
 
     $new_columns = array(
       'cb'         => $columns['cb'],
@@ -137,7 +138,7 @@ class AdminEventsViews {
    * @return void
    * @since 1.0.0
    */
-  function columns_content( string $column, int $post_id ) : void {
+  public function columns_content( string $column, int $post_id ) : void {
 
     $db_helpers          = DatabaseHelpers::get_instance();
     $is_recurring_child  = $db_helpers->is_recurring_child($post_id);
@@ -210,7 +211,7 @@ class AdminEventsViews {
    * @return array
    * @since 1.0.0
    */
-  function sortable_columns( array $columns ) : array {
+  public function sortable_columns( array $columns ) : array {
     $columns['event_date'] = 'bc_event_date';
     return $columns;
   }
@@ -226,7 +227,7 @@ class AdminEventsViews {
    * @return \WP_Query
    * @since 1.0.0
    */
-  function admin_queries( \WP_Query $query ) : \WP_Query {
+  public function admin_queries( \WP_Query $query ) : \WP_Query {
 
     if ( !is_admin() || !$query->is_main_query() || $query->query['post_type'] !== Settings::$events_machine_name ) {
       return $query;
@@ -367,7 +368,7 @@ class AdminEventsViews {
   //  * @param [type] $post_type
   //  * @return void
   //  */
-  function table_filtering($post_type) {
+  public function table_filtering($post_type) : void {
 
     // If is trash view, do not show filters
     if ( isset($_GET['post_status']) && $_GET['post_status'] === 'trash' ) {
@@ -390,7 +391,7 @@ class AdminEventsViews {
    *
    * @return void
    */
-  private function filter_month_year() {
+  private function filter_month_year() : void {
     global $wpdb;
 
     $date_selected = isset($_REQUEST[$this->event_date_filter_param]) ? $_REQUEST[$this->event_date_filter_param] : '';
@@ -433,7 +434,7 @@ class AdminEventsViews {
    *
    * @return void
    */
-  private function filter_query_view() {
+  private function filter_query_view() : void {
 
       $query_view_selected = isset($_REQUEST[$this->filter_events_param]) ? $_REQUEST[$this->filter_events_param] : '';
 
@@ -459,7 +460,7 @@ class AdminEventsViews {
    * @param string $selected_val
    * @return void
    */
-  function create_select($id, $name, $opts, $selected_val) {
+  private function create_select(string|int $id, string $name, array $opts, string $selected_val) : void {
     echo '<select id="' . $id . '" name="' . $name . '">';
 
     foreach($opts as $value => $option){
@@ -477,7 +478,7 @@ class AdminEventsViews {
    *
    * @return void
    */
-  function remove_core_dates_filter() {
+  public function remove_core_dates_filter() : void {
     $screen = get_current_screen();
 
     if ( Settings::$events_machine_name == $screen->post_type ){

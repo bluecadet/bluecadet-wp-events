@@ -1,13 +1,14 @@
 <?php
 
 namespace BluecadetEvents\ICS;
+use BluecadetEvents\Admin\Utils\AbstractService;
 use BluecadetEvents\Plugin\Hooks;
 use BluecadetEvents\Plugin\Settings;
-use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
 
-class TemplateRedirect {
+class TemplateRedirect extends AbstractService {
 
-  public function __construct() {
+  public function boot() : void {
     add_action('init', [$this, 'handle_init']);
     add_filter('redirect_canonical', [$this, 'handle_redirect_canonical'], 10, 1);
     add_action('template_redirect', [$this, 'handle_template_redirect']);
@@ -75,7 +76,7 @@ class TemplateRedirect {
   }
 
   private function build_ics(\WP_Post $post): string {
-    $keys  = MetaKeys::get_keys();
+    $keys  = EventsMetaKeys::get_keys();
     $start = (int) get_post_meta($post->ID, $keys['start_timestamp'], true);
     $end   = (int) get_post_meta($post->ID, $keys['end_timestamp'], true);
 

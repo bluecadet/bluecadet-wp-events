@@ -26,7 +26,7 @@ class Settings {
   public  static string $events_table;
 
 
-  public static function __init() {
+  public static function init() {
 
     if ( self::$initialized ) {
       return;

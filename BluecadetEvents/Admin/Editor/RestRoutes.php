@@ -1,24 +1,25 @@
 <?php
 
 namespace BluecadetEvents\Admin\Editor;
+use BluecadetEvents\Admin\Utils\AbstractService;
 use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Plugin\Hooks;
-use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
+use BluecadetEvents\Admin\Meta\Keys\LocationMetaKeys;
+use BluecadetEvents\Admin\Meta\Keys\SeriesMetaKeys;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
 
 /**
  * Handle date formatting
  *
  */
-class RestRoutes {
+class RestRoutes extends AbstractService {
 
-  public function __construct() {
+  public function boot() : void {
     add_action( 'rest_api_init', [$this, 'rest_routes'] );
   }
 
-
-
-  public function rest_routes() {
+  public function rest_routes() : void {
     $namespace = Settings::$rest_namespace;
 
     // Time to timestamp
@@ -154,18 +155,18 @@ class RestRoutes {
 
 
   public function get_keys() : \WP_REST_Response | \WP_Error {
-    $keys = MetaKeys::get_keys();
+    $keys = EventsMetaKeys::get_keys();
     return rest_ensure_response( $keys );
   }
 
 
   public function get_location_keys() : \WP_REST_Response | \WP_Error {
-    $keys = \BluecadetEvents\Admin\Meta\Locations\MetaKeys::get_keys();
+    $keys = LocationMetaKeys::get_keys();
     return rest_ensure_response( $keys );
   }
 
   public function get_series_keys() : \WP_REST_Response | \WP_Error {
-    $keys = \BluecadetEvents\Admin\Meta\Series\MetaKeys::get_keys();
+    $keys = SeriesMetaKeys::get_keys();
     return rest_ensure_response( $keys );
   }
 

@@ -3,7 +3,7 @@
 namespace BluecadetEvents\Helpers;
 
 use BluecadetEvents\Plugin\Hooks;
-use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
 use BluecadetEvents\Plugin\Settings;
 
@@ -14,7 +14,7 @@ class TemplateHelpers {
   private array $keys = [];
 
   private function __construct() {
-    $this->keys = MetaKeys::get_keys();
+    $this->keys = EventsMetaKeys::get_keys();
   }
 
   public static function getInstance() : self {

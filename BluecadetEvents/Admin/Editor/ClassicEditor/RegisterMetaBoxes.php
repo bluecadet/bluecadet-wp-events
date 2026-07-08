@@ -1,6 +1,7 @@
 <?php
 
 namespace BluecadetEvents\Admin\Editor\ClassicEditor;
+use BluecadetEvents\Admin\Utils\AbstractService;
 use BluecadetEvents\Admin\Editor\ClassicEditor\FormContent;
 use BluecadetEvents\Plugin\Settings;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
@@ -14,19 +15,20 @@ use BluecadetEvents\Admin\Utils\DatabaseHelpers;
  * @since  1.0.0
  *
  */
-class RegisterMetaBoxes {
+class RegisterMetaBoxes extends AbstractService {
 
-  public function __construct() {
-    Settings::__init();
-    
+  public function register() : void {
+    Settings::init();
     new EditorScreen;
+  }
 
+  public function boot() : void {
     add_action( 'add_meta_boxes', [$this, 'register_meta_boxes'], 10, 2 );  
   }
 
   
 
-  public function register_meta_boxes(string $post_type, \WP_Post|int|null $post) {
+  public function register_meta_boxes(string $post_type, \WP_Post|int|null $post) : void {
 
     if ( ! $post instanceof \WP_Post ) {
         return;
@@ -54,7 +56,7 @@ class RegisterMetaBoxes {
   }
 
 
-  public function handle_events_metabox() {
+  public function handle_events_metabox() : void {
     $is_child_event = DatabaseHelpers::get_instance()->is_recurring_child(get_the_ID());
     ?>
     <div class="bc-event-dates bc-event-dates--classic">
@@ -67,7 +69,6 @@ class RegisterMetaBoxes {
       </div>
     </div>
     <?php
-    
   }
   
 

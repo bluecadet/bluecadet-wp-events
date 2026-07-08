@@ -1,7 +1,7 @@
 <?php
 
 namespace BluecadetEvents\Admin\Save\Recur\Objects;
-use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
 
 class RecurringEventDate {
 

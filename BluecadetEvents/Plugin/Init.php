@@ -8,50 +8,59 @@ use BluecadetEvents\Plugin\Settings;
 
 class Init {
 
-
 	protected string $plugin_root_dir;
   protected string $plugin_root_url;
 
-
   public function __construct() {
-    Settings::__init();
+    Settings::init();
     $this->plugin_root_dir = Settings::$plugin_dir;
     $this->plugin_root_url = Settings::$plugin_url;
     $this->initialize_plugin();
+  }
 
+  public function init() : void {
     add_action( 'after_setup_theme', [$this, 'run_after_theme_setup'] );
-
+    $this->initialize_plugin();
   }
 
 
   private function initialize_plugin() {
 
-    new Admin\PostTypes\PostTypes;
-    new Admin\Meta\RegisterMeta;
+    BackgroundProcesses::__init();
+
+    $services = [
+      new Admin\PostTypes\PostTypes,
+      new Admin\Meta\Register\RegisterEventMeta,
+      new Admin\Editor\Gutenberg,
+      new Admin\Editor\EditorAssets,
+      new Admin\Editor\RestRoutes,
+      new Admin\Editor\ClassicEditor\RegisterMetaBoxes,
+      new Admin\Save\Events,
+      new Admin\Trash\Events,
+      new ICS\TemplateRedirect,
+    ];
 
     if ( Hooks::hook_filter_use_event_locations() ) {
-      new Admin\Meta\Locations\RegisterMeta;
+      $services[] = new Admin\Meta\Register\RegisterLocationMeta;
     }
 
     if ( Hooks::hook_filter_use_event_series() ) {
-      new Admin\Meta\Series\RegisterMeta;
+      $services[] = new Admin\Meta\Register\RegisterSeriesMeta;
     }
-
-
-    new Admin\Editor\Gutenberg;
-    new Admin\Editor\EditorAssets;
-    new Admin\Editor\RestRoutes;
-    new Admin\Editor\ClassicEditor\RegisterMetaBoxes;
-    new Admin\Save\Events;
-    new Admin\Trash\Events;
-
-    BackgroundProcesses::__init();
 
     if ( \is_admin() ) {
-      new Admin\Views\AdminEventsViews;      
+      $services[] = new Admin\Views\AdminEventsViews;      
     }
 
-    new ICS\TemplateRedirect;
+    foreach ($services as $service) {
+      $service->register();
+    }
+
+    foreach ($services as $service) {
+      $service->boot();
+    }
+
+    
   }
 
 

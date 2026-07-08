@@ -1,7 +1,9 @@
 <?php
 
 namespace BluecadetEvents\Admin\PostTypes;
-use BluecadetEvents\Plugin;
+use BluecadetEvents\Admin\Utils\AbstractService;
+use BluecadetEvents\Plugin\Settings;
+use BluecadetEvents\Plugin\Hooks;
 
 /**
  * Create Custom Post Types
@@ -10,16 +12,11 @@ use BluecadetEvents\Plugin;
  * @since  1.0.0
  *
  */
-class PostTypes {
-  // private $settings;
-
-  public function __construct() {
-    // $this->settings = \get_option('bc_events_options');
-
+class PostTypes extends AbstractService {
+  
+  public function boot() : void {
     add_action('init', [$this, 'register_custom_post_types']);
-
     add_action( 'admin_head', [$this, 'add_cpt_admin_styles']);
-
   }
 
   /**
@@ -29,13 +26,13 @@ class PostTypes {
    */
   public function register_custom_post_types() {
 
-    Plugin\Settings::__init();
+    Settings::init();
 
-    $events_slug = Plugin\Hooks::hook_filter_events_rewrite_slug();
-    $events_machine_name = Plugin\Settings::$events_machine_name;
+    $events_slug = Hooks::hook_filter_events_rewrite_slug();
+    $events_machine_name = Settings::$events_machine_name;
     // Auto-inserted as a convenience, but freely movable/removable: the always-available
     // "Event Settings" panel guarantees the meta stays editable even without the block.
-    $template = Plugin\Hooks::hook_filter_events_gutenberg_template([
+    $template = Hooks::hook_filter_events_gutenberg_template([
       ['bc-events/event-dates', []]
     ]);
 
@@ -71,32 +68,20 @@ class PostTypes {
 
     register_post_type( $events_machine_name, $args );
 
-    // // Add `all` as slug for recurring events
-    // add_rewrite_rule(
-    //   '^events/([^/]+)(?:/([0-9]+))?/([^/]+)/?$',
-    //   'index.php?post_type=events&name=$matches[1]&all=$matches[3]',
-    //   'top'
-    // );
-
-    // //You then need to add a tag to it
-    // add_rewrite_tag('%all%','([^&]+)');
-
-
-
     // Event Locations
-    $use_locations = Plugin\Hooks::hook_filter_use_event_locations();
+    $use_locations = Hooks::hook_filter_use_event_locations();
 
     if ( $use_locations ) {
-      $loc_slug = Plugin\Hooks::hook_filter_locations_rewrite_slug();
+      $loc_slug = Hooks::hook_filter_locations_rewrite_slug();
 
       $labels = new LabelMaker('Event Locations', 'Event Location');
       $labels->labels['all_items'] = 'Event Locations';
       $labels = $labels->labels;
 
-      $public   = Plugin\Hooks::hook_filter_set_locations_public();
-      $supports = Plugin\Hooks::hook_filter_locations_supports();
+      $public   = Hooks::hook_filter_set_locations_public();
+      $supports = Hooks::hook_filter_locations_supports();
 
-      $template = Plugin\Hooks::hook_filter_locations_gutenberg_template([
+      $template = Hooks::hook_filter_locations_gutenberg_template([
         ['bc-events/location', []]
       ]);
 
@@ -122,24 +107,24 @@ class PostTypes {
 
       $args = \apply_filters('bc_events_location_post_type_settings', $default_args);
 
-      register_post_type( Plugin\Settings::$locations_machine_name, $args );
+      register_post_type( Settings::$locations_machine_name, $args );
     }
 
 
     // Event Series
-    $use_series = Plugin\Hooks::hook_filter_use_event_series();
+    $use_series = Hooks::hook_filter_use_event_series();
 
     if ( $use_series ) {
-      $series_slug = Plugin\Hooks::hook_filter_event_series_rewrite_slug();
+      $series_slug = Hooks::hook_filter_event_series_rewrite_slug();
 
       $labels = new LabelMaker('Event Series', 'Event Series');
       $labels->labels['all_items'] = 'Event Series';
       $labels = $labels->labels;
 
-      $public = Plugin\Hooks::hook_filter_set_series_public();
-      $supports = Plugin\Hooks::hook_filter_series_supports();
+      $public = Hooks::hook_filter_set_series_public();
+      $supports = Hooks::hook_filter_series_supports();
 
-      $template = Plugin\Hooks::hook_filter_series_gutenberg_template([
+      $template = Hooks::hook_filter_series_gutenberg_template([
         ['bc-events/series', []]
       ]);
 
@@ -165,7 +150,7 @@ class PostTypes {
 
       $args = \apply_filters('bc_events_series_post_type_settings', $default_args);
 
-      register_post_type( Plugin\Settings::$series_machine_name, $args );
+      register_post_type( Settings::$series_machine_name, $args );
     }
 
 

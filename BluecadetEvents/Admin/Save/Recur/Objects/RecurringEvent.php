@@ -1,7 +1,7 @@
 <?php
 
 namespace BluecadetEvents\Admin\Save\Recur\Objects;
-use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
 use BluecadetEvents\Admin\Save\Recur\Objects\EventClone;
 use BluecadetEvents\Admin\Utils\DatabaseHelpers;
 
@@ -136,7 +136,7 @@ class RecurringEvent {
     $this->parent_post = $post;
     $this->parent_update = $update;
     $this->timezone = wp_timezone();
-    $this->keys = MetaKeys::get_keys();
+    $this->keys = EventsMetaKeys::get_keys();
     $this->is_recurring = get_post_meta($this->parent_post_id, $this->keys['is_recurring'], true);
     $this->is_recurring_was = get_post_meta($this->parent_post_id, $this->keys['is_recurring_was'], true);
     $this->recurring_delete = get_post_meta($this->parent_post_id, $this->keys['remove_recurring'], true);

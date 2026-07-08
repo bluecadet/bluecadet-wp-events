@@ -1,8 +1,9 @@
 <?php
 
 namespace BluecadetEvents\Admin\Save;
+use BluecadetEvents\Admin\Utils\AbstractService;
 use BluecadetEvents\Admin\Utils\Logger;
-use BluecadetEvents\Admin\Meta\MetaKeys;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
 
 /**
  * Handle recurring events
@@ -11,14 +12,14 @@ use BluecadetEvents\Admin\Meta\MetaKeys;
  * @since  1.0.0
  *
  */
-class Events {
+class Events extends AbstractService {
 
-  public function __construct() {
+  public function boot() : void {
     add_action( 'save_post', [$this, 'handle_save_post'], 10, 2 );
     add_action( 'wp_after_insert_post', [ $this, 'handle_wp_after_insert_post' ], 99, 4 );
   }
 
-  public function handle_save_post( int $post_id, \WP_Post $post ) {
+  public function handle_save_post( int $post_id, \WP_Post $post ) : void {
     // Bail for autosaves, revisions, wrong post type, or block editor saves
     if (
         defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE
@@ -40,10 +41,10 @@ class Events {
       return;
     }
 
-    remove_action( 'save_post', [$this, 'handle_save_post'], 10 );
+    remove_action( 'save_post', [$this, 'handle_save_post'], 10, 2 );
 
-    $save_keys = MetaKeys::get_event_save_keys();
-    $keys = MetaKeys::get_keys();
+    $save_keys = EventsMetaKeys::get_event_save_keys();
+    $keys = EventsMetaKeys::get_keys();
 
     // Only touch the keys the rendered form declared it manages (see the
     // bc_managed_keys hidden inputs in Event.php / ChildEvent.php). This scopes

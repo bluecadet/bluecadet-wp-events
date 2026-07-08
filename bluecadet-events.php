@@ -18,9 +18,6 @@ if ( ! defined( 'WPINC' ) ) {
 include_once( plugin_dir_path( __FILE__ ) . 'vendor/autoload.php' );
 
 
-// echo '<pre>'; print_r('IS WORKING'); echo '</pre>';
-// die();
-
 /**
  * The code that runs during plugin activation.
  */
@@ -29,6 +26,15 @@ register_activation_hook( __FILE__, function() {
 } );
 
 
-new BluecadetEvents\Plugin\Init;
+/**
+ * Fire in the hole
+ *
+ */
+(new BluecadetEvents\Plugin\Init)->init();
 
+
+/**
+ * Global functions
+ *
+ */
 include_once plugin_dir_path( __FILE__ ) . 'global_functions/helpers.php';
