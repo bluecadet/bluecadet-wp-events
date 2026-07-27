@@ -14,17 +14,17 @@ class RegisterLocationMeta extends AbstractRegisterMeta {
   public function register_meta() : void {
     $meta_type = Settings::$locations_machine_name;
 
-		register_post_meta( $meta_type, $this->keys['address'], array_merge( $this->string_args, [
-			'description' => __( 'Location address', 'basecadet' ),
-		] ) );
+    $this->field( $meta_type, 'address', $this->string_args, [
+      'description' => __( 'Location address', 'basecadet' ),
+    ] );
 
-    register_post_meta( $meta_type, $this->keys['description'], array_merge( $this->string_args, [
-			'description' => __( 'Location description', 'basecadet' ),
-		] ) );
+    $this->field( $meta_type, 'description', $this->string_args, [
+      'description' => __( 'Location description', 'basecadet' ),
+    ] );
 
-    register_post_meta( $meta_type, $this->keys['website'], array_merge( $this->string_args, [
-			'description' => __( 'Location website', 'basecadet' ),
-		] ) );
+    $this->field( $meta_type, 'website', $this->string_args, [
+      'description' => __( 'Location website', 'basecadet' ),
+    ] );
 
   }
 }

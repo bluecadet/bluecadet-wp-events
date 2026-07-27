@@ -54,10 +54,10 @@ class EventsMetaKeys extends AbstractMetaKeys {
     return [
       $instance->keys['start_date'] => 'string',
       $instance->keys['start_time'] => 'string',
-      $instance->keys['start_timestamp'] => 'string',
+      $instance->keys['start_timestamp'] => 'integer',
       $instance->keys['end_date'] => 'string',
       $instance->keys['end_time'] => 'string',
-      $instance->keys['end_timestamp'] => 'string',
+      $instance->keys['end_timestamp'] => 'integer',
       $instance->keys['hide_time_display'] => 'boolean',
       $instance->keys['hide_end_time_display'] => 'boolean',
       $instance->keys['virtual_event'] => 'boolean',

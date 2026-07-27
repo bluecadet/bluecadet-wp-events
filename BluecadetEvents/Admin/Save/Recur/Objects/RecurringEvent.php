@@ -13,35 +13,35 @@ class RecurringEvent {
    *
    * @var integer
    */
-  public int $parent_post_id;
+  public readonly int $parent_post_id;
 
   /**
    * Parent/Saved Post Object
    *
    * @var \WP_Post
    */
-  public \WP_Post $parent_post;
-  
+  public readonly \WP_Post $parent_post;
+
   /**
   * Whether this is an update to an existing post or a new post
   *
   * @var boolean
   */
-  public bool $parent_update;
-  
+  public readonly bool $parent_update;
+
   /**
    * Timezone for the event
    *
    * @var \DateTimeZone
    */
-  public \DateTimeZone $timezone;
-  
+  public readonly \DateTimeZone $timezone;
+
   /**
    * Meta keys for the event
    *
    * @var array
    */
-  public array $keys = [];
+  public readonly array $keys;
 
   /**
    * Whether the event is recurring
