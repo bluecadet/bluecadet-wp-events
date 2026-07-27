@@ -120,7 +120,7 @@ class QuerySetters {
     } else {
 
       if ( $this->starting_on ) {
-        $ymd = sanitize_text_field($_GET[$this->settings['starting_on_parameter']]);
+        $ymd = sanitize_text_field(wp_unslash($_GET[$this->settings['starting_on_parameter']]));
 
         if ( $ymdDate = \DateTime::createFromFormat('Y-m-d', $ymd, $this->timezone) ) {
           $ymdDate->setTime(0, 0, 0);
@@ -204,7 +204,11 @@ class QuerySetters {
   private function set_month_view() {
     if ( $this->view_value ) {
       // Month of value as Y-m
-      $date    = \DateTime::createFromFormat('Y-m', $this->view_value, $this->timezone);
+      $date = \DateTime::createFromFormat('Y-m', $this->view_value, $this->timezone);
+
+      // Bail on malformed input before using $date (e.g. ?month-of=garbage).
+      if ( !$date ) { return; }
+
       $now_ym  = $this->now_date->format('Ym');
       $date_ym = $date->format('Ym');
       $this->is_past = $date_ym < $now_ym;
@@ -213,8 +217,6 @@ class QuerySetters {
       // Get current month
       $date = clone $this->now_date;
     }
-
-    if ( !$date ) { return false; }
 
     $this->set_unlimited_query_defaults();
 
@@ -399,7 +401,12 @@ class QuerySetters {
         continue;
       }
 
-      $terms       = explode(',', $_GET[$settings['parameter']]);
+      // Guard against array input (e.g. ?param[]=x) which would make explode() throw.
+      if ( !is_string($_GET[$settings['parameter']]) ) {
+        continue;
+      }
+
+      $terms       = explode(',', wp_unslash($_GET[$settings['parameter']]));
       $clean_terms = [];
 
       foreach( $terms as $term ) {

@@ -71,8 +71,7 @@ class PostTypes extends AbstractService {
     </svg>';
 
     // Events
-    $labels = new LabelMaker('Events', 'Event');
-    $labels = $labels->labels;
+    $labels = LabelMaker::create_labels('Events', 'Event');
 
     $default_args = array(
       'label'             => $labels['name'],
@@ -109,9 +108,8 @@ class PostTypes extends AbstractService {
   private function register_locations() : void {
     $loc_slug = Hooks::hook_filter_locations_rewrite_slug();
 
-    $labels = new LabelMaker('Event Locations', 'Event Location');
-    $labels->labels['all_items'] = 'Event Locations';
-    $labels = $labels->labels;
+    $labels = LabelMaker::create_labels('Event Locations', 'Event Location');
+    $labels['all_items'] = 'Event Locations';
 
     $public   = Hooks::hook_filter_set_locations_public();
     $supports = Hooks::hook_filter_locations_supports();
@@ -155,9 +153,8 @@ class PostTypes extends AbstractService {
   private function register_series() : void {
     $series_slug = Hooks::hook_filter_event_series_rewrite_slug();
 
-    $labels = new LabelMaker('Event Series', 'Event Series');
-    $labels->labels['all_items'] = 'Event Series';
-    $labels = $labels->labels;
+    $labels = LabelMaker::create_labels('Event Series', 'Event Series');
+    $labels['all_items'] = 'Event Series';
 
     $public = Hooks::hook_filter_set_series_public();
     $supports = Hooks::hook_filter_series_supports();

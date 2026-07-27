@@ -1,21 +1,20 @@
 <?php
 
 namespace BluecadetEvents\Templates;
+
+use BluecadetEvents\Admin\Utils\AbstractService;
 use BluecadetEvents\Plugin\Hooks;
 use BluecadetEvents\Plugin\Settings;
 
-class Queries {
+class Query extends AbstractService {
 
   private array $settings;
   private array $taxonomies = [];
   private QuerySetters $query_setters;
 
-  public function __construct() {
-
+  public function boot() : void {
     add_action( 'pre_get_posts', [$this, 'handle_query'] );
-
     add_filter( 'posts_clauses', [$this, 'events_posts_clauses'], 10, 2 );
-    
   }
 
 
@@ -61,15 +60,15 @@ class Queries {
     $this->settings  = Hooks::hook_filter_archive_settings();
 
     if ( isset($_GET['day-of']) ) {
-      $day_of = \sanitize_text_field($_GET['day-of']);
+      $day_of = \sanitize_text_field(\wp_unslash($_GET['day-of']));
       $this->query_setters->set_query('day_of', $day_of);
 
     } elseif ( isset($_GET['week-of']) ) {
-      $week_of = \sanitize_text_field($_GET['week-of']);
+      $week_of = \sanitize_text_field(\wp_unslash($_GET['week-of']));
       $this->query_setters->set_query('week_of', $week_of);
 
     } elseif ( isset($_GET['month-of']) ) {
-      $month_of = \sanitize_text_field($_GET['month-of']);
+      $month_of = \sanitize_text_field(\wp_unslash($_GET['month-of']));
       $this->query_setters->set_query('month_of', $month_of);
 
     } else {

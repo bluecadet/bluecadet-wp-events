@@ -2,20 +2,26 @@
 
 namespace BluecadetEvents\Rest;
 use BluecadetEvents\Plugin\Settings;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
+use BluecadetEvents\Admin\Utils\AbstractService;
 
-class PublicEndpoints {
+class PublicEndpoints extends AbstractService {
 
   private string $rest_namespace;
   private array $datepicker_data;
   private \DateTimeZone $timezone;
+  private array $keys;
 
   public function __construct() {
     $this->rest_namespace = Settings::$rest_namespace;
     $this->timezone       = \wp_timezone();
-    add_action( 'rest_api_init', [$this, 'handle_endpoints'] );
+    $this->keys           = EventsMetaKeys::get_keys();
   }
 
 
+  public function boot() : void {
+    add_action( 'rest_api_init', [$this, 'handle_endpoints'] );
+  }
 
   /**
    * Add rest routes
@@ -106,8 +112,8 @@ class PublicEndpoints {
       $this->datepicker_data = [];
 
       foreach ( $events->posts as $pID) {
-        $start_timestamp = get_post_meta($pID, '_bc_events_start_timestamp', true);
-        $end_timestamp   = get_post_meta($pID, '_bc_events_end_timestamp', true);
+        $start_timestamp = get_post_meta($pID, $this->keys['start_timestamp'], true);
+        $end_timestamp   = get_post_meta($pID, $this->keys['end_timestamp'], true);
 
         if ( $start_timestamp && $end_timestamp) {
           $start = new \DateTime('now', $this->timezone);

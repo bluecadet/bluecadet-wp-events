@@ -3,8 +3,10 @@
 namespace BluecadetEvents\Plugin;
 use BluecadetEvents\Admin;
 use BluecadetEvents\ICS;
+use BluecadetEvents\Rest;
 use BluecadetEvents\Plugin\Hooks;
 use BluecadetEvents\Plugin\Settings;
+use BluecadetEvents\Templates;
 
 class Init {
 
@@ -34,6 +36,8 @@ class Init {
       new Admin\Save\Events,
       new Admin\Trash\Events,
       new ICS\TemplateRedirect,
+      new Rest\PublicEndpoints,
+      new Templates\Query,
     ];
 
     if ( Hooks::hook_filter_use_event_locations() ) {

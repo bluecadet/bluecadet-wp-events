@@ -13,28 +13,12 @@ namespace BluecadetEvents\Admin\PostTypes;
 class LabelMaker {
 
   /**
-   * Labels
-   *
-   * @var array
-   */
-  public $labels;
-
-  /**
-   * @param  string $name     Admin name of CPT label
-   * @param  string $singular Singular form of CPT label
-   * @param  string $plural   Plural for of CPT label
-   */
-  public function __construct($name, $singular = false, $plural = false) {
-    $this->labels = $this->Create_Labels($name, $singular, $plural);
-  }
-
-  /**
    * @param string $name
    * @param string $singular
    * @param string $plural
    * @return array Label array neecessary for CPT
    */
-  public function Create_Labels($name, $singular = false, $plural = false) {
+  public static function create_labels(string $name, string | null | false $singular = false, string | null | false $plural = false) : array {
     $singular = $singular ? $singular : $name;
     $plural = $plural ? $plural : $name;
 
