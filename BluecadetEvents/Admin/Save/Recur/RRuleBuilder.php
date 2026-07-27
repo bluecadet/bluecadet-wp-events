@@ -5,6 +5,16 @@ use BluecadetEvents\Admin\Utils\Logger;
 
 
 class RRuleBuilder {
+
+  /**
+   * Hard upper bound on the number of generated occurrences.
+   *
+   * Safety net: an open-ended or misconfigured rule (no `until`/`count`) must
+   * never iterate unbounded, which would risk a request timeout / OOM. Any
+   * path that can't resolve an explicit end falls back to this cap.
+   */
+  const MAX_OCCURRENCES = 1000;
+
   private $args;
   private $timezone;
 
@@ -40,12 +50,13 @@ class RRuleBuilder {
   public function get_recurring_date_period() {
     $rrule_conditional_args = [];
     $begin                  = new \DateTime('now', $this->timezone);
-    
-    $begin->setTimestamp($this->args['start_date_timestamp']);
-    
-    if ( !$begin ) {
-      new \WP_Error('bc-events', 'Invalid begin date for RRule');
+
+    if ( !is_numeric($this->args['start_date_timestamp']) ) {
+      Logger::log('RRuleBuilder: missing or non-numeric start_date_timestamp; cannot build recurrence.');
+      return [];
     }
+
+    $begin->setTimestamp((int) $this->args['start_date_timestamp']);
 
     switch ($this->args['frequency']) {
       case 'weekly':
@@ -201,18 +212,31 @@ class RRuleBuilder {
     $args = [];
 
     if ( $this->args['frequency'] === 'consecutive' ) {
-      $args['count'] = intval($this->args['consecutive_count']);
+      $count = intval($this->args['consecutive_count']);
+      $args['count'] = ( $count > 0 ) ? $count : self::MAX_OCCURRENCES;
       return $args;
     }
 
     if ( $this->args['end_type'] === 'on_date' ) {
-      $args['until'] = \DateTime::createFromFormat('Y-m-d', $this->args['end_date'], $this->timezone);
+      $until = \DateTime::createFromFormat('Y-m-d', $this->args['end_date'], $this->timezone);
+      if ( $until ) {
+        $args['until'] = $until;
+        return $args;
+      }
+      Logger::log('RRuleBuilder: invalid end_date "' . $this->args['end_date'] . '"; applying occurrence cap.');
     } else if ( $this->args['end_type'] === 'after_x' ) {
-      $args['count'] = intval($this->args['end_after_x']) - 1;
+      $count = intval($this->args['end_after_x']) - 1;
+      if ( $count > 0 ) {
+        $args['count'] = $count;
+        return $args;
+      }
+      Logger::log('RRuleBuilder: invalid end_after_x "' . $this->args['end_after_x'] . '"; applying occurrence cap.');
     } else {
-      $error = new \WP_Error('bc-events', 'No End Date value set. Please select a end date or ends after value)');
+      Logger::log('RRuleBuilder: no valid end_type set; applying occurrence cap to prevent an unbounded rule.');
     }
 
+    // Safety net: never return a rule without an upper bound.
+    $args['count'] = self::MAX_OCCURRENCES;
     return $args;
 
   }

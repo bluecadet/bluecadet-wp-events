@@ -544,10 +544,10 @@ class TemplateHelpers {
    * @return boolean
    */
   public function is_past() : bool {
-    $param = Hooks::hook_filter_archive_settings();
-    
-    if ( $param ) {
-      return isset($_GET[$param]);
+    $settings = Hooks::hook_filter_archive_settings();
+
+    if ( !empty($settings['past_parameter']) ) {
+      return isset($_GET[$settings['past_parameter']]);
     }
 
     return false;

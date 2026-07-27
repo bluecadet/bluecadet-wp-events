@@ -84,4 +84,55 @@ class EventsMetaKeys extends AbstractMetaKeys {
     ];
   }
 
+
+  /**
+   * Logical key names for the recurrence configuration.
+   *
+   * Single source of truth for every site that needs to strip or delete the
+   * recurrence rule (clone builders, the child-delete cleanup). Keep this in
+   * sync by editing it here only.
+   *
+   * @return string[]
+   */
+  public static function recur_config_keys() : array {
+    return [
+      'is_recurring',
+      'is_recurring_was',
+      'use_frequency',
+      'freq',
+      'freq_days',
+      'freq_mo_schedule',
+      'freq_mo_day',
+      'freq_mo_date',
+      'freq_consecutive_buffer',
+      'freq_consecutive_count',
+      'freq_end_type',
+      'freq_end_date',
+      'freq_end_after_x',
+      'custom_occurrences',
+      'omissions',
+      'remove_recurring',
+      'recur_strategy_was',
+      'is_parent',
+    ];
+  }
+
+
+  /**
+   * Logical key names for date/time meta derived from the recurrence rule.
+   *
+   * @return string[]
+   */
+  public static function recur_date_keys() : array {
+    return [
+      'start_timestamp',
+      'end_timestamp',
+      'start_date',
+      'start_time',
+      'end_date',
+      'end_time',
+      'start_month_year',
+    ];
+  }
+
 }

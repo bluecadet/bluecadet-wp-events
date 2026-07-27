@@ -3,6 +3,7 @@
 namespace BluecadetEvents\Admin\Save\Recur;
 use BluecadetEvents\Admin\Save\Recur\Objects\RecurringEvent;
 use BluecadetEvents\Admin\Save\Recur\Objects\EventClone;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
 use BluecadetEvents\Plugin\Hooks;
 use BluecadetEvents\Admin\Utils\Logger;
 
@@ -102,24 +103,7 @@ class EventCloneBuilder {
 
 
   public function clear_recurring() {
-    $recur_keys = [
-      'is_recurring',
-      'is_recurring_was',
-      'use_frequency',
-      'freq',
-      'freq_days',
-      'freq_mo_schedule',
-      'freq_mo_day',
-      'freq_mo_date',
-      'freq_end_type',
-      'freq_end_date',
-      'freq_end_after_x',
-      'custom_occurrences',
-      'omissions',
-      'remove_recurring',
-      'recur_strategy_was',
-      'is_parent',
-    ];
+    $recur_keys = EventsMetaKeys::recur_config_keys();
 
     foreach ($recur_keys as $key) {
       if ( isset($this->clone_data->meta[$this->RDATE->keys[$key]]) ) {
@@ -131,31 +115,10 @@ class EventCloneBuilder {
 
   // Update only - don't overwrite date related meta
   public function clear_dates_meta() {
-    $recur_keys = [
-      'is_recurring',
-      'is_recurring_was',
-      'use_frequency',
-      'freq',
-      'freq_days',
-      'freq_mo_schedule',
-      'freq_mo_day',
-      'freq_mo_date',
-      'freq_end_type',
-      'freq_end_date',
-      'freq_end_after_x',
-      'custom_occurrences',
-      'omissions',
-      'remove_recurring',
-      'recur_strategy_was',
-      'is_parent',
-      'start_timestamp',
-      'end_timestamp',
-      'start_date',
-      'start_time',
-      'end_date',
-      'end_time',
-      'start_month_year',
-    ];
+    $recur_keys = array_merge(
+      EventsMetaKeys::recur_config_keys(),
+      EventsMetaKeys::recur_date_keys()
+    );
 
     foreach ($recur_keys as $key) {
       if ( isset($this->clone_data->meta[$this->RDATE->keys[$key]]) ) {

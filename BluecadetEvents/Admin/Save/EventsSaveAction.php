@@ -7,6 +7,7 @@ use BluecadetEvents\Admin\Save\Recur\Objects\RecurringEvent;
 use BluecadetEvents\Admin\Save\Recur\Objects\EventPost;
 use BluecadetEvents\Admin\Save\Recur\Objects\FrequencyArgs;
 use BluecadetEvents\Admin\Save\Recur\EventCloneBuilder;
+use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
 use BluecadetEvents\Admin\Save\Recur\Objects\RecurringEventsArray;
 use BluecadetEvents\Admin\Utils\Logger;
 use BluecadetEvents\Plugin\BackgroundProcesses;
@@ -53,7 +54,6 @@ class EventsSaveAction {
       }
       
       $this->maybe_handle_recurring_events();
-      $this->handle_always();
     }
 
     $this->handle_always();
@@ -268,28 +268,7 @@ class EventsSaveAction {
 
     $delete_handler->save()->dispatch();
 
-    $recur_keys = [
-      'is_recurring',
-      'is_recurring_was',
-      'use_frequency',
-      'freq',
-      'freq_days',
-      'freq_mo_schedule',
-      'freq_mo_day',
-      'freq_mo_date',
-      'freq_consecutive_buffer',
-      'freq_consecutive_count',
-      'freq_end_type',
-      'freq_end_date',
-      'freq_end_after_x',
-      'custom_occurrences',
-      'omissions',
-      'remove_recurring',
-      'recur_strategy_was',
-      'is_parent',
-    ];
-
-    foreach ($recur_keys as $key) {
+    foreach (EventsMetaKeys::recur_config_keys() as $key) {
       delete_post_meta($this->RDATE->parent_post_id, $this->RDATE->keys[$key]);
     }
   }
