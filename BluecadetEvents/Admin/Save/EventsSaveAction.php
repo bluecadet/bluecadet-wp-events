@@ -183,7 +183,7 @@ class EventsSaveAction {
       if ( empty($diff) ) {
         $this->update_only();
       } else {
-        $this->handle_build_recurring_events(); 
+        $this->handle_build_recurring_events();
       }
     }
 

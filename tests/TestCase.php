@@ -98,7 +98,7 @@ abstract class TestCase extends WP_UnitTestCase {
 	 *
 	 * @param array<string,mixed> $meta Keyed by FULL meta key.
 	 */
-	protected function save_via_post( int $post_id, array $meta, string $title = 'Test Event' ): void {
+	protected function save_via_post( int $post_id, array $meta, string $title = 'Test Event', string $content = '' ): void {
 		$_POST                    = [];
 		$_POST['post_title']      = $title;
 		$_POST['bc_meta_nonce']   = wp_create_nonce( 'bc_save_meta' );
@@ -109,7 +109,7 @@ abstract class TestCase extends WP_UnitTestCase {
 		}
 
 		// Fires save_post (meta write) then wp_after_insert_post (engine).
-		wp_update_post( [ 'ID' => $post_id, 'post_title' => $title ] );
+		wp_update_post( [ 'ID' => $post_id, 'post_title' => $title, 'post_content' => $content ] );
 
 		$_POST = [];
 	}
@@ -147,6 +147,11 @@ abstract class TestCase extends WP_UnitTestCase {
 			$wp_rest_server = new WP_REST_Server();
 			do_action( 'rest_api_init', $wp_rest_server );
 		}
+	}
+
+	/** The DatabaseHelpers singleton. */
+	protected function db(): \BluecadetEvents\Admin\Utils\DatabaseHelpers {
+		return \BluecadetEvents\Admin\Utils\DatabaseHelpers::get_instance();
 	}
 
 	/** Custom-table row for a post, or null. */

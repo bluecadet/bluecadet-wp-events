@@ -20,6 +20,11 @@ trait SynchronousDispatch {
    */
   public function dispatch() {
     if ( apply_filters( 'bc_events/background/sync', false ) ) {
+      // handle() finishes with wp_die() (correct for the async ajax request it
+      // is designed for, but fatal when run inline). Suppress it for the
+      // synchronous run. Idempotent, and only active while the sync filter is on.
+      add_filter( $this->identifier . '_wp_die', '__return_false' );
+
       // The batch was already persisted by the preceding save(). handle()
       // processes every batch and calls complete() once the queue is empty.
       return $this->handle();

@@ -20,6 +20,15 @@ class Events extends AbstractService {
   }
 
   public function handle_save_post( int $post_id, \WP_Post $post ) : void {
+    // The recurrence engine owns child writes; while it is generating them do
+    // not let the generic form-save path overwrite a child's meta. (In async
+    // production this request has no $_POST, so the nonce check below already
+    // bails; the guard matters when the queue runs synchronously — CLI/tests —
+    // and mirrors the same guard in handle_wp_after_insert_post().)
+    if ( EventsSaveAction::$generating ) {
+      return;
+    }
+
     // Bail for autosaves, revisions, wrong post type, or block editor saves
     if (
         defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE

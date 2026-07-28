@@ -225,7 +225,10 @@ class RRuleBuilder {
       }
       Logger::log('RRuleBuilder: invalid end_date "' . $this->args['end_date'] . '"; applying occurrence cap.');
     } else if ( $this->args['end_type'] === 'after_x' ) {
-      $count = intval($this->args['end_after_x']) - 1;
+      // "End after X occurrences" means X events in the child set (the parent is
+      // the separate SEO/canonical anchor, not part of the set). RRULE COUNT
+      // includes dtstart, so COUNT == X yields exactly X children.
+      $count = intval($this->args['end_after_x']);
       if ( $count > 0 ) {
         $args['count'] = $count;
         return $args;
