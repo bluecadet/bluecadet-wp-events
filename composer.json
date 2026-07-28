@@ -5,6 +5,11 @@
             "BluecadetEvents\\": "BluecadetEvents/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "BluecadetEvents\\Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Shaun M Baer",
@@ -14,6 +19,21 @@
     "require": {
         "rlanvin/php-rrule": "^2.6",
         "deliciousbrains/wp-background-processing": "^1.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6",
+        "wp-phpunit/wp-phpunit": "^6.4",
+        "yoast/phpunit-polyfills": "^3.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:unit": "phpunit --testsuite unit",
+        "test:integration": "phpunit --testsuite integration"
     },
     "type": "wordpress-plugin",
     "version": "0.1.0"

@@ -1,0 +1,9 @@
+# Keep test/CI/dev tooling in git, but strip it from Composer dist installs so
+# the installed plugin package stays slim.
+/tests              export-ignore
+/.wp-env.json       export-ignore
+/phpunit.xml.dist   export-ignore
+/.gitattributes     export-ignore
+/.github            export-ignore
+/.ddev              export-ignore
+/TESTING.md         export-ignore

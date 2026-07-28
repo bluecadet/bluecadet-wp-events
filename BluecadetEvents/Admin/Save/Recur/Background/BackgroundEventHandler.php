@@ -13,6 +13,8 @@ use BluecadetEvents\Admin\Utils\Logger;
  *
  */
 class BackgroundEventHandler extends \WP_Background_Process {
+  use SynchronousDispatch;
+
   protected $action = 'bc_events_recur_event_handler';
 
 

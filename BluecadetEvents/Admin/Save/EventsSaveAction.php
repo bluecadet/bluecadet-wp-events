@@ -287,11 +287,20 @@ class EventsSaveAction {
     // Set recurring was meta value
     $this->set_meta_update($this->RDATE->keys['is_recurring_was'], $this->RDATE->is_recurring);
 
-    // Set start month year for sorting
     $start_timestamp = get_post_meta($this->RDATE->parent_post_id, $this->RDATE->keys['start_timestamp'], true);
     $end_timestamp = get_post_meta($this->RDATE->parent_post_id, $this->RDATE->keys['end_timestamp'], true);
+
+    // An event with no valid start timestamp isn't ready for the sort/lookup
+    // table yet — e.g. a freshly-created post before dates are entered. Bail
+    // rather than coercing an empty value to epoch 0 (a "January 1970" row),
+    // which on PHP 8+ also throws a TypeError from DateTime::setTimestamp().
+    if ( !is_numeric($start_timestamp) ) {
+      return;
+    }
+
+    // Set start month year for sorting
     $d = new \DateTime();
-    $d->setTimestamp($start_timestamp);
+    $d->setTimestamp((int) $start_timestamp);
     $this->set_meta_update($this->RDATE->keys['start_month_year'], $d->format('F Y'));
 
     if ( $this->RDATE->is_child ) {
