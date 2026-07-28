@@ -77,6 +77,52 @@ abstract class TestCase extends WP_UnitTestCase {
 		return EventsMetaKeys::get_keys();
 	}
 
+	/** Epoch for a Y-m-d H:i:s string interpreted in the site timezone. */
+	protected function site_ts( string $datetime ): int {
+		return ( new \DateTime( $datetime, wp_timezone() ) )->getTimestamp();
+	}
+
+	/** Create and save a single (non-recurring) event; returns the post id. */
+	protected function make_single_event(): int {
+		$k  = $this->keys();
+		$id = $this->new_event();
+		$this->save_via_post( $id, [
+			$k['start_date']      => '2026-09-07',
+			$k['start_time']      => '09:00',
+			$k['start_timestamp'] => $this->site_ts( '2026-09-07 09:00:00' ),
+			$k['end_date']        => '2026-09-07',
+			$k['end_time']        => '11:00',
+			$k['end_timestamp']   => $this->site_ts( '2026-09-07 11:00:00' ),
+		] );
+		return $id;
+	}
+
+	/**
+	 * Create and save a weekly-on-Mondays recurring master (5 occurrences by
+	 * default: 2026-09-07 .. 2026-10-05). Returns the master post id.
+	 */
+	protected function make_weekly_recurring_event( array $overrides = [] ): int {
+		$k       = $this->keys();
+		$id      = $this->new_event();
+		$payload = array_merge( [
+			$k['start_date']      => '2026-09-07',
+			$k['start_time']      => '09:00',
+			$k['start_timestamp'] => $this->site_ts( '2026-09-07 09:00:00' ),
+			$k['end_date']        => '2026-09-07',
+			$k['end_time']        => '11:00',
+			$k['end_timestamp']   => $this->site_ts( '2026-09-07 11:00:00' ),
+			$k['is_recurring']    => '1',
+			$k['use_frequency']   => '1',
+			$k['freq']            => 'weekly',
+			$k['freq_days']       => [ 'monday' ],
+			$k['freq_end_type']   => 'on_date',
+			$k['freq_end_date']   => '2026-10-05',
+		], $overrides );
+
+		$this->save_via_post( $id, $payload );
+		return $id;
+	}
+
 	/** Create a published bc-events post with no event meta yet. */
 	protected function new_event( array $postarr = [] ): int {
 		return self::factory()->post->create(
