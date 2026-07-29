@@ -65,7 +65,7 @@ class AdminEventsViews extends AbstractService {
    */
   public function post_states( array $post_states, \WP_Post $post ) : array {
 
-    if ( $post->post_type !== 'bc-events') {
+    if ( $post->post_type !== Settings::$events_machine_name ) {
       return $post_states;
     }
 
@@ -376,7 +376,7 @@ class AdminEventsViews extends AbstractService {
     }
 
 
-    if ( $post_type !== 'bc-events' ) {
+    if ( $post_type !== Settings::$events_machine_name ) {
       return;
     }
 
@@ -397,13 +397,13 @@ class AdminEventsViews extends AbstractService {
     $date_selected = isset($_REQUEST[$this->event_date_filter_param]) ? $_REQUEST[$this->event_date_filter_param] : '';
 
     // Custom Event Date Filter
-    $d = $wpdb->get_results( "
-        SELECT DISTINCT(pm.meta_value) FROM $wpdb->postmeta pm
-        LEFT JOIN $wpdb->posts p ON p.ID = pm.post_id
+    $d = $wpdb->get_results( $wpdb->prepare( "
+        SELECT DISTINCT(pm.meta_value) FROM {$wpdb->postmeta} pm
+        LEFT JOIN {$wpdb->posts} p ON p.ID = pm.post_id
         WHERE pm.meta_key = 'bc_events_start_month_year'
         AND p.post_status = 'publish'
-        AND p.post_type = 'bc-events'
-    " );
+        AND p.post_type = %s
+    ", Settings::$events_machine_name ) );
 
     if ($d) {
       foreach($d as $dv) {

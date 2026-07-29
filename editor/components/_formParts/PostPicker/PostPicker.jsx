@@ -17,7 +17,7 @@ const DEBOUNCE_MS = 300;
  * - Emits a bare post ID via onChange.
  *
  * @param {Object}            props
- * @param {string}            props.postType Post type slug (e.g. 'bc-events-locations').
+ * @param {string}            props.postType Post type slug (e.g. 'bc_events_locations').
  * @param {number|string}     props.value    Currently selected post ID.
  * @param {(id:number)=>void} props.onChange Called with the selected post ID.
  */

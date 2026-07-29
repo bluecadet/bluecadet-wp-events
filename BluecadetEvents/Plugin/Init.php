@@ -49,7 +49,8 @@ class Init {
     }
 
     if ( \is_admin() ) {
-      $services[] = new Admin\Views\AdminEventsViews;      
+      $services[] = new Admin\Views\AdminEventsViews;
+      $services[] = new Admin\Settings\DeactivateModal;
     }
 
     foreach ($services as $service) {

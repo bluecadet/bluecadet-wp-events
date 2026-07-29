@@ -19,9 +19,9 @@ import './eventsPluginPanel.scss';
  * is all it takes to give it an always-available settings panel.
  */
 const PANEL_MAP = {
-	'bc-events':           { Fields: EventFields,    title: __( 'Event Settings', 'basecadet' ) },
-	'bc-events-locations': { Fields: LocationFields, title: __( 'Location Settings', 'basecadet' ) },
-	'bc-events-series':    { Fields: SeriesFields,   title: __( 'Series Settings', 'basecadet' ) },
+	'bc_events':           { Fields: EventFields,    title: __( 'Event Settings', 'basecadet' ) },
+	'bc_events_locations': { Fields: LocationFields, title: __( 'Location Settings', 'basecadet' ) },
+	'bc_events_series':    { Fields: SeriesFields,   title: __( 'Series Settings', 'basecadet' ) },
 };
 
 /**
@@ -73,9 +73,9 @@ function EventSettingsPanel() {
 
   let buttonTitle = __( 'Edit Event Settings', 'basecadet' );
 
-  if ( postType === 'bc-events-locations' ) {
+  if ( postType === 'bc_events_locations' ) {
     buttonTitle = __( 'Edit Location Settings', 'basecadet' );
-  } else if ( postType === 'bc-events-series' ) {
+  } else if ( postType === 'bc_events_series' ) {
     buttonTitle = __( 'Edit Series Settings', 'basecadet' );
   }
 

@@ -4,6 +4,7 @@ namespace BluecadetEvents\Admin\Save;
 use BluecadetEvents\Admin\Utils\AbstractService;
 use BluecadetEvents\Admin\Utils\Logger;
 use BluecadetEvents\Admin\Meta\Keys\EventsMetaKeys;
+use BluecadetEvents\Plugin\Settings;
 
 /**
  * Handle recurring events
@@ -33,7 +34,7 @@ class Events extends AbstractService {
     if (
         defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE
         || wp_is_post_revision( $post_id )
-        || $post->post_type !== 'bc-events'
+        || $post->post_type !== Settings::$events_machine_name
         || ! isset( $_POST['bc_meta_nonce'] )
         || ! wp_verify_nonce( $_POST['bc_meta_nonce'], 'bc_save_meta' )
     ) {

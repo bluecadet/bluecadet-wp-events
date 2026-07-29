@@ -196,8 +196,8 @@ class PostTypes extends AbstractService {
     $uri = 'data:image/svg+xml;base64,' . base64_encode( $svg );
     ?>
 <style>
-  #menu-posts-bc-events .wp-menu-image { background:none !important; }
-  #menu-posts-bc-events .wp-menu-image::before {
+  #menu-posts-<?php echo esc_attr( Settings::$events_machine_name ); ?> .wp-menu-image { background:none !important; }
+  #menu-posts-<?php echo esc_attr( Settings::$events_machine_name ); ?> .wp-menu-image::before {
     content:""; 
     display:inline-block; 
     width:20px; 

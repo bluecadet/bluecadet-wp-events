@@ -4,7 +4,7 @@ import RepeatingPostPicker from '../RepeatingPostPicker/RepeatingPostPicker';
 export default function EventSeries() {
   return (
     <RepeatingPostPicker
-      postType="bc-events-series"
+      postType="bc_events_series"
       id="event-series"
       sectionTitle={ __( 'Event Series', 'basecadet' ) }
       metaKey="series_ids"

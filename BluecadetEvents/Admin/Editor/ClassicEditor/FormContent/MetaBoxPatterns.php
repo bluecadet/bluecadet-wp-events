@@ -482,7 +482,7 @@ class MetaBoxPatterns {
       'event-locations',
       __( 'Event Locations', 'bluecadet-events' ),
       $this->keys['location_ids'],
-      'bc-events-locations',
+      Plugin\Settings::$locations_machine_name,
       __( 'Add Location', 'bluecadet-events' )
     );
   }
@@ -496,7 +496,7 @@ class MetaBoxPatterns {
       'event-series',
       __( 'Event Series', 'bluecadet-events' ),
       $this->keys['series_ids'],
-      'bc-events-series',
+      Plugin\Settings::$series_machine_name,
       __( 'Add Series', 'bluecadet-events' )
     );
   }

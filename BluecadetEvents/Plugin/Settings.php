@@ -43,10 +43,10 @@ class Settings {
     self::$series_meta_ns    = 'bc_events_series_';
     self::$contact_meta_ns   = 'bc_events_contact_';
 
-    self::$events_machine_name   = 'bc-events';
-    self::$locations_machine_name = 'bc-events-locations';
-    self::$contact_machine_name  = 'bc-events-contacts';
-    self::$series_machine_name   = 'bc-events-series';
+    self::$events_machine_name   = 'bc_events';
+    self::$locations_machine_name = 'bc_events_locations';
+    self::$contact_machine_name  = 'bc_events_contacts';
+    self::$series_machine_name   = 'bc_events_series';
 
     self::$events_table = 'bc_events';
 
