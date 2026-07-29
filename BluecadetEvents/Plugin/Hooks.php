@@ -32,28 +32,23 @@ class Hooks {
       'dedupe_main_query' => false,
     ];
 
-    $args  = \apply_filters('bc_events/events/settings/archive', $args);
+    $filtered = \apply_filters('bc_events/events/settings/archive', $args);
+    $args     = is_array($filtered) ? $filtered : $args;
 
-    // Enforce some things...
-    if ( !isset($args['layout']) || empty($args['layout']) || !in_array( $args['layout'], ['list', 'week'] ) ) {
-      $args['layout'] = 'list';
-    }
+    // Enforce every known key to a safe, correctly-typed value.
+    $args['layout'] = ( isset($args['layout']) && in_array($args['layout'], ['list', 'week'], true) )
+      ? $args['layout'] : 'list';
 
-    if ( !isset($args['per_page']) || empty($args['per_page']) ) {
-      $args['per_page'] = 12;
-    }
+    $args['per_page'] = ( isset($args['per_page']) && is_numeric($args['per_page']) && (int) $args['per_page'] > 0 )
+      ? (int) $args['per_page'] : 12;
 
-    if ( !isset($args['past_parameter']) || empty($args['past_parameter']) ) {
-      $args['past_parameter'] = 'is-past';
-    }
+    $args['past_parameter'] = ( isset($args['past_parameter']) && is_string($args['past_parameter']) && $args['past_parameter'] !== '' )
+      ? $args['past_parameter'] : 'is-past';
 
-    if ( !isset($args['starting_on_parameter']) || empty($args['starting_on_parameter']) ) {
-      $args['starting_on_parameter'] = 'starting-on';
-    }
+    $args['starting_on_parameter'] = ( isset($args['starting_on_parameter']) && is_string($args['starting_on_parameter']) && $args['starting_on_parameter'] !== '' )
+      ? $args['starting_on_parameter'] : 'starting-on';
 
-    if ( !isset($args['dedupe_main_query']) || empty($args['dedupe_main_query']) ) {
-      $args['dedupe_main_query'] = false;
-    }
+    $args['dedupe_main_query'] = isset($args['dedupe_main_query']) ? (bool) $args['dedupe_main_query'] : false;
 
     return $args;
   }
@@ -62,7 +57,7 @@ class Hooks {
 
   /**
    * hook_filter_frequency_options
-   * 
+   *
    * Array can only contain 'daily', 'weekly', 'monthly', and 'consecutive'.
    * If array is empty, no recurring frequency options will be available
    *
@@ -109,7 +104,7 @@ class Hooks {
 
   /**
    * hook_filter_events_rewrite_slug
-   * 
+   *
    * @hook 'bc_events/events/post_type/rewrite_slug'
    * @hook_object_type Events
    * @hook_category Post Type
@@ -117,14 +112,17 @@ class Hooks {
    * @return string
    */
   public static function hook_filter_events_rewrite_slug() : string {
-    return \apply_filters('bc_events/events/post_type/rewrite_slug', 'events');
+    return self::guard_string(
+      \apply_filters('bc_events/events/post_type/rewrite_slug', 'events'),
+      'events'
+    );
   }
 
 
   /**
    * hook_filter_events_gutenberg_template
    *
-   * 
+   *
    * @hook 'bc_events/events/post_type/gutenberg_template'
    * @hook_object_type Events
    * @hook_category Post Type
@@ -132,13 +130,10 @@ class Hooks {
    * @return array
    */
   public static function hook_filter_events_gutenberg_template(array $template) : array {
-    $template = \apply_filters('bc_events/events/post_type/gutenberg_template', $template);
-    
-    if ( !is_array($template) || empty($template) ) {
-      $template = [];
-    }
-    
-    return $template;
+    return self::guard_array(
+      \apply_filters('bc_events/events/post_type/gutenberg_template', $template),
+      []
+    );
   }
 
 
@@ -157,7 +152,10 @@ class Hooks {
    * @return array
    */
   public static function hook_filter_exclude_meta_keys() : array {
-    return \apply_filters('bc_events/events/save/exclude_copy_meta_keys', []);
+    return self::guard_array(
+      \apply_filters('bc_events/events/save/exclude_copy_meta_keys', []),
+      []
+    );
   }
 
 
@@ -172,7 +170,10 @@ class Hooks {
    * @return array
    */
   public static function hook_filter_finalized_exclude_cloned_meta_keys(array $finalized_exclude_keys) : array {
-    return \apply_filters('bc_events/events/save/finalized_exclude_cloned_meta_keys', $finalized_exclude_keys);
+    return self::guard_array(
+      \apply_filters('bc_events/events/save/finalized_exclude_cloned_meta_keys', $finalized_exclude_keys),
+      $finalized_exclude_keys
+    );
   }
 
 
@@ -191,7 +192,10 @@ class Hooks {
    * @return string
    */
   public static function hook_filter_date_display_format() : string {
-    return \apply_filters('bc_events/events/display/date_format', 'F j, Y');
+    return self::guard_string(
+      \apply_filters('bc_events/events/display/date_format', 'F j, Y'),
+      'F j, Y'
+    );
   }
 
 
@@ -206,10 +210,13 @@ class Hooks {
    * @return string
    */
   public static function hook_filter_time_display_format() : string {
-    return \apply_filters('bc_events/events/display/time_format', 'g:ia');
+    return self::guard_string(
+      \apply_filters('bc_events/events/display/time_format', 'g:ia'),
+      'g:ia'
+    );
   }
 
-  
+
 
   /**
    * hook_filter_date_time_sep_format
@@ -221,7 +228,11 @@ class Hooks {
    * @return string
    */
   public static function hook_filter_date_time_sep_format() : string {
-    return \apply_filters('bc_events/events/display/date_time_sep_format', ' | ');
+    return self::guard_string(
+      \apply_filters('bc_events/events/display/date_time_sep_format', ' | '),
+      ' | ',
+      true // a separator may legitimately be an empty string
+    );
   }
 
 
@@ -237,7 +248,10 @@ class Hooks {
    */
   public static function hook_filter_day_view_title(\DateTime $date) : string {
     $title = $date->format('l, F jS');
-    return \apply_filters('bc_events/events/display/day_view_title', $title, $date);
+    return self::guard_string(
+      \apply_filters('bc_events/events/display/day_view_title', $title, $date),
+      $title
+    );
   }
 
 
@@ -253,7 +267,10 @@ class Hooks {
    */
   public static function hook_filter_week_of_view_title(\DateTime $date) : string {
     $title = 'Week of ' . $date->format('F jS, Y');
-    return \apply_filters('bc_events/events/display/week_of_view_title', $title, $date);
+    return self::guard_string(
+      \apply_filters('bc_events/events/display/week_of_view_title', $title, $date),
+      $title
+    );
   }
 
 
@@ -269,14 +286,17 @@ class Hooks {
    */
   public static function hook_filter_month_of_view_title(\DateTime $date) : string {
     $title = $date->format('F Y');
-    return \apply_filters('bc_events/events/display/month_of_view_title', $title, $date);
+    return self::guard_string(
+      \apply_filters('bc_events/events/display/month_of_view_title', $title, $date),
+      $title
+    );
   }
 
 
 
   /**
    * TODO: KEEP OR REMOVE
-   * 
+   *
    * hook_filter_use_event_recurring_description
    *
    * @hook 'bc_events/events/display/use_event_recurring_description'
@@ -286,12 +306,15 @@ class Hooks {
    * @return bool
    */
   public static function hook_filter_use_event_recurring_description() : bool {
-    return \apply_filters('bc_events/events/display/use_event_recurring_description', true);
+    return self::guard_bool(
+      \apply_filters('bc_events/events/display/use_event_recurring_description', true),
+      true
+    );
   }
 
   /**
    * TODO: KEEP OR REMOVE
-   * 
+   *
    * hook_filter_recurring_description_helper_text
    *
    * @hook 'bc_events/events/display/recurring_description_helper_text'
@@ -301,7 +324,12 @@ class Hooks {
    * @return string
    */
   public static function hook_filter_recurring_description_helper_text() : string {
-    return \apply_filters('bc_events/events/display/recurring_description_helper_text', "i.e. 'Daily' or 'Every Monday'");
+    $default = "i.e. 'Daily' or 'Every Monday'";
+    return self::guard_string(
+      \apply_filters('bc_events/events/display/recurring_description_helper_text', $default),
+      $default,
+      true // may be emptied to hide the helper text
+    );
   }
 
 
@@ -312,7 +340,7 @@ class Hooks {
 
   /**
    * TODO: ADD SUPPORT FOR THIS
-   * 
+   *
    * hook_filter_event_schema
    *
    * @hook 'bc_events/events/schema/event_schema'
@@ -322,13 +350,16 @@ class Hooks {
    * @return array
    */
   public static function hook_filter_event_schema(array $schema, int $post_id, \WP_Post $post) : array {
-    return \apply_filters('bc_events/events/schema/event_schema', $schema, $post_id, $post);
+    return self::guard_array(
+      \apply_filters('bc_events/events/schema/event_schema', $schema, $post_id, $post),
+      $schema
+    );
   }
 
 
   /**
    * TODO: ADD SUPPORT FOR THIS
-   * 
+   *
    * hook_filter_include_schema
    *
    * @hook 'bc_events/events/schema/include_schema'
@@ -338,7 +369,10 @@ class Hooks {
    * @return bool
    */
   public static function hook_filter_include_schema() : bool {
-    return \apply_filters('bc_events/events/schema/include_schema', true);
+    return self::guard_bool(
+      \apply_filters('bc_events/events/schema/include_schema', true),
+      true
+    );
   }
 
 
@@ -358,7 +392,10 @@ class Hooks {
    * @return string
    */
   public static function hook_filter_ics_event_title(string $title, int $post_id) : string {
-    return \apply_filters('bc_events/events/ics/event_title', $title, $post_id);
+    return self::guard_string(
+      \apply_filters('bc_events/events/ics/event_title', $title, $post_id),
+      $title
+    );
   }
 
 
@@ -371,8 +408,13 @@ class Hooks {
    * @hook_type filter
    * @return string
    */
-  public static function hook_filter_ics_default_organizer() {
-    return \apply_filters('bc_events/events/ics/default_organizer', \get_bloginfo('name'));
+  public static function hook_filter_ics_default_organizer() : string {
+    $default = (string) \get_bloginfo('name');
+    return self::guard_string(
+      \apply_filters('bc_events/events/ics/default_organizer', $default),
+      $default,
+      true
+    );
   }
 
 
@@ -431,8 +473,11 @@ class Hooks {
    * @hook_type filter
    * @return bool
    */
-  public static function hook_filter_use_event_locations() {
-    return \apply_filters('bc_events/locations/post_type/use_event_locations', true);
+  public static function hook_filter_use_event_locations() : bool {
+    return self::guard_bool(
+      \apply_filters('bc_events/locations/post_type/use_event_locations', true),
+      true
+    );
   }
 
 
@@ -443,10 +488,13 @@ class Hooks {
    * @hook_object_type Locations
    * @hook_category Post Type
    * @hook_type filter
-   * @return mixed
+   * @return string
    */
-  public static function hook_filter_locations_rewrite_slug() : mixed {
-    return \apply_filters('bc_events/locations/post_type/rewrite_slug', 'event-locations');
+  public static function hook_filter_locations_rewrite_slug() : string {
+    return self::guard_string(
+      \apply_filters('bc_events/locations/post_type/rewrite_slug', 'event-locations'),
+      'event-locations'
+    );
   }
 
 
@@ -459,8 +507,11 @@ class Hooks {
    * @hook_type filter
    * @return bool
    */
-  public static function hook_filter_set_locations_public() {
-    return \apply_filters('bc_events/locations/post_type/set_locations_public', true);
+  public static function hook_filter_set_locations_public() : bool {
+    return self::guard_bool(
+      \apply_filters('bc_events/locations/post_type/set_locations_public', true),
+      true
+    );
   }
 
 
@@ -471,10 +522,13 @@ class Hooks {
    * @hook_object_type Locations
    * @hook_category Post Type
    * @hook_type filter
-   * @return mixed
+   * @return array
    */
-  public static function hook_filter_locations_gutenberg_template(array $template) : mixed {
-    return \apply_filters('bc_events/locations/post_type/gutenberg_template', $template);
+  public static function hook_filter_locations_gutenberg_template(array $template) : array {
+    return self::guard_array(
+      \apply_filters('bc_events/locations/post_type/gutenberg_template', $template),
+      $template
+    );
   }
 
 
@@ -486,10 +540,13 @@ class Hooks {
    * @hook_object_type Locations
    * @hook_category Post Type
    * @hook_type filter
-   * @return mixed
+   * @return array
    */
-  public static function hook_filter_locations_supports(array $supports = ['title', 'thumbnail', 'slug', 'custom-fields', 'editor']) : mixed {
-    return \apply_filters('bc_events/locations/post_type/set_locations_supports', $supports);
+  public static function hook_filter_locations_supports(array $supports = ['title', 'thumbnail', 'slug', 'custom-fields', 'editor']) : array {
+    return self::guard_array(
+      \apply_filters('bc_events/locations/post_type/set_locations_supports', $supports),
+      $supports
+    );
   }
 
 
@@ -502,10 +559,13 @@ class Hooks {
    * @hook_object_type Locations
    * @hook_category Post Type
    * @hook_type filter
-   * @return mixed
+   * @return string
    */
-  public static function hook_filter_rewrite_slug() : mixed {
-    return \apply_filters('bc_events/locations/post_type/rewrite_slug', 'event-locations');
+  public static function hook_filter_rewrite_slug() : string {
+    return self::guard_string(
+      \apply_filters('bc_events/locations/post_type/rewrite_slug', 'event-locations'),
+      'event-locations'
+    );
   }
 
 
@@ -542,10 +602,13 @@ class Hooks {
    * @hook_object_type Series
    * @hook_category Post Type
    * @hook_type filter
-   * @return mixed
+   * @return bool
    */
-  public static function hook_filter_use_event_series() : mixed {
-    return \apply_filters('bc_events/series/post_type/use_event_series', true);
+  public static function hook_filter_use_event_series() : bool {
+    return self::guard_bool(
+      \apply_filters('bc_events/series/post_type/use_event_series', true),
+      true
+    );
   }
 
 
@@ -557,10 +620,13 @@ class Hooks {
    * @hook_object_type Series
    * @hook_category Post Type
    * @hook_type filter
-   * @return mixed
+   * @return array
    */
-  public static function hook_filter_series_gutenberg_template(array $template) : mixed {
-    return \apply_filters('bc_events/series/post_type/gutenberg_template', $template);
+  public static function hook_filter_series_gutenberg_template(array $template) : array {
+    return self::guard_array(
+      \apply_filters('bc_events/series/post_type/gutenberg_template', $template),
+      $template
+    );
   }
 
 
@@ -572,10 +638,13 @@ class Hooks {
    * @hook_object_type Series
    * @hook_category Post Type
    * @hook_type filter
-   * @return mixed
+   * @return bool
    */
-  public static function hook_filter_set_series_public() : mixed {
-    return \apply_filters('bc_events/series/post_type/set_series_public', false);
+  public static function hook_filter_set_series_public() : bool {
+    return self::guard_bool(
+      \apply_filters('bc_events/series/post_type/set_series_public', false),
+      false
+    );
   }
 
 
@@ -586,10 +655,13 @@ class Hooks {
    * @hook_object_type Series
    * @hook_category Post Type
    * @hook_type filter
-   * @return mixed
+   * @return string
    */
-  public static function hook_filter_event_series_rewrite_slug() : mixed {
-    return \apply_filters('bc_events/series/post_type/rewrite_slug', 'event-series');
+  public static function hook_filter_event_series_rewrite_slug() : string {
+    return self::guard_string(
+      \apply_filters('bc_events/series/post_type/rewrite_slug', 'event-series'),
+      'event-series'
+    );
   }
 
 
@@ -601,23 +673,22 @@ class Hooks {
    * @hook_object_type Series
    * @hook_category Post Type
    * @hook_type filter
-   * @return mixed
+   * @return array
    */
-  public static function hook_filter_series_supports($supports = ['title', 'thumbnail', 'slug', 'custom-fields', 'editor']) : mixed {
-    return \apply_filters('bc_events/series/post_type/supports', $supports);
+  public static function hook_filter_series_supports(array $supports = ['title', 'thumbnail', 'slug', 'custom-fields', 'editor']) : array {
+    return self::guard_array(
+      \apply_filters('bc_events/series/post_type/supports', $supports),
+      $supports
+    );
   }
 
 
 
 
-
-  
-
-
   // ==========================================================================
   //                          Query Filter Hooks
   // ==========================================================================
-  
+
 
   /**
    * hook_filter_taxonomy_query_params
@@ -632,12 +703,15 @@ class Hooks {
    *      'parameter' => 'parameter-name',
    *    ]
    * ]
-   * @return mixed
+   * @return array
    */
-  public static function hook_filter_filter_taxonomies() : mixed {
-    return \apply_filters('bc_events/query_filters/taxonomies', []);
+  public static function hook_filter_filter_taxonomies() : array {
+    return self::guard_array(
+      \apply_filters('bc_events/query_filters/taxonomies', []),
+      []
+    );
   }
-  
+
 
 
   /**
@@ -650,10 +724,13 @@ class Hooks {
    * @hook_category Query Filters
    * @hook_type taxonomy
    * @example ['event_type', 'audience']
-   * @return mixed
+   * @return array
    */
-  public static function hook_apply_taxonomy_term_pages() : mixed {
-    return \apply_filters('bc_events/query_filters/apply_taxonomy_term_pages', []);
+  public static function hook_apply_taxonomy_term_pages() : array {
+    return self::guard_array(
+      \apply_filters('bc_events/query_filters/apply_taxonomy_term_pages', []),
+      []
+    );
   }
 
 
@@ -670,11 +747,39 @@ class Hooks {
   public static function hook_filter_taxonomy_query_field() : string {
     $field = \apply_filters('bc_events/query_filters/taxonomy_query_field', 'slug');
 
-    if ( empty($field) || !in_array( $field, ['slug', 'term_id'] ) ) {
+    if ( !is_string($field) || empty($field) || !in_array( $field, ['slug', 'term_id'], true ) ) {
       $field = 'slug';
     }
 
     return $field;
+  }
+
+
+
+  // ==========================================================================
+  //  Return-value guards
+  //
+  //  Filters are user-supplied. These keep a bad return value (wrong type,
+  //  empty where content is required, arbitrary garbage) from fataling or
+  //  corrupting behavior by falling back to the documented default.
+  // ==========================================================================
+
+  private static function guard_string( mixed $value, string $default, bool $allow_empty = false ) : string {
+    if ( is_string($value) && ( $allow_empty || $value !== '' ) ) {
+      return $value;
+    }
+    return $default;
+  }
+
+  private static function guard_bool( mixed $value, bool $default ) : bool {
+    return is_bool($value) ? $value : $default;
+  }
+
+  private static function guard_array( mixed $value, array $default, bool $allow_empty = true ) : array {
+    if ( is_array($value) && ( $allow_empty || ! empty($value) ) ) {
+      return $value;
+    }
+    return $default;
   }
 
 
