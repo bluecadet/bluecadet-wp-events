@@ -1,0 +1,60 @@
+name: Docs
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+# Least-privilege token, plus what Pages deployment needs.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one docs deployment at a time.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP + phpDocumentor
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer, phpDocumentor
+          coverage: none
+
+      # The hooks generator reflects the plugin classes, so it needs the
+      # autoloader (runtime deps only — no dev deps required here).
+      - name: Install autoloader
+        run: composer install --no-dev --no-interaction --no-progress
+
+      - name: Build API reference (phpDocumentor)
+        run: phpDocumentor run -c phpdoc.dist.xml
+
+      - name: Build Hooks reference
+        run: php bin/docs/generate-hooks.php .docs-build/hooks/index.html
+
+      - name: Add landing page
+        run: cp docs/index.html .docs-build/index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .docs-build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

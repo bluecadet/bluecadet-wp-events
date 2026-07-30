@@ -7,3 +7,8 @@
 /.github            export-ignore
 /.ddev              export-ignore
 /TESTING.md         export-ignore
+/bin                export-ignore
+/docs               export-ignore
+/phpdoc.dist.xml    export-ignore
+/.docs-build        export-ignore
+/.phpdoc-cache      export-ignore

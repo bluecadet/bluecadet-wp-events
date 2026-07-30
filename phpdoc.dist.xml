@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdocumentor configVersion="3">
+    <title>Bluecadet Events — API Reference</title>
+    <paths>
+        <output>.docs-build/api</output>
+        <cache>.phpdoc-cache</cache>
+    </paths>
+    <version number="1.0.0">
+        <api>
+            <source dsn=".">
+                <path>BluecadetEvents</path>
+                <path>global_functions</path>
+            </source>
+            <ignore hidden="true">
+                <path>vendor/**/*</path>
+                <path>tests/**/*</path>
+                <path>node_modules/**/*</path>
+                <path>editor/**/*</path>
+            </ignore>
+            <visibility>public</visibility>
+        </api>
+    </version>
+</phpdocumentor>
