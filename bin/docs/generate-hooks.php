@@ -1,11 +1,11 @@
 <?php
 /**
- * Generate the Hooks reference page from the custom docblock tags in
+ * Generate the Hooks reference page from the docblock tags in
  * BluecadetEvents\Plugin\Hooks.
  *
- * Dependency-free: reflects the class and parses the @hook / @hook_object_type
- * / @hook_category / @hook_type / @example tags, then renders a grouped,
- * self-contained HTML page.
+ * Dependency-free: reflects the class and parses each hook's summary, @param,
+ * @return, @since, the custom @hook* grouping tags, and @example, then renders
+ * a grouped, self-contained HTML page.
  *
  * Usage:
  *   php bin/docs/generate-hooks.php [output-file]
@@ -30,13 +30,12 @@ function bc_parse_hook_docblock( ReflectionMethod $method ) : ?array {
 		return null;
 	}
 
-	// Strip the comment framing to clean text lines.
 	$lines = preg_split( '/\R/', $raw );
 	$lines = array_map(
 		static function ( $line ) {
-			$line = preg_replace( '#^\s*/\*\*?#', '', $line ); // opening /**
-			$line = preg_replace( '#\s*\*/\s*$#', '', $line );  // closing */
-			$line = preg_replace( '#^\s*\*\s?#', '', $line );    // leading  *
+			$line = preg_replace( '#^\s*/\*\*?#', '', $line );
+			$line = preg_replace( '#\s*\*/\s*$#', '', $line );
+			$line = preg_replace( '#^\s*\*\s?#', '', $line );
 			return rtrim( $line );
 		},
 		$lines
@@ -48,7 +47,10 @@ function bc_parse_hook_docblock( ReflectionMethod $method ) : ?array {
 		'object_type' => 'Other',
 		'category'    => 'General',
 		'type'        => 'filter',
-		'return'      => null,
+		'since'       => null,
+		'return_type' => null,
+		'return_desc' => null,
+		'params'      => [],
 		'description' => [],
 		'example'     => [],
 	];
@@ -70,17 +72,27 @@ function bc_parse_hook_docblock( ReflectionMethod $method ) : ?array {
 		} elseif ( str_starts_with( $trimmed, '@hook_type ' ) ) {
 			$in_example = false;
 			$hook['type'] = trim( substr( $trimmed, 11 ) );
+		} elseif ( str_starts_with( $trimmed, '@since' ) ) {
+			$in_example = false;
+			$hook['since'] = trim( substr( $trimmed, 6 ) );
+		} elseif ( str_starts_with( $trimmed, '@param ' ) ) {
+			$in_example = false;
+			if ( preg_match( '/^@param\s+(\S+)\s+\$(\S+)\s*(.*)$/', $trimmed, $m ) ) {
+				$hook['params'][] = [ 'type' => $m[1], 'name' => $m[2], 'desc' => trim( $m[3] ) ];
+			}
 		} elseif ( str_starts_with( $trimmed, '@return' ) ) {
 			$in_example = false;
-			$hook['return'] = trim( substr( $trimmed, 7 ) );
+			$rest  = trim( substr( $trimmed, 7 ) );
+			$parts = preg_split( '/\s+/', $rest, 2 );
+			$hook['return_type'] = $parts[0] ?? '';
+			$hook['return_desc'] = trim( $parts[1] ?? '' );
 		} elseif ( str_starts_with( $trimmed, '@example' ) ) {
 			$in_example = true;
 		} elseif ( str_starts_with( $trimmed, '@' ) ) {
-			$in_example = false; // some other tag we don't render
+			$in_example = false;
 		} elseif ( $in_example ) {
 			$hook['example'][] = $line;
 		} elseif ( '' !== $trimmed && $trimmed !== $method->getName() ) {
-			// Description: skip the redundant method-name line and blanks.
 			$hook['description'][] = $trimmed;
 		}
 	}
@@ -88,12 +100,30 @@ function bc_parse_hook_docblock( ReflectionMethod $method ) : ?array {
 	return $hook['tag'] ? $hook : null;
 }
 
+/** Build a realistic add_filter/add_action usage snippet from the params. */
+function bc_hook_usage_snippet( array $hook ) : string {
+	$fn      = 'filter' === $hook['type'] ? 'add_filter' : 'add_action';
+	$params  = $hook['params'];
+	$arglist = $params
+		? implode( ', ', array_map( static fn( $p ) => '$' . $p['name'], $params ) )
+		: '$value';
+	$count   = max( 1, count( $params ) );
+
+	$body = 'filter' === $hook['type']
+		? "\n    // ...\n    return " . ( $params ? '$' . $params[0]['name'] : '$value' ) . ";\n"
+		: "\n    // ...\n";
+
+	$priority = $count > 1 ? ", 10, {$count}" : '';
+
+	return "{$fn}( '{$hook['tag']}', function ( {$arglist} ) {{$body}}{$priority} );";
+}
+
 // --- Collect + group -------------------------------------------------------
 
 $class   = new ReflectionClass( Hooks::class );
 $methods = $class->getMethods( ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_STATIC );
 
-$grouped = []; // object_type => category => [ hooks ]
+$grouped = [];
 foreach ( $methods as $method ) {
 	$hook = bc_parse_hook_docblock( $method );
 	if ( ! $hook ) {
@@ -115,8 +145,7 @@ $total = array_sum( array_map(
 
 // --- Render ----------------------------------------------------------------
 
-$e = static fn( $s ) => htmlspecialchars( (string) $s, ENT_QUOTES );
-
+$e      = static fn( $s ) => htmlspecialchars( (string) $s, ENT_QUOTES );
 $anchor = static fn( $s ) => strtolower( preg_replace( '/[^a-z0-9]+/i', '-', (string) $s ) );
 
 ob_start();
@@ -146,11 +175,17 @@ ob_start();
   .badge { display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:2px 8px; border-radius:10px; margin-left:8px; vertical-align:middle; }
   .badge.filter { background:#e6f0f7; color:#0a4b78; }
   .badge.action { background:#eef7e6; color:#28660a; }
-  .hook .meta { color:var(--muted); font-size:13px; margin:6px 0; }
-  .hook p { margin:8px 0; }
+  .badge.since { background:#f0f0f1; color:#646970; }
+  .hook .byline { color:var(--muted); font-size:13px; margin:6px 0 0; }
+  .hook p.desc { margin:10px 0; }
+  h4.sub { margin:16px 0 4px; font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  table.params { border-collapse:collapse; width:100%; margin:4px 0 6px; font-size:14px; }
+  table.params th, table.params td { text-align:left; padding:6px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  table.params th { color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
+  table.params td.nm code, table.params td.ty code { white-space:nowrap; }
+  .ret code { white-space:nowrap; }
   pre { background:var(--code); border:1px solid var(--border); border-radius:6px; padding:12px 14px; overflow-x:auto; font-size:13px; }
   code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
-  .toplink { font-size:12px; }
 </style>
 </head>
 <body>
@@ -177,21 +212,36 @@ ob_start();
       <div class="hook" id="<?php echo $e( $anchor( $hook['tag'] ) ); ?>">
         <code class="tag"><?php echo $e( $hook['tag'] ); ?></code>
         <span class="badge <?php echo $e( $hook['type'] ); ?>"><?php echo $e( $hook['type'] ); ?></span>
-        <div class="meta">
-          <?php echo $e( ucfirst( $hook['type'] ) ); ?>
-          <?php if ( $hook['return'] ) : ?> · returns <code><?php echo $e( $hook['return'] ); ?></code><?php endif; ?>
-          · <code>Hooks::<?php echo $e( $hook['method'] ); ?>()</code>
-        </div>
+        <?php if ( $hook['since'] ) : ?><span class="badge since">since <?php echo $e( $hook['since'] ); ?></span><?php endif; ?>
+        <p class="byline"><code>Hooks::<?php echo $e( $hook['method'] ); ?>()</code></p>
+
         <?php if ( $hook['description'] ) : ?>
-          <p><?php echo $e( implode( ' ', $hook['description'] ) ); ?></p>
+          <p class="desc"><?php echo $e( implode( ' ', $hook['description'] ) ); ?></p>
         <?php endif; ?>
-        <?php
-        $fn   = 'filter' === $hook['type'] ? 'add_filter' : 'add_action';
-        $snip = "{$fn}( '{$hook['tag']}', function ( \$value ) {\n    // ...\n    return \$value;\n} );";
-        ?>
-        <pre><code><?php echo $e( $snip ); ?></code></pre>
+
+        <?php if ( $hook['params'] ) : ?>
+          <h4 class="sub">Parameters</h4>
+          <table class="params">
+            <tr><th>Type</th><th>Name</th><th>Description</th></tr>
+            <?php foreach ( $hook['params'] as $i => $p ) : ?>
+              <tr>
+                <td class="ty"><code><?php echo $e( $p['type'] ); ?></code></td>
+                <td class="nm"><code>$<?php echo $e( $p['name'] ); ?></code><?php if ( 'filter' === $hook['type'] && 0 === $i ) : ?> <em>(value)</em><?php endif; ?></td>
+                <td><?php echo $e( $p['desc'] ); ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </table>
+        <?php endif; ?>
+
+        <?php if ( 'filter' === $hook['type'] && ( $hook['return_type'] || $hook['return_desc'] ) ) : ?>
+          <p class="ret"><strong>Returns</strong> <code><?php echo $e( $hook['return_type'] ); ?></code><?php echo $hook['return_desc'] ? ' — ' . $e( $hook['return_desc'] ) : ''; ?></p>
+        <?php endif; ?>
+
+        <h4 class="sub">Usage</h4>
+        <pre><code><?php echo $e( bc_hook_usage_snippet( $hook ) ); ?></code></pre>
+
         <?php if ( $hook['example'] ) : ?>
-          <div class="meta">Example value:</div>
+          <h4 class="sub">Example value</h4>
           <pre><code><?php echo $e( rtrim( implode( "\n", $hook['example'] ) ) ); ?></code></pre>
         <?php endif; ?>
       </div>

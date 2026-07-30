@@ -14,13 +14,17 @@ class Hooks {
   // ==================================
 
   /**
-   * hook_filter_archive_settings
+   * Filters the events archive settings: the layout, per-page count, and the
+   * query-string parameter names used on the list view.
    *
    * @hook 'bc_events/events/settings/archive'
    * @hook_object_type Events
    * @hook_category Settings
    * @hook_type filter
-   * @return array
+   * @since 1.0.0
+   *
+   * @param array $args The archive settings, with keys: 'layout' (string 'list'|'week', default 'list'), 'per_page' (int, default 12), 'past_parameter' (string, default 'is-past'), 'starting_on_parameter' (string, default 'starting-on'), 'dedupe_main_query' (bool, default false). Invalid values fall back to these defaults.
+   * @return array The validated archive settings.
    */
   public static function hook_filter_archive_settings() {
 
@@ -238,13 +242,17 @@ class Hooks {
 
 
   /**
-   * hook_filter_day_view_title
+   * Filters the heading shown above the single-day archive view.
    *
    * @hook 'bc_events/events/display/day_view_title'
    * @hook_object_type Events
    * @hook_category Display
    * @hook_type filter
-   * @return string
+   * @since 1.0.0
+   *
+   * @param string    $title The formatted day heading. Default e.g. "Monday, September 7th".
+   * @param \DateTime $date  The day being rendered.
+   * @return string The heading to display above the day view.
    */
   public static function hook_filter_day_view_title(\DateTime $date) : string {
     $title = $date->format('l, F jS');

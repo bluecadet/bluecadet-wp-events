@@ -33,7 +33,12 @@
     "scripts": {
         "test": "phpunit",
         "test:unit": "phpunit --testsuite unit",
-        "test:integration": "phpunit --testsuite integration"
+        "test:integration": "phpunit --testsuite integration",
+        "docs": [ "@docs:api", "@docs:hooks", "@docs:landing" ],
+        "docs:api": "docker run --rm -v \"$PWD\":/data phpdoc/phpdoc:3 run -c phpdoc.dist.xml",
+        "docs:hooks": "php bin/docs/generate-hooks.php .docs-build/hooks/index.html",
+        "docs:landing": "@php -r \"@mkdir('.docs-build',0755,true); copy('docs/index.html','.docs-build/index.html');\"",
+        "docs:serve": "php -S localhost:8080 -t .docs-build"
     },
     "type": "wordpress-plugin",
     "version": "0.1.0"
