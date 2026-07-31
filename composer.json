@@ -1,5 +1,5 @@
 {
-    "name": "bluecadet/bluecadet-events",
+    "name": "bluecadet/bluecadet-wp-events",
     "autoload": {
         "psr-4": {
             "BluecadetEvents\\": "BluecadetEvents/"
