@@ -15,7 +15,15 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-include_once( plugin_dir_path( __FILE__ ) . 'vendor/autoload.php' );
+// Load the plugin's own Composer autoloader when it exists (standalone install).
+// When this plugin is installed AS a Composer dependency, its deps live in the
+// host project's vendor/ and that autoloader already registers these classes,
+// so there is no vendor/autoload.php here — including it unconditionally would
+// emit warnings ("unexpected output during activation").
+$bc_events_autoload = plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
+if ( is_readable( $bc_events_autoload ) ) {
+	require_once $bc_events_autoload;
+}
 
 
 /**
