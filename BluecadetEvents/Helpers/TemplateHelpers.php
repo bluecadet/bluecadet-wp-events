@@ -70,24 +70,37 @@ class TemplateHelpers {
   /**
    * Get start and end date object
    *
-   * @param [type] $post
-   * @return array|false
+   * Both entries are timezone-aware DateTimeImmutable instances, in the site timezone.
+   *
+   * @param null|int|\WP_Post $post
+   * @return array{start: \DateTimeImmutable, end: \DateTimeImmutable}|false
    */
   public function get_event_date_objects( null|int|\WP_Post $post = null ) : array|false {
     if ( !$post_id = $this->resolve_post_id( $post ) ) {
       return false;
     }
 
-    $tz = \wp_timezone();
-    $now = new \DateTime( 'now', $tz );
+    $tz              = \wp_timezone();
     $start_timestamp = $this->get_start_timestamp( $post_id );
     $end_timestamp   = $this->get_end_timestamp( $post_id );
-    
+
+    /*
+     * DateTimeImmutable, NOT DateTime. On a mutable DateTime, setTimestamp() mutates the
+     * receiver and returns $this — so building both entries from one object handed back two
+     * references to the SAME instance, and because 'end' is assigned second, 'start' and
+     * 'end' both reported the END time. Callers saw a zero-length event.
+     *
+     * On an immutable, setTimestamp() returns a new instance, so each entry is its own value.
+     * Kept as setTimestamp() against a timezone-aware base rather than
+     * `new DateTime( '@' . $timestamp )`, which forces UTC and would need a separate
+     * setTimezone() call.
+     */
+    $base = new \DateTimeImmutable( 'now', $tz );
 
     if ( $start_timestamp && $end_timestamp ) {
       return [
-        'start' => $now->setTimestamp( $start_timestamp ),
-        'end'   => $now->setTimestamp( $end_timestamp ),
+        'start' => $base->setTimestamp( $start_timestamp ),
+        'end'   => $base->setTimestamp( $end_timestamp ),
       ];
     }
 
