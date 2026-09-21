@@ -60,6 +60,50 @@ class Hooks {
 
 
   /**
+   * Filters whether the current events view is the "past" view.
+   *
+   * A layer on top of the `past_parameter` query-string check, not a
+   * replacement: the default passed in is that check's result, so returning it
+   * untouched keeps the existing behavior. Use it to resolve the view from
+   * somewhere else — a rewrite tag, a path segment, a template — while the
+   * parameter keeps working alongside it.
+   *
+   * Both the archive query and TemplateHelpers::is_past() run through this, so
+   * a theme overriding it cannot leave the query and the template disagreeing.
+   *
+   *     add_rewrite_tag( '%event_view_filter%', '([^&]+)' );
+   *     add_rewrite_rule(
+   *       '^events/(past|upcoming)/?$',
+   *       'index.php?post_type=bc_events&event_view_filter=$matches[1]',
+   *       'top'
+   *     );
+   *
+   *     add_filter( 'bc_events/events/archive/is_past', function( $is_past, $query ) {
+   *       $view = $query ? $query->get( 'event_view_filter' ) : get_query_var( 'event_view_filter' );
+   *
+   *       if ( $view === 'past' )     { return true; }
+   *       if ( $view === 'upcoming' ) { return false; }
+   *
+   *       return $is_past;
+   *     }, 10, 2 );
+   *
+   * @hook 'bc_events/events/archive/is_past'
+   * @hook_object_type Events
+   * @hook_category Settings
+   * @hook_type filter
+   * @since 1.1.1
+   *
+   * @param bool $is_past Whether the past view is active, as resolved from the past_parameter query string.
+   * @param \WP_Query|null $query The query being set up, or null when resolving for a template outside a query.
+   * @return bool Whether the past view is active.
+   */
+  public static function hook_filter_is_past(bool $is_past, ?\WP_Query $query = null) : bool {
+    return (bool) \apply_filters('bc_events/events/archive/is_past', $is_past, $query);
+  }
+
+
+
+  /**
    * hook_filter_frequency_options
    *
    * Array can only contain 'daily', 'weekly', 'monthly', and 'consecutive'.

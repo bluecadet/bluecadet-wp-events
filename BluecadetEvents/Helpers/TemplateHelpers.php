@@ -559,11 +559,13 @@ class TemplateHelpers {
   public function is_past() : bool {
     $settings = Hooks::hook_filter_archive_settings();
 
-    if ( !empty($settings['past_parameter']) ) {
-      return isset($_GET[$settings['past_parameter']]);
-    }
+    $is_past = !empty($settings['past_parameter']) && isset($_GET[$settings['past_parameter']]);
 
-    return false;
+    // Resolved through the same filter the archive query uses, so a theme that
+    // overrides the view can't leave the template disagreeing with the results.
+    $query = $GLOBALS['wp_query'] ?? null;
+
+    return Hooks::hook_filter_is_past($is_past, $query instanceof \WP_Query ? $query : null);
   }
 
 
@@ -574,7 +576,7 @@ class TemplateHelpers {
    * @return false|array
    */
   public function get_view_pagination_links() : false|array {
-    global $wp_query;
+    global $wp_query, $wp;
 
     if ( !isset($wp_query->bce_view_wrapping_dates) || empty($wp_query->bce_view_wrapping_dates) ) {
       return false;
@@ -589,18 +591,28 @@ class TemplateHelpers {
       return false;
     }
 
-    $base_url     = get_post_type_archive_link(Settings::$events_machine_name);
-    $extra_params = '';
+    $param = $wp_query->bce_view_wrapping_dates['pagination_param'];
 
-    foreach($_GET as $key => $value) {
-      if ( !in_array($key, ['day-of', 'week-of', 'month-of']) ) {
-        $extra_params .= '&' . $key . '=' . $value;
-      }
+    // Page from the path WordPress actually matched rather than the bare archive
+    // link, so a view served by a rewrite rule (/events/past/, say) survives
+    // paging. $wp->request is relative to the home path, which is what home_url()
+    // wants, so a subdirectory install doesn't end up doubled.
+    $base_url = ( isset($wp->request) && $wp->request !== '' )
+      ? home_url( user_trailingslashit($wp->request) )
+      : get_post_type_archive_link(Settings::$events_machine_name);
+
+    // Carry the rest of the query string. The other view-date params are dropped
+    // so paging one view never leaves a stale date from another behind.
+    $carry = map_deep( wp_unslash($_GET), 'sanitize_text_field' );
+    unset( $carry['day-of'], $carry['week-of'], $carry['month-of'] );
+
+    if ( !empty($carry) ) {
+      $base_url = add_query_arg( $carry, $base_url );
     }
 
     return [
-      'prev'    => $base_url . '?' . $wp_query->bce_view_wrapping_dates['pagination_param'] . '=' . $wp_query->bce_view_wrapping_dates['prev_string'] . $extra_params,
-      'next'    => $base_url . '?' . $wp_query->bce_view_wrapping_dates['pagination_param'] . '=' . $wp_query->bce_view_wrapping_dates['next_string'] . $extra_params,
+      'prev'    => add_query_arg( $param, $wp_query->bce_view_wrapping_dates['prev_string'], $base_url ),
+      'next'    => add_query_arg( $param, $wp_query->bce_view_wrapping_dates['next_string'], $base_url ),
       'current' => $wp_query->bce_view_wrapping_dates['current_date'],
     ];
 
