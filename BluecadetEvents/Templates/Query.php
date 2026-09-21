@@ -118,8 +118,15 @@ class Query extends AbstractService {
 
     $bc_events_table = $wpdb->prefix . Settings::$events_table;
 
-    $order_raw = strtoupper( $query->get('order') );
-    $order     = in_array( $order_raw, ['ASC', 'DESC'] ) ? $order_raw : 'ASC';
+    // Default the direction from the view: a past list reads most-recent-first,
+    // everything else soonest-first. Checking $query->query rather than get()
+    // is what makes this a default at all — WP_Query fills query_vars['order']
+    // with 'DESC' when the caller didn't ask, so get() never comes back empty
+    // and an explicit choice is indistinguishable from no choice there.
+    $order_raw = isset($query->query['order']) ? strtoupper( (string) $query->query['order'] ) : '';
+    $order     = in_array( $order_raw, ['ASC', 'DESC'], true )
+      ? $order_raw
+      : ( $bc_query === 'past' ? 'DESC' : 'ASC' );
 
     $dedupe = (bool) $query->get('bc_events_dedupe');
     if ( !$dedupe && $query->is_main_query() ) {
