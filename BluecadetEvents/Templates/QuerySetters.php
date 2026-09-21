@@ -31,7 +31,12 @@ class QuerySetters {
     $this->keys             = EventsMetaKeys::get_keys();
     $this->now_date         = new \DateTime('now', $this->timezone);
     $this->now_ts           = $this->now_date->format('U');
-    $this->is_past          = isset($_GET[$this->settings['past_parameter']]);
+    // The query-string check stays the default; the filter lets a theme resolve
+    // the view from a rewrite tag or path segment on top of it.
+    $this->is_past          = Hooks::hook_filter_is_past(
+      isset($_GET[$this->settings['past_parameter']]),
+      $this->query
+    );
     $this->starting_on      = isset($_GET[$this->settings['starting_on_parameter']]);
   }
 
