@@ -87,6 +87,10 @@ class PublicEndpoints extends AbstractService {
       'post_type'      => Settings::$events_machine_name,
       'posts_per_page' => -1,
       'fields'         => 'ids',
+      // Opts into Templates\Query::events_posts_clauses so series masters are
+      // excluded — the datepicker marks occurrences, and a master duplicates the
+      // date of its own first child. 'range' with no bounds applies no date filter.
+      'bc_events_query' => 'range',
     ];
 
     if ( $tax && $term ) {

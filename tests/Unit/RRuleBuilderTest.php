@@ -52,6 +52,44 @@ class RRuleBuilderTest extends WP_UnitTestCase {
 		$this->assertCount( 3, $rrule );
 	}
 
+	public function test_degenerate_consecutive_rules_bail_instead_of_throwing(): void {
+		// Zero-length event, no buffer: the interval resolves to 0, which RRULE
+		// rejects with an uncaught exception (a white screen on save).
+		$zero_length = ( new RRuleBuilder(
+			$this->args(
+				[
+					'frequency'          => 'consecutive',
+					'consecutive_count'  => 3,
+					'consecutive_buffer' => 0,
+					'end_date_timestamp' => '1789840800', // same as the start
+				]
+			)
+		) )->get_recurring_date_period();
+
+		$this->assertSame( [], $zero_length );
+
+		// ...and a missing end timestamp would TypeError on setTimestamp().
+		$no_end = ( new RRuleBuilder(
+			$this->args( [ 'frequency' => 'consecutive', 'consecutive_count' => 3 ] )
+		) )->get_recurring_date_period();
+
+		$this->assertSame( [], $no_end );
+
+		// A buffer alone is enough to make the rule valid again.
+		$buffered = ( new RRuleBuilder(
+			$this->args(
+				[
+					'frequency'          => 'consecutive',
+					'consecutive_count'  => 3,
+					'consecutive_buffer' => 15,
+					'end_date_timestamp' => '1789840800',
+				]
+			)
+		) )->get_recurring_date_period();
+
+		$this->assertCount( 3, $buffered );
+	}
+
 	public function test_unbounded_rule_is_capped_as_a_safety_net(): void {
 		// No valid end_type -> handle_recurring_ends_setting() must fall back to
 		// the MAX_OCCURRENCES cap rather than producing an unbounded rule.

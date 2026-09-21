@@ -98,7 +98,11 @@ class Query extends AbstractService {
    *   - bc_events_range_start: Unix timestamp (range mode)
    *   - bc_events_range_end: Unix timestamp (range mode)
    *   - bc_events_timestamp: Unix timestamp override for 'now' (optional)
-   *   - bc_events_dedupe: true — collapse recurring children to their parent post
+   *   - bc_events_dedupe: true — collapse each series to its earliest occurrence
+   *
+   * Series masters (is_parent = 1) are never returned: they are single-page
+   * canonical anchors that list their own occurrences, so every listing shows
+   * children and standalone events only.
    *
    * @param array     $clauses
    * @param \WP_Query $query
@@ -158,18 +162,34 @@ class Query extends AbstractService {
     }
 
     if ( $dedupe ) {
-      $subquery_where    = $date_condition ? "WHERE {$date_condition}" : '';
-      $clauses['join']  .= " INNER JOIN (
-        SELECT
-          CASE WHEN t.parent_ID != 0 THEN t.parent_ID ELSE t.post_id END AS effective_post_id,
-          MIN(t.event_start) AS event_start
-        FROM {$bc_events_table} t
-        {$subquery_where}
-        GROUP BY effective_post_id
-      ) AS bc_events ON {$wpdb->posts}.ID = bc_events.effective_post_id";
+      // One row per series (a standalone event is its own series): the earliest
+      // occurrence in range — the latest one for past views, where the most
+      // recent occurrence is the relevant one. The inner query picks the winning
+      // start per series, the outer join resolves it back to a post id (MIN() as
+      // a tiebreak so the result stays deterministic if two ever share a start).
+      $pick           = ( $bc_query === 'past' ) ? 'MAX' : 'MIN';
+      $subquery_where = $date_condition ? "AND {$date_condition}" : '';
+
+      $clauses['join'] .= " INNER JOIN (
+        SELECT g.event_start, MIN(o.post_id) AS post_id
+        FROM (
+          SELECT
+            CASE WHEN t.parent_ID != 0 THEN t.parent_ID ELSE t.post_id END AS series_id,
+            {$pick}(t.event_start) AS event_start
+          FROM {$bc_events_table} t
+          WHERE t.is_parent = 0 {$subquery_where}
+          GROUP BY series_id
+        ) AS g
+        INNER JOIN {$bc_events_table} o
+          ON ( CASE WHEN o.parent_ID != 0 THEN o.parent_ID ELSE o.post_id END ) = g.series_id
+          AND o.event_start = g.event_start
+          AND o.is_parent = 0
+        GROUP BY g.series_id, g.event_start
+      ) AS bc_events ON {$wpdb->posts}.ID = bc_events.post_id";
       $clauses['orderby'] = "bc_events.event_start {$order}";
     } else {
       $clauses['join']  .= " INNER JOIN {$bc_events_table} AS t ON {$wpdb->posts}.ID = t.post_id";
+      $clauses['where'] .= " AND t.is_parent = 0";
       if ( $date_condition ) {
         $clauses['where'] .= " AND {$date_condition}";
       }

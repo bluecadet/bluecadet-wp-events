@@ -30,6 +30,13 @@ class RecurringEventsArray {
   public function build_array() {
     $this->events_array = [];
 
+    // The master's own date is occurrence #1. Listings render children, not the
+    // master, so a rule whose first hit isn't the start date (monthly, weekly on
+    // other weekdays) must not drop it.
+    if ( !$this->check_against_omission_array($this->parent_start->format('Y-m-d')) ) {
+      $this->set_date(clone $this->parent_start, clone $this->parent_end);
+    }
+
     // Handle frequency-based recurrence
     if ( $this->RDATE->get_meta('use_frequency') ) {
       $this->handle_frequency();
@@ -39,6 +46,8 @@ class RecurringEventsArray {
     if ( $this->RDATE->get_meta('custom_occurrences') ) {
       $this->handle_custom_occurences();
     }
+
+    $this->events_array = array_values($this->events_array);
   }
 
 
@@ -53,8 +62,16 @@ class RecurringEventsArray {
 
     if ( $rrule_dates ) {
       $date_period = $rrule_dates->get_recurring_date_period();
+      $limit       = $this->occurrence_limit();
 
       foreach ($date_period as $date) {
+        // "Ends after X occurrences" counts the seeded master date. RRULE COUNT
+        // can't know about the seed, so a rule whose first hit isn't the start
+        // date returns X dates on top of it — drop the overflow.
+        if ( $limit && count($this->events_array) >= $limit ) {
+          break;
+        }
+
         $date_ymd = $date->format('Y-m-d');
 
         if ( !$this->check_against_omission_array($date_ymd) ) {
@@ -62,6 +79,30 @@ class RecurringEventsArray {
         }
       }
     }
+  }
+
+
+
+  /**
+   * Cap on frequency-generated occurrences, or 0 when the rule ends on a date.
+   *
+   * Mirrors RRuleBuilder::handle_recurring_ends_setting(): a consecutive rule is
+   * bounded by its own count and ignores end_type.
+   *
+   * @return int
+   */
+  private function occurrence_limit() : int {
+    $args = $this->RDATE->freq_args;
+
+    if ( ($args['frequency'] ?? '') === 'consecutive' ) {
+      return 0;
+    }
+
+    if ( ($args['end_type'] ?? '') !== 'after_x' ) {
+      return 0;
+    }
+
+    return max(0, (int) ($args['end_after_x'] ?? 0));
   }
 
 
@@ -160,11 +201,11 @@ class RecurringEventsArray {
       $end = (clone $start)->add($this->parent_date_diff);
     }
 
-    $this->events_array[] = new RecurringEventDate(
-      $start,
-      $end,
-      $start->format('Y-m-d--H-i')
-    );
+    // Keyed by slug while building so the seeded master date and a rule/custom
+    // occurrence landing on the same slot collapse to one child.
+    $slug = $start->format('Y-m-d--H-i');
+
+    $this->events_array[$slug] ??= new RecurringEventDate( $start, $end, $slug );
   }
 
 

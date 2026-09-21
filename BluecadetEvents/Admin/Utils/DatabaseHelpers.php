@@ -351,27 +351,34 @@ class DatabaseHelpers {
 
 
   /**
-   * Find an existing, not-yet-touched occurrence matching a date slug.
+   * Find this master's existing, not-yet-touched occurrence for a date slug.
+   *
+   * Lets a regeneration reuse the post that already holds an occurrence instead
+   * of creating a new one and deleting the old, so unchanged dates keep their
+   * post id and permalink. `update_check = 0` scopes the match to rows the
+   * current pass has not already claimed.
    *
    * @param string $slug
-   * @param int    $child_id
-   * @return false|array Rows with a `post_id` property.
+   * @param int    $parent_id
+   * @return int|false Child post id, or false when there is nothing to reuse.
    */
-  public function check_child_events_for_date_slug(string $slug, int $child_id) : false|array {
+  public function check_child_events_for_date_slug(string $slug, int $parent_id) : int|false {
     global $wpdb;
     $table = $wpdb->prefix . $this->events_table;
 
-    $results = $wpdb->get_results(
+    $post_id = $wpdb->get_var(
       $wpdb->prepare(
-        "SELECT post_id FROM {$table} WHERE date_slug=%s AND post_id=%d AND update_check=0",
-        $slug,
-        $child_id
+        "SELECT post_id FROM {$table}
+         WHERE parent_ID=%d AND date_slug=%s AND update_check=0
+         ORDER BY post_id ASC LIMIT 1",
+        $parent_id,
+        $slug
       )
     );
 
-    if ( !$results ) { return false; }
+    if ( $post_id === null ) { return false; }
 
-    return $results;
+    return (int) $post_id;
   }
 
 }

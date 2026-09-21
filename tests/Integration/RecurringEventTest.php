@@ -152,6 +152,36 @@ class RecurringEventTest extends TestCase {
 		}
 	}
 
+	public function test_master_start_date_is_always_a_child(): void {
+		$k = $this->keys();
+
+		// Start on a Monday mid-month with a "first Monday of the month" rule: the
+		// rule's first hit is October, so the master's own date is only in the set
+		// because build_array() seeds it.
+		$master = $this->new_event();
+		$this->save_via_post( $master, $this->recurring_payload( [
+			$k['start_date']      => '2026-09-21',
+			$k['start_timestamp'] => $this->ts( '2026-09-21 09:00:00' ),
+			$k['end_date']        => '2026-09-21',
+			$k['end_timestamp']   => $this->ts( '2026-09-21 11:00:00' ),
+			$k['freq']             => 'monthly',
+			$k['freq_mo_schedule'] => 'first',
+			$k['freq_mo_day']      => 'monday',
+			$k['freq_end_date']    => '2026-11-30',
+		] ) );
+
+		$starts = $this->child_start_set( $master );
+
+		$this->assertContains(
+			$this->ts( '2026-09-21 09:00:00' ),
+			$starts,
+			"The master's own start date must exist as a child occurrence."
+		);
+		// Seed + first Mondays of Oct and Nov, with no duplicate of the seed.
+		$this->assertSame( array_unique( $starts ), $starts, 'No duplicate occurrences.' );
+		$this->assertCount( 3, $starts );
+	}
+
 	public function test_consecutive_uses_the_count(): void {
 		$master = $this->new_event();
 		$this->save_via_post( $master, $this->recurring_payload( [
@@ -162,6 +192,44 @@ class RecurringEventTest extends TestCase {
 
 		// Consecutive uses the count directly (no end date).
 		$this->assertCount( 3, $this->child_event_ids( $master ) );
+	}
+
+	public function test_rebuilding_a_series_keeps_existing_occurrence_posts(): void {
+		$k = $this->keys();
+
+		$master = $this->new_event();
+		$this->save_via_post( $master, $this->recurring_payload() );
+
+		// post id per occurrence start, before the rule changes.
+		$before = [];
+		foreach ( $this->child_event_ids( $master ) as $cid ) {
+			$before[ (int) get_post_meta( $cid, $k['start_timestamp'], true ) ] = $cid;
+		}
+		$this->assertCount( 5, $before );
+
+		// Extend the rule by one week. The first five dates are unchanged, so their
+		// posts must be reused rather than deleted and recreated.
+		$this->save_via_post( $master, $this->recurring_payload( [
+			$k['freq_end_date'] => '2026-10-12',
+		] ) );
+
+		$after = [];
+		foreach ( $this->child_event_ids( $master ) as $cid ) {
+			$after[ (int) get_post_meta( $cid, $k['start_timestamp'], true ) ] = $cid;
+		}
+
+		$this->assertCount( 6, $after, 'The extended rule should add a sixth occurrence.' );
+
+		foreach ( $before as $start => $original_id ) {
+			$this->assertArrayHasKey( $start, $after );
+			$this->assertSame(
+				$original_id,
+				$after[ $start ],
+				'An unchanged occurrence must keep its post id across a rebuild.'
+			);
+		}
+
+		$this->assertQueuesDrained();
 	}
 
 	public function test_long_parent_slug_is_trimmed_but_keeps_the_date_suffix(): void {

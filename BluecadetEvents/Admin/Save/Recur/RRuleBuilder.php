@@ -92,10 +92,25 @@ class RRuleBuilder {
         break;
 
       case 'consecutive':
+        // Back-to-back sessions: each one starts an event-length (plus the
+        // buffer) after the last, so the interval is the event's own duration.
+        // An empty end timestamp would TypeError on setTimestamp(), and a
+        // zero-length event resolves to INTERVAL 0, which RRULE rejects with an
+        // uncaught exception — a white screen on save. Bail on both.
+        if ( !is_numeric($this->args['end_date_timestamp']) ) {
+          Logger::log('RRuleBuilder: consecutive recurrence needs a numeric end_date_timestamp; cannot build recurrence.');
+          return [];
+        }
+
         $end = new \DateTime('now', $this->timezone);
-        $end->setTimestamp($this->args['end_date_timestamp']);
+        $end->setTimestamp((int) $this->args['end_date_timestamp']);
         $interval = (int) round(($end->getTimestamp() - $begin->getTimestamp()) / 60);
-        $interval = $interval + $this->args['consecutive_buffer'];
+        $interval = $interval + (int) $this->args['consecutive_buffer'];
+
+        if ( $interval < 1 ) {
+          Logger::log('RRuleBuilder: consecutive recurrence resolved to a ' . $interval . '-minute interval; give the event a duration or a buffer.');
+          return [];
+        }
 
         $rrule_conditional_args = [
           'freq'    => 'minutely',
@@ -225,9 +240,9 @@ class RRuleBuilder {
       }
       Logger::log('RRuleBuilder: invalid end_date "' . $this->args['end_date'] . '"; applying occurrence cap.');
     } else if ( $this->args['end_type'] === 'after_x' ) {
-      // "End after X occurrences" means X events in the child set (the parent is
-      // the separate SEO/canonical anchor, not part of the set). RRULE COUNT
-      // includes dtstart, so COUNT == X yields exactly X children.
+      // "End after X occurrences" means X events in the child set. RRULE COUNT
+      // includes dtstart, so COUNT == X yields exactly X rule dates; the master
+      // date RecurringEventsArray seeds on top is trimmed back there.
       $count = intval($this->args['end_after_x']);
       if ( $count > 0 ) {
         $args['count'] = $count;

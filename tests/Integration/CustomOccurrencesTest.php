@@ -51,10 +51,11 @@ class CustomOccurrencesTest extends TestCase {
 		] ) );
 
 		$children = $this->child_event_ids( $master );
-		$this->assertCount( 3, $children, 'One child per custom occurrence.' );
+		$this->assertCount( 4, $children, "The master's own date plus one child per custom occurrence." );
 
-		// Each custom date, at the master's start time (09:00).
+		// The master's own date, then each custom date at its start time (09:00).
 		$expected = [
+			$this->ts( '2026-09-07 09:00:00' ),
 			$this->ts( '2026-10-20 09:00:00' ),
 			$this->ts( '2026-11-03 09:00:00' ),
 			$this->ts( '2026-12-01 09:00:00' ),

@@ -69,24 +69,19 @@ class UpdateOrCreateEvent {
 
   private function update_or_add() : void {  
 
-    if ( $this->item->event_slug && $this->item->child_id ) {
-      $check_slugs = $this->DB_HELPERS->check_child_events_for_date_slug($this->item->event_slug, (int) $this->item->child_id);
+    // Reuse the post that already holds this occurrence, so regenerating a series
+    // keeps unchanged dates on their existing post id and permalink instead of
+    // replacing every occurrence with a fresh post.
+    $reuse_id = $this->item->event_slug
+      ? $this->DB_HELPERS->check_child_events_for_date_slug((string) $this->item->event_slug, $this->item->parent_id)
+      : false;
 
-      if ( is_array($check_slugs) && !empty($check_slugs) ) {
-        $this->copy_to_id = $check_slugs[0]->post_id;
-        $this->item->post['ID'] = $this->copy_to_id;
+    if ( $reuse_id ) {
+      $this->copy_to_id       = $reuse_id;
+      $this->item->post['ID'] = $reuse_id;
 
-
-        Logger::log(['$check_slugs' => $check_slugs]);
-
-        // Update the post
-        $this->insert_post();
-        $this->DB_HELPERS->upsert_child($this->item, $this->copy_to_id);
-
-      } else {
-        $this->add_post();  
-      }
-      
+      $this->insert_post();
+      $this->DB_HELPERS->upsert_child($this->item, $reuse_id);
     } else {
       $this->add_post();
     }
