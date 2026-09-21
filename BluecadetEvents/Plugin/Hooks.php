@@ -98,7 +98,10 @@ class Hooks {
    * @return bool Whether the past view is active.
    */
   public static function hook_filter_is_past(bool $is_past, ?\WP_Query $query = null) : bool {
-    return (bool) \apply_filters('bc_events/events/archive/is_past', $is_past, $query);
+    return self::guard_bool(
+       \apply_filters('bc_events/events/archive/is_past', $is_past, $query),
+       $is_past
+     );
   }
 
 
