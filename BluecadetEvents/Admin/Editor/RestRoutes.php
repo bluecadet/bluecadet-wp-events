@@ -165,7 +165,11 @@ class RestRoutes extends AbstractService {
    */
   public static function date_time_to_timestamp( string $date, string $time = '' ) : ?int {
     $date_time = \DateTime::createFromFormat( '!Y-m-d H:i', $date . ' ' . ( $time ?: '00:00' ), \wp_timezone() );
-    return $date_time ? $date_time->getTimestamp() : null;
+    $errors    = \DateTime::getLastErrors();
+
+    return $date_time && ( false === $errors || ( 0 === $errors['warning_count'] && 0 === $errors['error_count'] ) )
+      ? $date_time->getTimestamp()
+      : null;
   }
 
 
