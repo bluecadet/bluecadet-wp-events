@@ -430,7 +430,7 @@ class Abilities extends AbstractService {
       return $post;
     }
 
-    $is_child = (bool) get_post_meta( $post->ID, EventsMetaKeys::get_keys()['is_child'], true );
+    $is_child = get_post_meta( $post->ID, EventsMetaKeys::get_keys()['is_child'], true ) === '1';
     $fields   = $this->pick_fields( $input );
 
     if ( isset( $fields['child_deny_override'] ) && ! $is_child ) {
