@@ -6,7 +6,7 @@
  * @wordpress-plugin
  * Plugin Name:       Bluecadet Events
  * Description:       Events
- * Version:           1.1.2
+ * Version:           1.2.0
  * Author:            Bluecadet
  */
 
