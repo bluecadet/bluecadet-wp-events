@@ -103,7 +103,7 @@ class Abilities extends AbstractService {
     );
 
     $this->add( 'create-event', __( 'Create Event', 'basecadet' ),
-      __( 'Create an event. Dates and times are in the site timezone; timestamps are calculated for you. Recurring events generate their occurrences after saving, possibly in the background. Terms must already exist.', 'basecadet' ),
+      __( 'Create an event. Dates and times are in the site timezone; timestamps are calculated for you. Recurring events generate their occurrences during the save; their IDs are in occurrence_ids. Terms must already exist.', 'basecadet' ),
       $this->event_input_schema( false ),
       [$this, 'create_event'],
       [$this, 'can_create'],
@@ -417,7 +417,7 @@ class Abilities extends AbstractService {
     $postarr['post_type']   = Settings::$events_machine_name;
     $postarr['post_status'] = $postarr['post_status'] ?? 'draft';
 
-    $post_id = wp_insert_post( $postarr, true );
+    $post_id = $this->without_loopback( fn() => wp_insert_post( $postarr, true ) );
 
     return is_wp_error( $post_id ) ? $post_id : $this->event_data( get_post( $post_id ) );
   }
@@ -465,7 +465,7 @@ class Abilities extends AbstractService {
 
     $postarr['ID'] = $post->ID;
 
-    $result = wp_update_post( $postarr, true );
+    $result = $this->without_loopback( fn() => wp_update_post( $postarr, true ) );
 
     return is_wp_error( $result ) ? $result : $this->event_data( get_post( $post->ID ) );
   }
@@ -529,6 +529,26 @@ class Abilities extends AbstractService {
   // ==================================
   //  Helpers
   // ==================================
+
+
+  /**
+   * Run a save with the recurrence queue processed inline.
+   *
+   * The async loopback authenticates with the caller's cookies and a
+   * user-bound nonce. Ability calls usually come in with an application
+   * password and no cookies, so the loopback fails its nonce and the
+   * occurrences wait for the queue's cron health check. Inline, they exist
+   * before the ability returns.
+   */
+  private function without_loopback( callable $save ) : mixed {
+    add_filter( 'bc_events/background/sync', '__return_true' );
+
+    try {
+      return $save();
+    } finally {
+      remove_filter( 'bc_events/background/sync', '__return_true' );
+    }
+  }
 
 
   private function get_event_post( int $id ) : \WP_Post|\WP_Error {

@@ -57,6 +57,9 @@ class AbilitiesTest extends TestCase {
 	}
 
 	public function test_create_recurring_generates_occurrences_with_the_parents_terms(): void {
+		// The suite forces sync; the ability must not depend on that.
+		remove_filter( 'bc_events/background/sync', '__return_true' );
+
 		$term = self::factory()->term->create( [ 'taxonomy' => 'event_type', 'slug' => 'lecture' ] );
 
 		$event = $this->run_ability( 'create-event', $this->single_event_input( [
@@ -73,6 +76,7 @@ class AbilitiesTest extends TestCase {
 
 		$children = $this->child_event_ids( $event['id'] );
 		$this->assertCount( 5, $children );
+		$this->assertEqualsCanonicalizing( $children, $event['occurrence_ids'] );
 
 		foreach ( $children as $child_id ) {
 			$this->assertSame( [ $term ], wp_get_object_terms( $child_id, 'event_type', [ 'fields' => 'ids' ] ) );
