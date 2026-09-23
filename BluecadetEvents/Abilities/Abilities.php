@@ -784,7 +784,7 @@ class Abilities extends AbstractService {
       'end_date'     => get_post_meta( $post->ID, $k['end_date'], true ),
       'end_time'     => get_post_meta( $post->ID, $k['end_time'], true ),
       'is_recurring' => (bool) get_post_meta( $post->ID, $k['is_recurring'], true ),
-      'is_child'     => (bool) get_post_meta( $post->ID, $k['is_child'], true ),
+      'is_child'     => get_post_meta( $post->ID, $k['is_child'], true ) === '1',
       'parent_id'    => (int) get_post_meta( $post->ID, $k['parent_id'], true ) ?: null,
       'link'         => get_permalink( $post ),
     ];
