@@ -123,7 +123,6 @@ class RestRoutes extends AbstractService {
   public function to_timestamp(\WP_REST_Request $request) : \WP_REST_Response | \WP_Error {
     $date = $request->get_param( 'date' );
     $time = $request->get_param( 'time' );
-    $tz = \wp_timezone();
 
     if ( ! $date ) {
       return new \WP_Error( 'missing_date', 'Date parameter is required', [ 'status' => 400 ] );
@@ -139,18 +138,34 @@ class RestRoutes extends AbstractService {
       return new \WP_Error( 'invalid_time_format', 'Time must be in HH:MM format', [ 'status' => 400 ] );
     }
 
-    $date_time_str = $date . ' ' . ( $time ? $time : '00:00' );
-    $date_time = \DateTime::createFromFormat( 'Y-m-d H:i', $date_time_str, $tz );
+    $timestamp = self::date_time_to_timestamp( $date, (string) $time );
 
-    if ( ! $date_time ) {
+    if ( $timestamp === null ) {
       return new \WP_Error( 'invalid_date_time', 'Invalid date/time', [ 'status' => 400 ] );
     }
 
     $results = [
-      'timestamp' => $date_time->getTimestamp(),
+      'timestamp' => $timestamp,
     ];
 
 		return rest_ensure_response( $results );
+  }
+
+
+  /**
+   * Convert a site-timezone date (YYYY-MM-DD) and optional time (HH:MM) to a
+   * Unix timestamp. Shared by the editor route and the abilities.
+   *
+   * The leading '!' zeroes the unparsed fields; without it createFromFormat
+   * fills the seconds from the current clock.
+   *
+   * @param string $date YYYY-MM-DD
+   * @param string $time HH:MM, empty for midnight
+   * @return int|null Null when the date/time is invalid.
+   */
+  public static function date_time_to_timestamp( string $date, string $time = '' ) : ?int {
+    $date_time = \DateTime::createFromFormat( '!Y-m-d H:i', $date . ' ' . ( $time ?: '00:00' ), \wp_timezone() );
+    return $date_time ? $date_time->getTimestamp() : null;
   }
 
 

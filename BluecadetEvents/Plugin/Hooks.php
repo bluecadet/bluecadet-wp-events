@@ -109,14 +109,22 @@ class Hooks {
   /**
    * hook_filter_frequency_options
    *
-   * Array can only contain 'daily', 'weekly', 'monthly', and 'consecutive'.
-   * If array is empty, no recurring frequency options will be available
+   * Limit which recurrence frequencies editors (and the abilities) can pick.
+   * Keys can only be 'daily', 'weekly', 'monthly', and 'consecutive'; values are
+   * the labels. Unknown keys are dropped. An empty or non-array return falls
+   * back to all four, so this filter cannot turn recurrence off.
+   *
+   *     add_filter( 'bc_events/events/settings/frequency_options', function( $options ) {
+   *       unset( $options['consecutive'] );
+   *       return $options;
+   *     } );
    *
    * @hook 'bc_events/events/settings/frequency_options'
    * @hook_object_type Events
    * @hook_category Settings
    * @hook_type filter
-   * @return array
+   * @param array $options Frequency key => label. Default all four.
+   * @return array The allowed frequencies, never empty.
    */
   public static function hook_filter_frequency_options() {
 
@@ -734,6 +742,39 @@ class Hooks {
     return self::guard_array(
       \apply_filters('bc_events/series/post_type/supports', $supports),
       $supports
+    );
+  }
+
+
+
+
+  // ==========================================================================
+  //                          Abilities Hooks
+  // ==========================================================================
+
+
+  /**
+   * hook_filter_abilities_mcp_public
+   *
+   * Whether the `bc-events/*` abilities are exposed to MCP clients through the
+   * WordPress MCP Adapter's default server. They stay registered (and gated by
+   * the usual capabilities) either way; this only controls MCP visibility.
+   *
+   *     add_filter( 'bc_events/abilities/mcp_public', '__return_false' );
+   *
+   * @hook 'bc_events/abilities/mcp_public'
+   * @hook_object_type Events
+   * @hook_category Abilities
+   * @hook_type filter
+   * @since 1.2.0
+   *
+   * @param bool $public Default true.
+   * @return bool
+   */
+  public static function hook_filter_abilities_mcp_public() : bool {
+    return self::guard_bool(
+      \apply_filters('bc_events/abilities/mcp_public', true),
+      true
     );
   }
 

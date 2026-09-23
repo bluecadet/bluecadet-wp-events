@@ -1,6 +1,7 @@
 <?php
 
 namespace BluecadetEvents\Plugin;
+use BluecadetEvents\Abilities;
 use BluecadetEvents\Admin;
 use BluecadetEvents\ICS;
 use BluecadetEvents\Rest;
@@ -38,6 +39,7 @@ class Init {
       new ICS\TemplateRedirect,
       new Rest\PublicEndpoints,
       new Templates\Query,
+      new Abilities\Abilities,
     ];
 
     if ( Hooks::hook_filter_use_event_locations() ) {
