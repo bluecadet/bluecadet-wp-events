@@ -541,12 +541,13 @@ class Abilities extends AbstractService {
    * before the ability returns.
    */
   private function without_loopback( callable $save ) : mixed {
-    add_filter( 'bc_events/background/sync', '__return_true' );
+    $sync = static fn() => true;
+    add_filter( 'bc_events/background/sync', $sync );
 
     try {
       return $save();
     } finally {
-      remove_filter( 'bc_events/background/sync', '__return_true' );
+      remove_filter( 'bc_events/background/sync', $sync );
     }
   }
 
