@@ -36,7 +36,7 @@ class Settings {
     self::$plugin_name       = 'bluecadet-events';
     self::$plugin_dir        = plugin_dir_path( dirname( __FILE__, 2 ) );
     self::$plugin_url        = plugin_dir_url(  dirname( __FILE__, 2 ) );
-    self::$version           = '1.1.1';
+    self::$version           = '1.2.0';
     self::$rest_namespace    = 'bc-events/v1';
     self::$events_meta_ns    = 'bc_events_';
     self::$locations_meta_ns = 'bc_events_location_';
