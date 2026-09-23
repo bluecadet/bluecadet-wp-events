@@ -332,7 +332,7 @@ class Abilities extends AbstractService {
         'label'        => $tax->label,
         'hierarchical' => (bool) $tax->hierarchical,
       ],
-      array_filter( get_object_taxonomies( $post_type, 'objects' ), fn( $tax ) => $tax->show_ui )
+      get_object_taxonomies( $post_type, 'objects' )
     ) );
 
     return [
